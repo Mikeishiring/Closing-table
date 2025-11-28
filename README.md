@@ -39,15 +39,55 @@ The candidate screen also has a **"Check Market Data"** button that, in this pro
 
 ## Using the app
 
-The whole app lives in a single `index.html` file.
+The app consists of a single-page frontend (`index.html`) and a minimal Node.js backend (`server.js`). The mechanism runs on the server to ensure privacy and security.
 
-### 1. Run it
+### Technical Details
+
+**Frontend:**
+- **React 18** (production builds via CDN)
+- **Babel Standalone** for JSX transformation in the browser
+- **Tailwind CSS** via CDN
+- All frontend code is in a single HTML file with inline JavaScript
+
+**Backend:**
+- **Node.js** with Express
+- In-memory offer storage (no database)
+- Offers expire after 24 hours
+- Automatic cleanup of expired offers
+
+### Running the app
 
 ```bash
 git clone https://github.com/Mikeishiring/Closing-table.git
 cd Closing-table
-# Option A: just open index.html in your browser
-# Option B (recommended):
-python -m http.server 8000
-# then open http://localhost:8000/index.html
 ```
+
+**Install dependencies:**
+```bash
+npm install
+```
+
+**Start the server:**
+```bash
+npm start
+```
+
+The server will run on `http://localhost:3000` (or the port specified by the `PORT` environment variable).
+
+Open `http://localhost:3000` in your browser.
+
+### How Offers Work
+
+- **Company creates an offer**: Sets a maximum budget and email, then clicks "Lock Budget & Create Link"
+- **Server stores the offer**: The backend creates a unique `offerId` and stores the offer data in memory
+- **Shareable link generated**: Link format is `/#offer=<offerId>` (e.g., `/#offer=abc123-def456-...`)
+- **Candidate opens link**: Frontend calls `GET /api/offers/:offerId` to verify the offer is valid
+- **Candidate submits minimum**: Frontend calls `POST /api/offers/:offerId/submit` with their minimum salary
+- **Server runs mechanism**: The backend calculates the result (success/close/fail) and marks the offer as used
+- **Result displayed**: Candidate sees the outcome based on the mechanism's calculation
+
+**Key features:**
+- Offers expire after 24 hours
+- Each offer can only be used once
+- All data is stored in memory (lost on server restart)
+- No permanent data storage — matches the "no recording" ethos

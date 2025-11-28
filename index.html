@@ -4,20 +4,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A fair, private way to close salary negotiations. Double-blind mechanism that splits the difference when ranges overlap.">
+    <meta name="theme-color" content="#0F0518">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+    
     <title>The Closing Table</title>
-    <!-- Core React Imports -->
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Resource Hints for Performance -->
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://grainy-gradients.vercel.app">
+    
+    <!-- Optimized Font Loading -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"></noscript>
+    
+    <!-- Core React Imports - Production Builds for Better Performance -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js" defer></script>
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com" defer></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
-
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background-color: #0F0518;
-            /* Deepest Purple Background */
             color: #E2E8F0;
             min-height: 100vh;
         }
@@ -31,19 +48,13 @@
         .gold-text-gradient {
             background: linear-gradient(to right, #FCD34D, #F59E0B);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         @keyframes fade-in-up {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .animate-enter {
@@ -56,11 +67,10 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        // Ensure React hooks are correctly aliased
         const { useState, useEffect } = React;
 
         // --- MECHANISM CONSTANTS ---
-        const BRIDGE_ZONE_PCT = 0.10;       // 10% gap treated as "close"
+        const BRIDGE_ZONE_PCT = 0.10;       // 10% gap treated as "close, talk"
         const ROUNDING_GRANULARITY = 1000;  // $1,000 rounding
 
         // --- SIMPLE EVENT LOGGER ---
@@ -73,31 +83,125 @@
             console.log('[closing-table-event]', event);
         }
 
-        // --- CONFIGURATION ---
+        // --- CONFIGURATION (visual only) ---
         const COLORS = {
             BG: '#0F0518',
             CARD: 'rgba(45, 20, 85, 0.4)',
-            ACCENT: '#A7EF00', // Lime
-            ACCENT_SEC: '#E879F9', // Fuchsia/Pink (Replaces Blue)
-            GOLD: '#FCD34D', // Gold
+            ACCENT: '#A7EF00',
+            ACCENT_SEC: '#E879F9',
+            GOLD: '#FCD34D',
             TEXT_MAIN: '#FFFFFF',
             TEXT_MUTED: '#94A3B8',
         };
 
         // --- ICONS ---
         const Icons = {
-            Lock: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>,
-            Unlock: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 9.9-1" /></svg>,
-            Mail: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>,
-            Check: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="20 6 9 17 4 12" /></svg>,
-            Copy: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>,
-            ArrowRight: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>,
-            Handshake: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m11 17 2 2a2 2 0 1 0 2.8-2.8l-6-6-2 2 2 2 2 2a2 2 0 1 1-2.8 2.8L11 17Z" /><path d="m22 11-2-2-6 6-2-2-6 6-2-2a2 2 0 0 1 2.8-2.8l6 6 2-2 6-6 2 2 2 2a2 2 0 0 1 2.8 2.8l-2 2Z" /></svg>,
-            Phone: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>,
-            Shield: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>,
-            TrendingUp: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="22 7 13.5 15.5 8.5 10.5 2 17" /><polyline points="18 7 22 7 22 11" /></svg>,
-            Terminal: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="4 17 10 11 4 5" /><line x1="12" y1="19" x2="20" y2="19" /></svg>,
-            Info: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>,
+            Lock: ({ className }) => (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" strokeWidth="2"
+                     strokeLinecap="round" strokeLinejoin="round"
+                     className={className}>
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+            ),
+            Unlock: ({ className }) => (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" strokeWidth="2"
+                     strokeLinecap="round" strokeLinejoin="round"
+                     className={className}>
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 9.9-1" />
+                </svg>
+            ),
+            Mail: ({ className }) => (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" strokeWidth="2"
+                     strokeLinecap="round" strokeLinejoin="round"
+                     className={className}>
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                    <polyline points="22,6 12,13 2,6" />
+                </svg>
+            ),
+            Check: ({ className }) => (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" strokeWidth="2"
+                     strokeLinecap="round" strokeLinejoin="round"
+                     className={className}>
+                    <polyline points="20 6 9 17 4 12" />
+                </svg>
+            ),
+            Copy: ({ className }) => (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" strokeWidth="2"
+                     strokeLinecap="round" strokeLinejoin="round"
+                     className={className}>
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                </svg>
+            ),
+            ArrowRight: ({ className }) => (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" strokeWidth="2"
+                     strokeLinecap="round" strokeLinejoin="round"
+                     className={className}>
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                </svg>
+            ),
+            Handshake: ({ className }) => (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" strokeWidth="2"
+                     strokeLinecap="round" strokeLinejoin="round"
+                     className={className}>
+                    <path d="m11 17 2 2a2 2 0 1 0 2.8-2.8l-6-6-2 2 2 2 2 2a2 2 0 1 1-2.8 2.8L11 17Z" />
+                    <path d="m22 11-2-2-6 6-2-2-6 6-2-2a2 2 0 0 1 2.8-2.8l6 6 2-2 6-6 2 2 2 2a2 2 0 0 1 2.8 2.8l-2 2Z" />
+                </svg>
+            ),
+            Phone: ({ className }) => (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" strokeWidth="2"
+                     strokeLinecap="round" strokeLinejoin="round"
+                     className={className}>
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                </svg>
+            ),
+            Shield: ({ className }) => (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" strokeWidth="2"
+                     strokeLinecap="round" strokeLinejoin="round"
+                     className={className}>
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+            ),
+            TrendingUp: ({ className }) => (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" strokeWidth="2"
+                     strokeLinecap="round" strokeLinejoin="round"
+                     className={className}>
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+                    <polyline points="18 7 22 7 22 11" />
+                </svg>
+            ),
+            Terminal: ({ className }) => (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" strokeWidth="2"
+                     strokeLinecap="round" strokeLinejoin="round"
+                     className={className}>
+                    <polyline points="4 17 10 11 4 5" />
+                    <line x1="12" y1="19" x2="20" y2="19" />
+                </svg>
+            ),
+            Info: ({ className }) => (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" strokeWidth="2"
+                     strokeLinecap="round" strokeLinejoin="round"
+                     className={className}>
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+            ),
         };
 
         // --- COMPONENTS ---
@@ -112,7 +216,6 @@
                             style={{ width: `${percent}%` }}
                         />
                     </div>
-                    {/* Invisible Range Input */}
                     <input
                         type="range"
                         min={min}
@@ -120,9 +223,9 @@
                         step={step}
                         value={value}
                         onChange={onChange}
+                        aria-label={`Slider value: ${value}`}
                         className="absolute w-full h-full opacity-0 cursor-pointer z-20"
                     />
-                    {/* Custom Thumb */}
                     <div
                         className="absolute h-6 w-6 bg-white border-4 border-lime-400 rounded-full shadow-lg z-10 pointer-events-none transition-all duration-100"
                         style={{ left: `calc(${percent}% - 12px)` }}
@@ -132,7 +235,8 @@
         };
 
         const Button = ({ children, onClick, disabled, variant = 'primary', className = '' }) => {
-            const baseStyle = "relative px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed";
+            const baseStyle =
+                "relative px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed";
 
             const variants = {
                 primary: "bg-lime-400 text-black hover:bg-lime-300 shadow-lg shadow-lime-400/20 hover:shadow-lime-400/40",
@@ -147,6 +251,7 @@
                 <button
                     onClick={onClick}
                     disabled={disabled}
+                    aria-disabled={disabled}
                     className={`${baseStyle} ${variants[variant]} ${className}`}
                 >
                     {children}
@@ -174,29 +279,22 @@
             );
         };
 
-        // --- VISUALS ---
-
         const SplitDiagram = () => (
             <div className="my-8 p-6 bg-white/5 rounded-2xl border border-white/10">
-                <h3 className="text-lime-400 font-bold mb-4 text-sm tracking-widest uppercase">The Fair Split Logic</h3>
+                <h3 className="text-lime-400 font-bold mb-4 text-sm tracking-widest uppercase">
+                    The Fair Split Logic
+                </h3>
                 <div className="relative h-16 w-full flex items-center">
-                    {/* Track */}
                     <div className="absolute w-full h-2 bg-gray-700 rounded-full"></div>
-
-                    {/* Overlap Zone */}
                     <div className="absolute left-1/4 right-1/4 h-2 bg-gradient-to-r from-lime-400 to-yellow-400 rounded-full opacity-50 animate-pulse"></div>
-
-                    {/* Markers */}
                     <div className="absolute left-1/4 top-[-25px] flex flex-col items-center">
                         <span className="text-xs font-bold text-white mb-1">You</span>
                         <div className="w-4 h-4 bg-lime-400 rounded-full border-4 border-gray-900"></div>
                     </div>
-
                     <div className="absolute left-1/2 top-4 flex flex-col items-center">
                         <div className="h-6 w-px bg-white/20 mb-1"></div>
                         <span className="text-xs font-bold text-yellow-400">Split Surplus</span>
                     </div>
-
                     <div className="absolute right-1/4 top-[-25px] flex flex-col items-center">
                         <span className="text-xs font-bold text-gray-400 mb-1">Company</span>
                         <div className="w-4 h-4 bg-gray-600 rounded-full border-4 border-gray-900"></div>
@@ -208,31 +306,64 @@
             </div>
         );
 
-        // --- APP LOGIC ---
+        // --- COMPANY VIEW ---
 
         const CompanyView = () => {
             const [budget, setBudget] = useState(140000);
             const [email, setEmail] = useState('');
             const [link, setLink] = useState(null);
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState(null);
 
-            const generateLink = () => {
-                const payload = { max: budget, email, ts: Date.now(), demo: false };
-                const encoded = btoa(JSON.stringify(payload));
-                const newLink = `${window.location.origin}${window.location.pathname}#offer=${encoded}`;
-                setLink(newLink);
+            const generateLink = async () => {
+                setLoading(true);
+                setError(null);
+                try {
+                    const response = await fetch('/api/offers', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ max: budget, email }),
+                    });
 
-                logEvent('offer_created', {
-                    max: budget,
-                    email,
-                    linkLength: newLink.length,
-                });
+                    if (!response.ok) {
+                        const data = await response.json();
+                        throw new Error(data.error || 'Failed to create offer');
+                    }
+
+                    const { offerId } = await response.json();
+                    const newLink = `${window.location.origin}${window.location.pathname}#offer=${offerId}`;
+                    setLink(newLink);
+
+                    logEvent('offer_created', {
+                        max: budget,
+                        email,
+                        offerId,
+                    });
+                } catch (err) {
+                    setError(err.message);
+                    logEvent('offer_create_error', { error: err.message });
+                } finally {
+                    setLoading(false);
+                }
             };
 
-            const copyLink = () => {
-                // Use document.execCommand('copy') as navigator.clipboard might fail in iFrames
+            const copyLink = async () => {
+                try {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        await navigator.clipboard.writeText(link);
+                        alert("Link copied to clipboard");
+                        logEvent('offer_link_copied', { linkLength: link.length });
+                        return;
+                    }
+                } catch (err) {
+                    console.warn('Clipboard API failed, trying fallback:', err);
+                }
+                
                 const textarea = document.createElement('textarea');
                 textarea.value = link;
                 textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                textarea.setAttribute('aria-hidden', 'true');
                 document.body.appendChild(textarea);
                 textarea.focus();
                 textarea.select();
@@ -262,8 +393,14 @@
 
                         <GlassCard className="mb-8">
                             <div className="bg-black/30 p-4 rounded-xl border border-white/10 flex items-center justify-between gap-4 mb-6">
-                                <code className="text-lime-400 truncate flex-1 text-left font-mono text-sm">{link}</code>
-                                <button onClick={copyLink} className="p-2 hover:bg-white/10 rounded-lg transition">
+                                <code className="text-lime-400 truncate flex-1 text-left font-mono text-sm">
+                                    {link}
+                                </code>
+                                <button
+                                    onClick={copyLink}
+                                    aria-label="Copy link to clipboard"
+                                    className="p-2 hover:bg-white/10 rounded-lg transition"
+                                >
                                     <Icons.Copy className="w-5 h-5 text-gray-400" />
                                 </button>
                             </div>
@@ -271,10 +408,13 @@
                                 <Button onClick={copyLink} variant="gold">
                                     Copy Link & Close
                                 </Button>
-                                <Button variant="secondary" onClick={() => {
-                                    window.location.hash = `#offer=${link.split('offer=')[1]}`;
-                                    window.location.reload();
-                                }}>
+                                <Button
+                                    variant="secondary"
+                                    onClick={() => {
+                                        window.location.hash = `#offer=${link.split('offer=')[1]}`;
+                                        window.location.reload();
+                                    }}
+                                >
                                     <Icons.ArrowRight className="w-5 h-5" />
                                     Preview Candidate View
                                 </Button>
@@ -335,18 +475,26 @@
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         placeholder="you@company.com"
+                                        aria-label="Company email address"
+                                        autoComplete="email"
                                         className="w-full bg-black/30 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors"
                                     />
                                 </div>
                             </div>
 
-                            <Button onClick={generateLink} disabled={!email} variant="gold" className="w-full">
+                            {error && (
+                                <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-xl">
+                                    <p className="text-red-200 text-sm">{error}</p>
+                                </div>
+                            )}
+
+                            <Button onClick={generateLink} disabled={!email || loading} variant="gold" className="w-full">
                                 <Icons.Lock className="w-5 h-5" />
-                                Lock Budget & Create Link
+                                {loading ? 'Creating Offer...' : 'Lock Budget & Create Link'}
                             </Button>
 
                             <p className="text-center text-xs text-gray-500">
-                                This prototype runs entirely in the browser and does not store offer data on a server.
+                                Offers expire after 24 hours and are not stored permanently.
                             </p>
                         </div>
                     </GlassCard>
@@ -354,74 +502,140 @@
             );
         };
 
-        const CandidateView = ({ data }) => {
+        // --- CANDIDATE VIEW ---
+
+        const CandidateView = ({ offerId }) => {
             const [ask, setAsk] = useState(120000);
             const [email, setEmail] = useState('');
-            const [step, setStep] = useState('intro');
+            const [step, setStep] = useState('loading');
             const [result, setResult] = useState(null);
             const [marketData, setMarketData] = useState(null);
             const [loadingMarket, setLoadingMarket] = useState(false);
+            const [offerStatus, setOfferStatus] = useState(null);
+            const [error, setError] = useState(null);
 
-            const isDemo = data.demo === true;
+            // Check offer status on load
+            useEffect(() => {
+                const checkOffer = async () => {
+                    try {
+                        const response = await fetch(`/api/offers/${offerId}`);
+                        const data = await response.json();
+                        
+                        if (data.status === 'invalid') {
+                            setError('This offer link is invalid or has expired.');
+                            setStep('error');
+                            logEvent('offer_check_invalid', { offerId });
+                        } else if (data.status === 'expired') {
+                            setError('This offer has expired. Please request a new link.');
+                            setStep('error');
+                            logEvent('offer_check_expired', { offerId });
+                        } else if (data.status === 'used') {
+                            setError('This offer has already been used.');
+                            setStep('error');
+                            logEvent('offer_check_used', { offerId });
+                        } else {
+                            setOfferStatus('ok');
+                            setStep('intro');
+                            logEvent('offer_viewed', { offerId, status: 'ok' });
+                        }
+                    } catch (err) {
+                        setError('Failed to load offer. Please check your connection.');
+                        setStep('error');
+                        logEvent('offer_check_error', { offerId, error: err.message });
+                    }
+                };
+
+                if (offerId) {
+                    checkOffer();
+                }
+            }, [offerId]);
 
             const fetchMarketData = () => {
+                if (loadingMarket || marketData) return;
                 setLoadingMarket(true);
-                // Mock API call delay
                 setTimeout(() => {
-                    // Mock data calculation: slightly below the company max to encourage a reasonable ask
-                    const mockMarketValue = Math.round((data.max * 0.95 + ROUNDING_GRANULARITY) / ROUNDING_GRANULARITY) * ROUNDING_GRANULARITY;
+                    // Mock market data - in real system this would come from API
+                    const mockMarketValue =
+                        Math.round((120000 * 0.95 + ROUNDING_GRANULARITY) / ROUNDING_GRANULARITY) *
+                        ROUNDING_GRANULARITY;
                     setMarketData(mockMarketValue);
                     setLoadingMarket(false);
-                    logEvent('market_data_shown', { max: data.max, suggested: mockMarketValue });
+                    logEvent('market_data_shown', { suggested: mockMarketValue });
                 }, 1500);
             };
 
-            const submit = () => {
-                const cMax = data.max;
-                const cMin = ask;
+            const submit = async () => {
+                setStep('submitting');
+                try {
+                    const response = await fetch(`/api/offers/${offerId}/submit`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ min: ask, email }),
+                    });
 
-                let outcome;
-                let surplus = null;
-                let gap = null;
+                    const data = await response.json();
 
-                if (cMin <= cMax) {
-                    // Success: Overlap found. Split the difference.
-                    surplus = cMax - cMin;
-                    const rawFinal = cMin + (surplus / 2);
-                    const final = Math.round(rawFinal / ROUNDING_GRANULARITY) * ROUNDING_GRANULARITY;
-                    outcome = { status: 'success', final, surplus };
-                } else if (cMin <= cMax * (1 + BRIDGE_ZONE_PCT)) {
-                    // Close failure: within bridge zone -> Recommendation to Talk
-                    gap = cMin - cMax;
-                    outcome = { status: 'close', gap };
-                } else {
-                    // Hard failure
-                    gap = cMin - cMax;
-                    outcome = { status: 'fail', gap };
+                    if (data.status === 'invalid' || data.status === 'expired' || data.status === 'used') {
+                        setError(`This offer is ${data.status}.`);
+                        setStep('error');
+                        logEvent('submit_rejected', { offerId, status: data.status });
+                        return;
+                    }
+
+                    setResult(data);
+                    setStep('result');
+
+                    logEvent('candidate_submitted', {
+                        offerId,
+                        min: ask,
+                        status: data.status,
+                        surplus: data.surplus,
+                        gap: data.gap,
+                        emailProvided: !!email,
+                    });
+                } catch (err) {
+                    setError('Failed to submit. Please try again.');
+                    setStep('error');
+                    logEvent('submit_error', { offerId, error: err.message });
                 }
-
-                setResult(outcome);
-                setStep('result');
-
-                logEvent('candidate_submitted', {
-                    max: cMax,
-                    min: cMin,
-                    status: outcome.status,
-                    surplus: surplus,
-                    gap: gap,
-                    emailProvided: !!email,
-                    demo: isDemo,
-                });
             };
+
+            if (step === 'loading') {
+                return (
+                    <div className="max-w-xl mx-auto animate-enter text-center">
+                        <div className="text-gray-400">Loading offer...</div>
+                    </div>
+                );
+            }
+
+            if (step === 'error') {
+                return (
+                    <div className="max-w-xl mx-auto animate-enter text-center">
+                        <GlassCard className="border-red-500/30">
+                            <div className="w-24 h-24 mx-auto rounded-full bg-red-500/20 flex items-center justify-center mb-8">
+                                <Icons.Lock className="w-12 h-12 text-red-400" />
+                            </div>
+                            <h2 className="text-3xl font-bold text-white mb-4">Unable to Load Offer</h2>
+                            <p className="text-gray-300 mb-6">{error}</p>
+                            <Button variant="outline" onClick={() => window.location.href = '/'}>
+                                Start Over
+                            </Button>
+                        </GlassCard>
+                    </div>
+                );
+            }
+
+            if (step === 'submitting') {
+                return (
+                    <div className="max-w-xl mx-auto animate-enter text-center">
+                        <div className="text-gray-400">Processing your submission...</div>
+                    </div>
+                );
+            }
 
             if (step === 'intro') {
                 return (
                     <div className="max-w-3xl mx-auto animate-enter">
-                        {isDemo && (
-                            <div className="mb-4 text-xs text-center text-gray-400 uppercase tracking-widest">
-                                Demo Mode – Numbers are for illustration only.
-                            </div>
-                        )}
                         <div className="text-center mb-12">
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-lime-400 font-bold mb-6">
                                 <Icons.Lock className="w-4 h-4" /> Single-Step, Private Mechanism
@@ -431,7 +645,20 @@
                             </h1>
                             <p className="text-xl md:text-2xl text-gray-300 leading-relaxed max-w-2xl mx-auto">
                                 The company has set a maximum they're willing to pay.
-                                <br />You set your minimum. If your ranges overlap, the tool splits the surplus and closes the deal.
+                                <br />
+                                You set your minimum. If your ranges overlap, the tool splits the surplus
+                                and closes the deal in a single step.
+                            </p>
+                            <p className="mt-4 text-xs text-gray-500">
+                                For broader compensation context, see the{' '}
+                                <a
+                                    href="https://dccr.dragonfly.xyz/report"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="underline text-lime-400 hover:text-lime-300"
+                                >
+                                    Dragonfly DCCR report
+                                </a>.
                             </p>
                         </div>
 
@@ -444,19 +671,27 @@
                                             <div className="w-8 h-8 rounded-full bg-lime-400/10 flex items-center justify-center shrink-0">
                                                 <span className="font-bold text-lime-400">1</span>
                                             </div>
-                                            <p className="text-gray-300">They set a max limit. You never see it in this interface.</p>
+                                            <p className="text-gray-300">
+                                                They set a max limit. You never see it in this interface.
+                                            </p>
                                         </li>
                                         <li className="flex gap-4">
                                             <div className="w-8 h-8 rounded-full bg-lime-400/10 flex items-center justify-center shrink-0">
                                                 <span className="font-bold text-lime-400">2</span>
                                             </div>
-                                            <p className="text-gray-300">You set your minimum. They never see it directly.</p>
+                                            <p className="text-gray-300">
+                                                You set your minimum. They never see it directly.
+                                            </p>
                                         </li>
                                         <li className="flex gap-4">
                                             <div className="w-8 h-8 rounded-full bg-lime-400/10 flex items-center justify-center shrink-0">
                                                 <span className="font-bold text-lime-400">3</span>
                                             </div>
-                                            <p className="text-gray-300">If there's overlap, we <strong>split the extra money</strong> 50/50 and round the final number.</p>
+                                            <p className="text-gray-300">
+                                                If there's overlap, we{' '}
+                                                <strong>split the extra money</strong> 50/50, round to the nearest
+                                                thousand, and show the final base salary.
+                                            </p>
                                         </li>
                                     </ul>
                                 </div>
@@ -466,7 +701,8 @@
                             </div>
                             <div className="mt-10 text-center">
                                 <Button onClick={() => setStep('input')} className="w-full md:w-auto">
-                                    Take Your Seat at the Table <Icons.ArrowRight className="w-5 h-5" />
+                                    Take Your Seat at the Table{' '}
+                                    <Icons.ArrowRight className="w-5 h-5" />
                                 </Button>
                             </div>
                         </GlassCard>
@@ -477,13 +713,10 @@
             if (step === 'input') {
                 return (
                     <div className="max-w-xl mx-auto animate-enter text-center">
-                        {isDemo && (
-                            <div className="mb-4 text-xs text-center text-gray-400 uppercase tracking-widest">
-                                Demo Mode – No real offers are created.
-                            </div>
-                        )}
                         <h2 className="text-3xl font-bold text-white mb-2">What is your minimum?</h2>
-                        <p className="text-gray-400 mb-10">The lowest number you'd happily sign for today.</p>
+                        <p className="text-gray-400 mb-10">
+                            The lowest base salary you would happily sign for today.
+                        </p>
 
                         <GlassCard>
                             <div className="flex items-baseline justify-center mb-2">
@@ -504,14 +737,17 @@
                                 />
                             </div>
 
-                            {/* Market Data Feature */}
                             <div className="mb-8 p-4 bg-white/5 rounded-xl border border-white/10">
                                 <div className="flex justify-between items-center">
-                                    <span className="text-sm font-bold text-gray-400">Not sure what to ask?</span>
+                                    <span className="text-sm font-bold text-gray-400">
+                                        Not sure what to ask?
+                                    </span>
                                     <button
                                         onClick={fetchMarketData}
                                         disabled={loadingMarket || marketData}
-                                        className="text-xs font-bold text-lime-400 hover:text-lime-300 uppercase tracking-widest"
+                                        aria-label="Check market data for salary guidance"
+                                        aria-busy={loadingMarket}
+                                        className="text-xs font-bold text-lime-400 hover:text-lime-300 uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         {loadingMarket ? 'Checking...' : 'Check Market Data'}
                                     </button>
@@ -519,8 +755,18 @@
                                 {marketData && (
                                     <div className="mt-3 text-left animate-enter">
                                         <p className="text-sm text-gray-300">
-                                            Market-style guidance for this role is around <strong className="text-white">${marketData.toLocaleString()}</strong>.
-                                            <button onClick={() => setAsk(marketData)} className="ml-2 underline text-lime-400">Use this</button>
+                                            Market-style guidance for this role is around{' '}
+                                            <strong className="text-white">
+                                                ${marketData.toLocaleString()}
+                                            </strong>
+                                            .
+                                            <button
+                                                onClick={() => setAsk(marketData)}
+                                                aria-label={`Set minimum salary to ${marketData.toLocaleString()}`}
+                                                className="ml-2 underline text-lime-400 hover:text-lime-300 transition-colors"
+                                            >
+                                                Use this
+                                            </button>
                                         </p>
                                     </div>
                                 )}
@@ -536,6 +782,8 @@
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         placeholder="you@email.com"
+                                        aria-label="Candidate email address"
+                                        autoComplete="email"
                                         className="w-full bg-black/30 border border-white/10 rounded-xl py-4 px-4 text-white focus:outline-none focus:border-lime-400 transition-colors"
                                     />
                                 </div>
@@ -554,50 +802,88 @@
 
                 return (
                     <div className="max-w-xl mx-auto animate-enter text-center">
-                        <div className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-8 shadow-2xl ${isSuccess ? 'bg-lime-400 shadow-lime-400/50' : result.status === 'close' ? 'bg-yellow-500 shadow-yellow-500/50' : 'bg-red-500 shadow-red-500/50'}`}>
-                            {isSuccess ? <Icons.Handshake className="w-12 h-12 text-black" /> : result.status === 'close' ? <Icons.Phone className="w-12 h-12 text-black" /> : <Icons.Lock className="w-12 h-12 text-white" />}
+                        <div
+                            className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-8 shadow-2xl ${
+                                isSuccess
+                                    ? 'bg-lime-400 shadow-lime-400/50'
+                                    : result.status === 'close'
+                                    ? 'bg-yellow-500 shadow-yellow-500/50'
+                                    : 'bg-red-500 shadow-red-500/50'
+                            }`}
+                        >
+                            {isSuccess ? (
+                                <Icons.Handshake className="w-12 h-12 text-black" />
+                            ) : result.status === 'close' ? (
+                                <Icons.Phone className="w-12 h-12 text-black" />
+                            ) : (
+                                <Icons.Lock className="w-12 h-12 text-white" />
+                            )}
                         </div>
 
-                        {isDemo && (
-                            <div className="mb-4 text-xs text-center text-gray-400 uppercase tracking-widest">
-                                Demo Mode – Example outcome only.
-                            </div>
-                        )}
-
                         <h2 className="text-5xl font-bold text-white mb-6">
-                            {isSuccess ? 'Deal Accepted!' : result.status === 'close' ? 'Gap Detected' : 'No Deal.'}
+                            {isSuccess
+                                ? 'Deal Accepted!'
+                                : result.status === 'close'
+                                ? 'Gap Detected'
+                                : 'No Deal.'}
                         </h2>
 
                         {isSuccess ? (
                             <GlassCard className="border-lime-500/30">
-                                <p className="text-gray-400 text-lg mb-2">Final Binding Offer (from the mechanism)</p>
+                                <p className="text-gray-400 text-lg mb-2">
+                                    Final Binding Offer (from the mechanism)
+                                </p>
                                 <p className="text-7xl font-bold text-lime-400 mb-4 tracking-tighter">
                                     ${result.final.toLocaleString()}
                                 </p>
                                 <div className="bg-lime-400/10 rounded-lg p-4 inline-block">
                                     <p className="text-lime-200 text-sm font-medium">
-                                        Rounded for privacy. Includes a <strong>${result.surplus.toLocaleString()}</strong> fair split of the surplus between your minimum and their maximum.
+                                        Rounded for privacy. Includes a{' '}
+                                        <strong>
+                                            ${result.surplus.toLocaleString()}
+                                        </strong>{' '}
+                                        fair split of the surplus between your minimum and their maximum.
                                     </p>
                                 </div>
                                 <p className="mt-8 text-gray-400 text-sm">
-                                    In a full system, this is where an official offer workflow (emails, docs) would kick in using the final number and your email: {email}.
+                                    In a full system, this is where an official offer workflow (emails, docs)
+                                    would kick in using the final number and your email: {email}.
                                 </p>
                             </GlassCard>
                         ) : (
-                            <GlassCard className={result.status === 'close' ? 'border-yellow-500/30' : 'border-red-500/30'}>
+                            <GlassCard
+                                className={
+                                    result.status === 'close'
+                                        ? 'border-yellow-500/30'
+                                        : 'border-red-500/30'
+                                }
+                            >
                                 <p className="text-gray-300 text-lg mb-6">
                                     Your minimum was higher than the company's maximum budget.
                                 </p>
                                 {result.status === 'close' && (
                                     <div className="bg-yellow-500/10 border border-yellow-500/30 p-6 rounded-xl mb-6 text-left">
                                         <p className="text-yellow-200 font-bold text-xl mb-2">
-                                            You are very close (Within 10%).
+                                            You are very close (within 10%).
                                         </p>
                                         <p className="text-yellow-100/70 text-sm mb-4">
-                                            The automated tool couldn't bridge the gap, but you are close enough that a short human conversation is highly recommended.
+                                            The automated tool couldn't bridge the gap, but you are close enough
+                                            that a short human conversation is highly recommended.
                                         </p>
-                                        <Button variant="gold" className="w-full justify-center" onClick={() => alert('In a full system, this would trigger a follow-up or scheduling flow.')}>
-                                            Schedule Resolution Call <Icons.Phone className="w-4 h-4" />
+                                        <Button
+                                            variant="gold"
+                                            className="w-full justify-center"
+                                            onClick={() => {
+                                                alert(
+                                                    'In a full system, this would trigger a follow-up or scheduling flow.'
+                                                );
+                                                logEvent('resolution_call_requested', {
+                                                    gap: result.gap,
+                                                });
+                                            }}
+                                        >
+                                            Schedule Resolution Call{' '}
+                                            <Icons.Phone className="w-4 h-4" />
                                         </Button>
                                     </div>
                                 )}
@@ -607,7 +893,8 @@
                                             Gap too large (&gt;10%).
                                         </p>
                                         <p className="text-red-100/70 text-sm mt-1">
-                                            The ranges don't overlap enough for this mechanism to close a deal. It may make sense to restart the search.
+                                            The ranges don't overlap enough for this mechanism to close a deal. It
+                                            may make sense to restart the search.
                                         </p>
                                     </div>
                                 )}
@@ -621,38 +908,20 @@
             }
         };
 
+        // --- ROOT APP ---
+
         const App = () => {
-            const [companyData, setCompanyData] = useState(null);
+            const [offerId, setOfferId] = useState(null);
             const [isReady, setIsReady] = useState(false);
 
             useEffect(() => {
                 const hash = window.location.hash;
                 const match = hash.match(/#offer=(.*)/);
                 if (match) {
-                    try {
-                        // Decode data passed via URL hash (base64)
-                        const decoded = JSON.parse(atob(match[1]));
-                        setCompanyData(decoded);
-                        logEvent('offer_viewed', {
-                            hasMax: typeof decoded.max === 'number',
-                            hasEmail: !!decoded.email,
-                            ts: decoded.ts,
-                            demo: !!decoded.demo,
-                        });
-                    } catch (e) {
-                        console.error(e);
-                        logEvent('offer_view_error', { error: String(e) });
-                    }
+                    setOfferId(match[1]);
+                    logEvent('app_loaded', { offerId: match[1] });
                 } else {
-                    // DEMO MODE: Auto-load candidate view for preview if no hash is present
-                    const demoData = {
-                        max: 160000,
-                        companyEmail: "demo@company.com",
-                        ts: Date.now(),
-                        demo: true,
-                    };
-                    setCompanyData(demoData);
-                    logEvent('demo_loaded', { max: demoData.max });
+                    logEvent('app_loaded', { mode: 'company' });
                 }
                 setIsReady(true);
             }, []);
@@ -662,8 +931,11 @@
             return (
                 <div className="min-h-screen w-full flex items-center justify-center p-4 md:p-8 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]">
                     <div className="w-full max-w-6xl relative z-10">
-                        {/* Render Candidate View if data exists, otherwise Company View */}
-                        {companyData ? <CandidateView data={companyData} /> : <CompanyView />}
+                        {offerId ? (
+                            <CandidateView offerId={offerId} />
+                        ) : (
+                            <CompanyView />
+                        )}
                     </div>
                 </div>
             );
@@ -672,6 +944,7 @@
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
+
 </body>
 
 </html>
