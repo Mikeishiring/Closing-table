@@ -45,25 +45,9 @@
             content: "";
             position: fixed;
             inset: 0;
-            background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.4) 70%);
+            background: radial-gradient(ellipse at center, #261436 0%, rgba(20, 8, 30, 0.95) 50%, rgba(10, 4, 15, 0.98) 100%);
             pointer-events: none;
             z-index: 0;
-        }
-
-        /* Subtle fingerprint-smudged polished glass texture for candidate view */
-        body::after {
-            content: "";
-            position: fixed;
-            inset: 0;
-            background-image: 
-                radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.015) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.01) 0%, transparent 50%),
-                radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.008) 0%, transparent 60%);
-            background-size: 200% 200%, 180% 180%, 150% 150%;
-            background-position: 0% 0%, 100% 100%, 50% 50%;
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.4;
         }
 
         .glass-panel {
@@ -71,7 +55,9 @@
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 
-                0 20px 60px rgba(0, 0, 0, 0.5), 
+                0 32px 80px rgba(38, 20, 54, 0.6),
+                0 16px 40px rgba(38, 20, 54, 0.4),
+                0 8px 20px rgba(0, 0, 0, 0.5),
                 0 0 0 1px rgba(255, 255, 255, 0.05) inset,
                 0 2px 8px rgba(0, 0, 0, 0.4) inset,
                 0 -2px 8px rgba(255, 255, 255, 0.02) inset;
@@ -140,6 +126,21 @@
             letter-spacing: -0.04em;
             line-height: 1.03;
             font-weight: 700;
+            background: linear-gradient(90deg, #DAA520 0%, #F4D03F 25%, #DAA520 50%, #F4D03F 75%, #DAA520 100%);
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: title-light-sweep 10s linear infinite;
+        }
+
+        @keyframes title-light-sweep {
+            0% {
+                background-position: -200% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
         }
 
         .financial-number {
@@ -161,10 +162,31 @@
             text-transform: uppercase;
         }
 
+        /* --- INPUT MATERIALITY (Frosted Glass) --- */
+        .frosted-input {
+            background: rgba(0, 0, 0, 0.3) !important;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
         /* --- BUTTON MICRO-ANIMATION --- */
         .btn {
             position: relative;
             overflow: hidden;
+            background-size: 200% 100%;
+        }
+
+        .btn-emerald-sweep {
+            animation: gradient-shift 4s ease-in-out infinite;
+        }
+
+        @keyframes gradient-shift {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
         }
 
         .btn::before {
@@ -186,6 +208,13 @@
             opacity: 1;
             transform: translate3d(120%, 0, 0);
             transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease-out;
+        }
+
+        /* --- LOCK ICON GLOW ON BUTTON HOVER --- */
+        .btn:hover .lock-charge-up {
+            filter: drop-shadow(0 0 8px #DAA520) drop-shadow(0 0 12px rgba(218, 165, 32, 0.6)) drop-shadow(0 0 16px rgba(218, 165, 32, 0.3));
+            transform: scale(1.1);
+            transition: filter 0.3s ease-out, transform 0.3s ease-out;
         }
 
         /* --- CARD HOVER --- */
@@ -398,17 +427,17 @@
             animation: card-sink 0.2s ease-out;
         }
 
-        /* --- TOOLTIP STYLES --- */
+        /* --- TOOLTIP STYLES (Mystic Theme) --- */
         .whisper-tooltip {
             position: absolute;
             bottom: 100%;
             left: 50%;
             transform: translateX(-50%) translateY(-8px);
-            background: rgba(10, 5, 20, 0.95);
+            background: rgba(38, 20, 54, 0.95);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 8px 12px;
-            border-radius: 6px;
+            border: 1px solid rgba(160, 141, 174, 0.3);
+            padding: 10px 14px;
+            border-radius: 12px;
             font-size: 0.75rem;
             color: #A08DAE;
             white-space: nowrap;
@@ -416,7 +445,10 @@
             pointer-events: none;
             transition: opacity 0.3s ease-out, transform 0.3s ease-out;
             z-index: 1000;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            box-shadow: 
+                0 8px 20px rgba(0, 0, 0, 0.6),
+                0 0 0 1px rgba(74, 42, 100, 0.5) inset;
+            clip-path: polygon(0% 0%, 100% 0%, 100% calc(100% - 8px), calc(50% + 6px) calc(100% - 8px), 50% 100%, calc(50% - 6px) calc(100% - 8px), 0% calc(100% - 8px));
         }
 
         .whisper-tooltip::after {
@@ -426,7 +458,7 @@
             left: 50%;
             transform: translateX(-50%);
             border: 6px solid transparent;
-            border-top-color: rgba(10, 5, 20, 0.95);
+            border-top-color: rgba(38, 20, 54, 0.95);
         }
 
         .tooltip-trigger:hover .whisper-tooltip {
@@ -434,19 +466,20 @@
             transform: translateX(-50%) translateY(-12px);
         }
 
-        /* --- SAFE DIAL KNOB --- */
+        /* --- SAFE DIAL KNOB (Metallic Gold) --- */
         .safe-knob {
             position: relative;
             width: 32px;
             height: 32px;
-            background: linear-gradient(135deg, #4A2A64 0%, #3C1C52 50%, #261436 100%);
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            background: linear-gradient(135deg, #DAA520 0%, #F4D03F 30%, #DAA520 60%, #B8860B 100%);
+            border: 2px solid rgba(218, 165, 32, 0.4);
             border-radius: 50%;
             box-shadow: 
-                0 0 12px rgba(0, 191, 154, 0.6),
+                0 0 16px rgba(218, 165, 32, 0.6),
+                0 0 8px rgba(218, 165, 32, 0.3),
                 0 2px 8px rgba(0, 0, 0, 0.5),
-                inset 0 2px 4px rgba(255, 255, 255, 0.1),
-                inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+                inset 0 2px 4px rgba(255, 255, 255, 0.2),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.4);
             transition: transform 0.1s linear;
         }
 
@@ -458,9 +491,9 @@
             transform: translate(-50%, -50%);
             width: 4px;
             height: 4px;
-            background: rgba(192, 154, 77, 0.8);
+            background: rgba(218, 165, 32, 0.9);
             border-radius: 50%;
-            box-shadow: 0 0 6px rgba(192, 154, 77, 0.8);
+            box-shadow: 0 0 8px rgba(218, 165, 32, 0.9);
         }
 
         .safe-knob::after {
@@ -852,7 +885,7 @@
             }, [onInteraction]);
 
             return (
-                <div ref={cardRef} className={`glass-panel card-hover rounded-3xl p-8 md:p-12 shadow-2xl ${className}`}>
+                <div ref={cardRef} className={`glass-panel card-hover rounded-3xl p-10 md:p-14 shadow-2xl ${className}`}>
                     {children}
                 </div>
             );
@@ -1173,7 +1206,7 @@
                                         placeholder="you@company.com"
                                         aria-label="Company email address"
                                         autoComplete="email"
-                                        className="w-full bg-black/30 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-[#F8F0E3] placeholder-[#A08DAE] focus:outline-none focus:border-[#00BF9A] focus:ring-2 focus:ring-[#00BF9A]/30 hover:border-[#00BF9A]/50 transition-all duration-200"
+                                        className="w-full frosted-input border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-[#F8F0E3] placeholder-[#A08DAE] focus:outline-none focus:border-[#00BF9A] focus:ring-2 focus:ring-[#00BF9A]/30 hover:border-[#00BF9A]/50 transition-all duration-200"
                                     />
                                 </div>
                                 <p className="mt-3 text-xs text-[#A08DAE] hush-hint">
@@ -1578,7 +1611,7 @@
                                         placeholder="you@email.com"
                                         aria-label="Candidate email address"
                                         autoComplete="email"
-                                        className="w-full bg-black/30 border border-white/10 rounded-2xl py-4 px-4 text-[#F8F0E3] focus:outline-none focus:border-[#00BF9A] focus:ring-2 focus:ring-[#00BF9A]/30 hover:border-[#00BF9A]/50 transition-all duration-200"
+                                        className="w-full frosted-input border border-white/10 rounded-2xl py-4 px-4 text-[#F8F0E3] focus:outline-none focus:border-[#00BF9A] focus:ring-2 focus:ring-[#00BF9A]/30 hover:border-[#00BF9A]/50 transition-all duration-200"
                                     />
                                     <p className="mt-3 text-xs text-[#A08DAE] hush-hint">
                                         The deal details will be sent here, securing your record. No messages are sent automatically in this prototype.
