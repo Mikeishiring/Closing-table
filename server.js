@@ -1,132 +1,231 @@
-import express from "express";
-import cors from "cors";
-import path from "path";
-import { fileURLToPath } from "url";
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// -----------------------------
-// In-memory Offer Store
-// -----------------------------
-const offers = new Map(); // offerId -> { max, email, createdAt, used, expiresAt }
-const OFFER_TTL_MS = 1000 * 60 * 60 * 4; // 4 hours
-
-// -----------------------------
-// Express App
-// -----------------------------
 const app = express();
+
+// Middleware
+app.use(helmet());
+app.use(cors());
 app.use(express.json());
-app.use(express.static("."));
+app.use(morgan('tiny'));
 
-// CORS
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL || "*",
-    methods: ["GET", "POST"],
-  })
-);
+// --- CONSTANTS ---
+const OFFER_TTL_MS = 24 * 60 * 60 * 1000;       // 24h offers
+const RESULT_TTL_MS = 7 * 24 * 60 * 60 * 1000;  // 7d results
+const BRIDGE_ZONE_PCT = 0.10;                   // 10% bridge zone
+const ROUNDING_GRANULARITY = 1000;              // $1,000 rounding
 
-// -----------------------------
-// Helpers
-// -----------------------------
-function generateId() {
-  return Math.random().toString(36).substring(2, 12);
+// --- IN-MEMORY STORES ---
+// offerId -> { max, email, createdAt, expiresAt, used }
+const offers = new Map();
+
+// resultId -> { status, final, surplus, min, max, createdAt }
+const results = new Map();
+
+// --- HELPERS ---
+function generateId(prefix = '') {
+  const id = Math.random().toString(36).slice(2, 10);
+  return prefix ? `${prefix}_${id}` : id;
 }
 
-function roundToK(value) {
-  return Math.round(value / 1000) * 1000;
+function isExpired(createdAt, ttlMs) {
+  return Date.now() - createdAt > ttlMs;
 }
 
-// -----------------------------
-// API ENDPOINTS
-// -----------------------------
+function roundToGranularity(value) {
+  return Math.round(value / ROUNDING_GRANULARITY) * ROUNDING_GRANULARITY;
+}
 
-// 1. Create offer (company)
-app.post("/api/offers", (req, res) => {
-  const { max, email } = req.body;
+async function sendResultEmail(email, revealLink, final) {
+  const frontendBase = process.env.FRONTEND_BASE || 'https://closing-table.pages.dev';
 
-  if (!max || typeof max !== "number") {
-    return res.status(400).json({ error: "Invalid max number" });
+  if (!email) {
+    console.log(`[email stub] No email provided. Result link: ${revealLink} (final: ${final})`);
+    return;
   }
 
-  const id = generateId();
-  const offer = {
+  console.log(
+    `[email stub] Would send email to ${email} with final ${final} and link: ${revealLink} (frontend: ${frontendBase})`
+  );
+}
+
+// --- HEALTHCHECK ---
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', time: new Date().toISOString() });
+});
+
+// --- CREATE OFFER ---
+app.post('/api/offers', (req, res) => {
+  const { max, email } = req.body || {};
+
+  if (typeof max !== 'number' || !Number.isFinite(max) || max <= 0) {
+    return res.status(400).json({ error: 'Invalid or missing "max"' });
+  }
+
+  if (!email || typeof email !== 'string') {
+    return res.status(400).json({ error: 'Email is required' });
+  }
+
+  const createdAt = Date.now();
+  const expiresAt = createdAt + OFFER_TTL_MS;
+  const offerId = generateId('o');
+
+  offers.set(offerId, {
     max,
-    email: email || null,
-    createdAt: Date.now(),
+    email,
+    createdAt,
+    expiresAt,
     used: false,
-    expiresAt: Date.now() + OFFER_TTL_MS,
-  };
-
-  offers.set(id, offer);
-
-  res.json({ offerId: id });
-});
-
-// 2. Validate offer (candidate loads link)
-app.get("/api/offers/:id", (req, res) => {
-  const offer = offers.get(req.params.id);
-
-  if (!offer) return res.json({ status: "invalid" });
-  if (Date.now() > offer.expiresAt) return res.json({ status: "expired" });
-  if (offer.used) return res.json({ status: "used" });
-
-  res.json({
-    status: "ok",
-    max: offer.max,
   });
+
+  console.log('[offer_created]', { offerId, max, email, createdAt });
+
+  return res.json({ offerId });
 });
 
-// 3. Submit candidate minimum
-app.post("/api/offers/:id/submit", (req, res) => {
-  const offer = offers.get(req.params.id);
-  if (!offer) return res.json({ status: "invalid" });
+// --- CHECK OFFER STATUS ---
+app.get('/api/offers/:offerId', (req, res) => {
+  const { offerId } = req.params;
+  const offer = offers.get(offerId);
 
-  if (Date.now() > offer.expiresAt)
-    return res.json({ status: "expired" });
+  if (!offer) {
+    return res.json({ status: 'invalid' });
+  }
 
-  if (offer.used)
-    return res.json({ status: "used" });
+  if (isExpired(offer.createdAt, OFFER_TTL_MS)) {
+    offers.delete(offerId);
+    return res.json({ status: 'expired' });
+  }
 
-  const { min, email } = req.body;
+  if (offer.used) {
+    return res.json({ status: 'used' });
+  }
 
-  if (!min || typeof min !== "number") {
-    return res.status(400).json({ error: "Invalid minimum number" });
+  // Frontend only cares that it's "ok"
+  return res.json({ status: 'ok' });
+});
+
+// --- SUBMIT CANDIDATE MIN & RUN MECHANISM ---
+app.post('/api/offers/:offerId/submit', async (req, res) => {
+  const { offerId } = req.params;
+  const { min, email } = req.body || {};
+
+  if (typeof min !== 'number' || !Number.isFinite(min) || min <= 0) {
+    return res.status(400).json({ error: 'Invalid or missing "min"' });
+  }
+
+  if (!email || typeof email !== 'string') {
+    return res.status(400).json({ error: 'Email is required' });
+  }
+
+  const offer = offers.get(offerId);
+
+  if (!offer) {
+    return res.json({ status: 'invalid' });
+  }
+
+  if (isExpired(offer.createdAt, OFFER_TTL_MS)) {
+    offers.delete(offerId);
+    return res.json({ status: 'expired' });
+  }
+
+  if (offer.used) {
+    return res.json({ status: 'used' });
   }
 
   const cMax = offer.max;
   const cMin = min;
 
-  let outcome;
+  let status;
+  let final = null;
+  let surplus = null;
+  let gap = null;
+  let resultId = null;
 
   if (cMin <= cMax) {
-    const surplus = cMax - cMin;
-    const raw = cMin + surplus / 2;
-    const final = roundToK(raw);
-    outcome = { status: "success", final, surplus };
-  } else if (cMin <= cMax * 1.1) {
-    const gap = cMin - cMax;
-    outcome = { status: "close", gap };
+    status = 'success';
+    surplus = cMax - cMin;
+    const rawFinal = cMin + surplus / 2;
+    final = roundToGranularity(rawFinal);
+
+    // Store result snapshot
+    const createdAt = Date.now();
+    resultId = generateId('r');
+
+    results.set(resultId, {
+      status,
+      final,
+      surplus,
+      min: cMin,
+      max: cMax,
+      createdAt,
+    });
+
+    const frontendBase = process.env.FRONTEND_BASE || 'https://closing-table.pages.dev';
+    const base = frontendBase.replace(/\/+$/, '');
+    const revealLink = `${base}/#result=${encodeURIComponent(resultId)}`;
+
+    try {
+      await sendResultEmail(email, revealLink, final);
+    } catch (err) {
+      console.error('[sendResultEmail error]', err);
+    }
   } else {
-    const gap = cMin - cMax;
-    outcome = { status: "fail", gap };
+    gap = cMin - cMax;
+    const withinBridge = gap <= cMax * BRIDGE_ZONE_PCT;
+    status = withinBridge ? 'close' : 'fail';
   }
 
-  offer.used = true; // one-shot
+  // One shot: mark offer used regardless of status
+  offer.used = true;
 
-  res.json(outcome);
+  console.log('[offer_submitted]', {
+    offerId,
+    min: cMin,
+    email,
+    status,
+    surplus,
+    gap,
+    resultId,
+  });
+
+  return res.json({
+    status,
+    final,
+    surplus,
+    gap,
+    resultId,
+  });
 });
 
-// Serve index.html for all other routes (SPA routing)
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
+// --- REVEAL RESULT ---
+app.get('/api/results/:resultId', (req, res) => {
+  const { resultId } = req.params;
+  const result = results.get(resultId);
+
+  if (!result) {
+    return res.json({ status: 'invalid' });
+  }
+
+  if (isExpired(result.createdAt, RESULT_TTL_MS)) {
+    results.delete(resultId);
+    return res.json({ status: 'expired' });
+  }
+
+  return res.json({
+    status: result.status,
+    final: result.final,
+    surplus: result.surplus,
+    min: result.min,
+    max: result.max,
+    createdAt: result.createdAt,
+  });
 });
 
-// -----------------------------
-// Server Start
-// -----------------------------
-const PORT = process.env.PORT || 10000;
+// --- START SERVER ---
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log("Closing Table backend running on port", PORT);
+  console.log(`Closing Table backend listening on port ${PORT}`);
 });
