@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import crypto from "crypto"; // ✅ ES module import
 
 const app = express();
 app.use(cors());
@@ -14,12 +15,25 @@ const OFFER_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const BRIDGE_ZONE_MULTIPLIER = 1.1; // 10% above max is "close"
 const ROUNDING_GRANULARITY = 1000; // Round to nearest $1,000
 
+// NEW: short-lived result store (no DB)
+const RESULT_TTL_MS = OFFER_TTL_MS;
+const results = new Map(); // key: resultId, value: { outcome, createdAt, expiresAt }
+
 // Cleanup loop (every 15 mins)
 setInterval(() => {
   const now = Date.now();
+
+  // Offers
   for (const [id, offer] of offers.entries()) {
     if (now > offer.expiresAt || offer.used) {
       offers.delete(id);
+    }
+  }
+
+  // Results
+  for (const [id, entry] of results.entries()) {
+    if (entry.expiresAt <= now) {
+      results.delete(id);
     }
   }
 }, 1000 * 60 * 15);
@@ -142,10 +156,44 @@ app.post("/api/offers/:id/submit", (req, res) => {
   // Mark as used before computing outcome (prevents race conditions)
   offer.used = true;
 
-  // Compute outcome using extracted helper
-  const outcome = computeOutcome(offer.max, min);
+  // Compute outcome using extracted helper (unchanged)
+  const outcome = computeOutcome(offer.max, min); // { status, final, surplus, gap }
 
-  res.json(outcome);
+  // NEW: create short-lived result token
+  const resultId = crypto.randomUUID();
+
+  results.set(resultId, {
+    outcome,
+    createdAt: Date.now(),
+    expiresAt: Date.now() + RESULT_TTL_MS,
+  });
+
+  // Return previous payload + resultId (front-end keeps working as-is)
+  res.json({
+    ...outcome,
+    resultId,
+  });
+});
+
+app.get("/api/results/:resultId", (req, res) => {
+  const { resultId } = req.params;
+  const entry = results.get(resultId);
+
+  if (!entry) {
+    return res.json({ status: "invalid" });
+  }
+
+  const now = Date.now();
+  if (entry.expiresAt <= now) {
+    results.delete(resultId);
+    return res.json({ status: "expired" });
+  }
+
+  // Happy path
+  return res.json({
+    status: "ok",
+    result: entry.outcome, // { status, final, surplus, gap }
+  });
 });
 
 const PORT = process.env.PORT || 3001;
