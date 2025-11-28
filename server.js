@@ -39,6 +39,56 @@ function roundToGranularity(value) {
   return Math.round(value / ROUNDING_GRANULARITY) * ROUNDING_GRANULARITY;
 }
 
+// --- PURE MECHANISM CALCULATION ---
+/**
+ * Pure function to calculate deal outcome from CMax and CMin
+ * @param {number} cMax - Company's maximum offer
+ * @param {number} cMin - Candidate's minimum requirement
+ * @returns {Object} Result object with status, final, surplus/gap
+ */
+function calculateDeal(cMax, cMin) {
+  if (typeof cMax !== 'number' || !Number.isFinite(cMax) || cMax <= 0) {
+    throw new Error('Invalid cMax: must be a positive finite number');
+  }
+  if (typeof cMin !== 'number' || !Number.isFinite(cMin) || cMin <= 0) {
+    throw new Error('Invalid cMin: must be a positive finite number');
+  }
+
+  // FAIR_SPLIT: Overlap case
+  if (cMin <= cMax) {
+    const surplus = cMax - cMin;
+    const rawFinal = cMin + surplus / 2;
+    const final = roundToGranularity(rawFinal);
+    return {
+      status: 'success', // FAIR_SPLIT
+      final,
+      surplus,
+      gap: null,
+    };
+  }
+
+  // Gap case: cMin > cMax
+  const gap = cMin - cMax;
+  const gapPercent = (gap / cMax) * 100;
+  const withinBridge = gapPercent <= (BRIDGE_ZONE_PCT * 100);
+
+  if (withinBridge) {
+    return {
+      status: 'close', // BRIDGE_ZONE
+      final: null,
+      surplus: null,
+      gap,
+    };
+  }
+
+  return {
+    status: 'fail', // NO_DEAL
+    final: null,
+    surplus: null,
+    gap,
+  };
+}
+
 async function sendResultEmail(email, revealLink, final) {
   const frontendBase = process.env.FRONTEND_BASE || 'https://closing-table.pages.dev';
 
@@ -138,25 +188,22 @@ app.post('/api/offers/:offerId/submit', async (req, res) => {
   }
 
   if (offer.used) {
-    return res.json({ status: 'used' });
+    return res.status(403).json({ 
+      status: 'used',
+      error: 'This offer has already been used. The mechanism only runs once per offer.' 
+    });
   }
 
   const cMax = offer.max;
   const cMin = min;
 
-  let status;
-  let final = null;
-  let surplus = null;
-  let gap = null;
+  // Use pure calculateDeal function
+  const dealResult = calculateDeal(cMax, cMin);
+  const { status, final, surplus, gap } = dealResult;
   let resultId = null;
 
-  if (cMin <= cMax) {
-    status = 'success';
-    surplus = cMax - cMin;
-    const rawFinal = cMin + surplus / 2;
-    final = roundToGranularity(rawFinal);
-
-    // Store result snapshot
+  // Store result snapshot only for successful deals
+  if (status === 'success') {
     const createdAt = Date.now();
     resultId = generateId('r');
 
@@ -178,13 +225,10 @@ app.post('/api/offers/:offerId/submit', async (req, res) => {
     } catch (err) {
       console.error('[sendResultEmail error]', err);
     }
-  } else {
-    gap = cMin - cMax;
-    const withinBridge = gap <= cMax * BRIDGE_ZONE_PCT;
-    status = withinBridge ? 'close' : 'fail';
   }
 
-  // One shot: mark offer used regardless of status
+  // Single-use constraint: mark offer as used immediately after mechanism runs
+  // This prevents any possibility of re-submission
   offer.used = true;
 
   console.log('[offer_submitted]', {
@@ -230,8 +274,22 @@ app.get('/api/results/:resultId', (req, res) => {
   });
 });
 
+// Export for testing (before starting server)
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    calculateDeal,
+    roundToGranularity,
+    BRIDGE_ZONE_PCT,
+    ROUNDING_GRANULARITY,
+    app,
+  };
+}
+
 // --- START SERVER ---
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Closing Table backend listening on port ${PORT}`);
-});
+// Only start server if this file is run directly (not when required for tests)
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Closing Table backend listening on port ${PORT}`);
+  });
+}

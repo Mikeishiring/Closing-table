@@ -19,31 +19,34 @@ This is a **prototype** to explore fair, transparent, double-blind negotiation m
 
 The mechanism operates on a simple mathematical principle: when two parties' acceptable ranges overlap, there's a "surplus" that can be split fairly. The app ensures neither party goes below their minimum or above their maximum.
 
-### The Mechanism (Step-by-Step)
+### The Mechanism (Mathematical Definition)
 
-- The **company** secretly chooses a maximum salary (`CMax`).
-- The **candidate** secretly chooses a minimum salary (`CMin`).
-- Neither side ever sees the other's number.
+**Inputs:**
+- `CMax`: Company's true maximum salary (private, submitted first)
+- `CMin`: Candidate's true minimum salary (private, submitted second)
 
-The app then:
+**Calculation:**
+1. **FAIR_SPLIT (Overlap Case):** If `CMin ≤ CMax`
+   - Surplus = `CMax - CMin`
+   - Final Offer = `CMin + (Surplus / 2)`
+   - Final Offer is rounded to the nearest $1,000
+   - Status: `success`
 
-1. **Deal found (overlap)**  
-   If `CMin ≤ CMax`, there is an overlap.  
-   - It computes the surplus: `Surplus = CMax - CMin`.  
-   - It sets the final salary halfway between them and then **rounds to the nearest \$1,000**.  
-   - The candidate never goes below their minimum.  
-   - The company never goes above their max.
+2. **BRIDGE_ZONE (Close Gap):** If `CMin > CMax` and `(CMin - CMax) / CMax ≤ 0.10`
+   - Gap = `CMin - CMax`
+   - Gap is within 10% of company's maximum
+   - Status: `close` (suggests human conversation)
 
-2. **Gap, but close (within 10%)**  
-   If `CMin` is above `CMax` but within 10%:
-   - No automatic deal.
-   - The app shows a **"Gap Detected"** state and suggests a short call to see if stock/bonus/etc. can bridge the gap.
+3. **NO_DEAL (Large Gap):** If `CMin > CMax` and `(CMin - CMax) / CMax > 0.10`
+   - Gap = `CMin - CMax`
+   - Gap exceeds 10% threshold
+   - Status: `fail` (deal cannot be closed)
 
-3. **Gap too large**  
-   If `CMin` is more than 10% above `CMax`:
-   - The app shows **"No Deal"** and suggests restarting the search.
-
-The candidate screen also has a **"Check Market Data"** button that, in this prototype, shows illustrative guidance to help candidates sanity-check their ask. This is not a real market data feed — it's a prototype feature.
+**Key Properties:**
+- **Double-blind:** Neither party sees the other's number until after submission
+- **Single-use:** Each offer can only be submitted once
+- **Fair split:** When overlap exists, surplus is divided exactly 50/50
+- **Rounding:** Final offers are rounded to nearest $1,000 for privacy and simplicity
 
 ---
 
@@ -120,24 +123,50 @@ The server will run on `http://localhost:3000` (or the port specified by the `PO
 
 Open `http://localhost:3000` in your browser.
 
-### How Offers Work
+### Running Tests
 
-- **Company creates an offer**: Sets a maximum budget and email, then clicks "Lock Budget & Create Link"
-- **Server stores the offer**: The backend creates a unique `offerId` and stores the offer data in memory
-- **Shareable link generated**: Link format is `/#offer=<offerId>` (e.g., `/#offer=abc123-def456-...`)
-- **Candidate opens link**: Frontend calls `GET /api/offers/:offerId` to verify the offer is valid
-- **Candidate submits minimum**: Frontend calls `POST /api/offers/:offerId/submit` with their minimum salary
-- **Server runs mechanism**: The backend calculates the result (success/close/fail) and marks the offer as used
-- **Result displayed**: Candidate sees the outcome based on the mechanism's calculation
+```bash
+npm test
+```
+
+The test suite includes:
+- **Unit tests** for the `calculateDeal` function (5 tests covering all outcome scenarios)
+- **Integration tests** for API endpoints (2 tests for single-use constraint and offer expiry)
+
+### User Flow
+
+**Phase 1: Commitment Panel (INPUT)**
+- **Company View:** 
+  - Company enters their maximum budget (CMax) and email
+  - Clicks "🔒 Lock Budget & Create Link"
+  - Receives a shareable link
+  
+- **Candidate View:**
+  - Candidate opens the company's link
+  - Views landing page explaining the mechanism
+  - Enters their walk-away number (CMin) and email
+  - Clicks "🔒 Commit & See Your Result"
+
+**Phase 2: Mechanism Processing (LOADING)**
+- Brief animation showing commitment confirmation
+- "CMin Locked. Waiting for CMax... Running Double-Blind Mechanism... Calculating Fair Split..."
+
+**Phase 3: Result Panel (RESULT)**
+- Single dynamic visualization showing:
+  - **FAIR_SPLIT (Green):** Revealed CMax and CMin, visual bar with "Shared Surplus (50/50)", final offer, and benefit gained
+  - **BRIDGE_ZONE (Yellow):** Gap visualization with "10% Bridge Window", suggests human conversation
+  - **NO_DEAL (Red):** Large gap visualization, suggests restarting search
+- Closing Table Signature for successful deals with shareable confirmation link
 
 **Key features:**
-- Offers expire after 24 hours
-- Each offer can only be used **once** (single-shot mechanism)
-- Results are stored for 7 days (for reveal links)
-- All data is stored in memory (lost on server restart)
-- No permanent data storage — matches the "no recording" ethos
-- No email integration (prototype only)
-- No negotiation history or audit trails
+- **Single-flow UI:** Commitment Panel → Loading → Result Panel (no redundant graphics)
+- **Single-use constraint:** Each offer can only be submitted once (enforced with 403 error on re-submission)
+- **Time-limited storage:** Offers expire after 24 hours, results after 7 days
+- **In-memory only:** All data is ephemeral (lost on server restart)
+- **No permanent storage:** Matches the "no recording" ethos
+- **Pure calculation:** Core mechanism logic is isolated in `calculateDeal(CMax, CMin)` function
+- **No email integration:** Prototype only (stub implementation)
+- **No negotiation history:** Single-shot, no audit trails
 
 ---
 

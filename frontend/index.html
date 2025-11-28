@@ -366,35 +366,6 @@
             animation: candidate-lime-flash 0.8s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        /* --- MECHANISM HIGHLIGHTS STRIP ANIMATIONS --- */
-        @keyframes surplus-split {
-            0%, 100% {
-                width: 100%;
-                left: 0%;
-            }
-            50% {
-                width: 50%;
-                left: 25%;
-            }
-        }
-
-        @keyframes bridge-approach {
-            0%, 100% {
-                transform: translateX(0);
-            }
-            50% {
-                transform: translateX(85%);
-            }
-        }
-
-        @keyframes no-deal-separate {
-            0%, 100% {
-                gap: 0px;
-            }
-            50% {
-                gap: 40px;
-            }
-        }
 
         @keyframes pulse-subtle {
             0%, 100% {
@@ -405,131 +376,6 @@
             }
         }
 
-        .mechanism-highlight-card {
-            background: #2D1455;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            padding: 20px;
-            position: relative;
-            overflow: hidden;
-            transition: border-color 0.3s ease-out, background-color 0.3s ease-out;
-        }
-
-        .mechanism-highlight-card:hover {
-            border-color: rgba(255, 255, 255, 0.15);
-            background: rgba(45, 20, 85, 0.6);
-        }
-
-        .mechanism-highlight-card::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(167, 239, 0, 0.03) 0%, transparent 50%);
-            pointer-events: none;
-            transition: opacity 0.3s ease-out;
-        }
-
-        .mechanism-highlight-card:hover::before {
-            opacity: 0.8;
-        }
-
-        .surplus-bar {
-            height: 8px;
-            background: #A7EF00;
-            border-radius: 4px;
-            position: relative;
-            animation: surplus-split 6s ease-in-out infinite;
-            opacity: 0.8;
-        }
-
-        .bridge-bar {
-            height: 8px;
-            background: #FACC15;
-            border-radius: 4px;
-            width: 90%;
-            animation: bridge-approach 6s ease-in-out infinite;
-            opacity: 0.8;
-        }
-
-        .bridge-limit {
-            position: absolute;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: #A7EF00;
-            opacity: 0.5;
-        }
-
-        .no-deal-container {
-            display: flex;
-            gap: 0;
-            animation: no-deal-separate 6s ease-in-out infinite;
-        }
-
-        .no-deal-bar {
-            height: 8px;
-            width: 45%;
-            border-radius: 4px;
-        }
-
-        .no-deal-bar.left {
-            background: #A7EF00;
-        }
-
-        .no-deal-bar.right {
-            background: #EF4444;
-        }
-
-        /* --- DEAL EXPLORER ANIMATIONS --- */
-        @keyframes bar-grow {
-            from {
-                width: 0%;
-            }
-        }
-
-        .deal-bar {
-            transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-            height: 12px;
-            border-radius: 6px;
-        }
-
-        .deal-bar-company {
-            background: linear-gradient(to right, #FCD34D, #F59E0B);
-        }
-
-        .deal-bar-candidate {
-            background: linear-gradient(to right, #A7EF00, #C8FF4D);
-        }
-
-        .deal-bar-overlap {
-            background: linear-gradient(to right, #A7EF00, #C8FF4D);
-            animation: pulse-subtle 4s ease-in-out infinite;
-        }
-
-        .deal-bar-gap {
-            background: #FACC15;
-        }
-
-        .deal-bar-no-deal {
-            background: #EF4444;
-        }
-
-        /* --- SCENARIO CAROUSEL ANIMATIONS --- */
-        @keyframes fade-in-slide {
-            from {
-                opacity: 0;
-                transform: translateX(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .scenario-card-enter {
-            animation: fade-in-slide 0.4s ease-out;
-        }
 
         /* --- INTERACTIVE VIGNETTE --- */
         .vignette-active {
@@ -1309,141 +1155,6 @@
         );
 
         // --- DEAL EXPLORER PLAYGROUND ---
-        const DealExplorer = () => {
-            const [companyMax, setCompanyMax] = useState(140000);
-            const [candidateMin, setCandidateMin] = useState(120000);
-            const [isOpen, setIsOpen] = useState(false);
-
-            const computeOutcome = (max, min) => {
-                if (min <= max) {
-                    const surplus = max - min;
-                    const rawFinal = min + surplus / 2;
-                    const final = Math.round(rawFinal / 1000) * 1000;
-                    return { status: 'success', final, surplus };
-                } else {
-                    const gap = min - max;
-                    const withinBridge = gap <= max * 0.1;
-                    return { status: withinBridge ? 'close' : 'fail', gap };
-                }
-            };
-
-            const outcome = computeOutcome(companyMax, candidateMin);
-            const companyPercent = Math.min(100, (companyMax / 300000) * 100);
-            const candidatePercent = Math.min(100, (candidateMin / 300000) * 100);
-            const overlapPercent = outcome.status === 'success' 
-                ? ((candidateMin / companyMax) * companyPercent)
-                : 0;
-
-            if (!isOpen) {
-                return (
-                    <div className="text-center mb-8">
-                        <Button
-                            variant="outline"
-                            onClick={() => setIsOpen(true)}
-                            className="text-sm"
-                        >
-                            Show Deal Explorer
-                        </Button>
-                    </div>
-                );
-            }
-
-            return (
-                <GlassCard className="mb-8">
-                    <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-lg font-bold text-[#F1F5F9]">Deal Explorer</h3>
-                        <button
-                            onClick={() => setIsOpen(false)}
-                            className="text-[#CBD5E1] hover:text-[#F1F5F9] text-sm"
-                        >
-                            Close
-                        </button>
-                    </div>
-
-                    <div className="space-y-6">
-                        <div>
-                            <label className="block text-xs font-semibold text-[#CBD5E1] mb-2">
-                                Company Max: ${companyMax.toLocaleString()}
-                            </label>
-                            <Slider
-                                min={50000}
-                                max={300000}
-                                step={5000}
-                                value={companyMax}
-                                onChange={(e) => setCompanyMax(parseInt(e.target.value, 10))}
-                                onDragStart={() => {}}
-                                onDragEnd={() => {}}
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-xs font-semibold text-[#CBD5E1] mb-2">
-                                Candidate Min: ${candidateMin.toLocaleString()}
-                            </label>
-                            <Slider
-                                min={80000}
-                                max={250000}
-                                step={1000}
-                                value={candidateMin}
-                                onChange={(e) => setCandidateMin(parseInt(e.target.value, 10))}
-                                onDragStart={() => {}}
-                                onDragEnd={() => {}}
-                            />
-                        </div>
-
-                        <div className="bg-[#1D0D32] rounded-lg p-4">
-                            <div className="relative h-16 mb-4">
-                                <div className="absolute inset-0 flex items-center">
-                                    <div className="w-full h-3 bg-[#0F0518] rounded-full relative">
-                                        <div
-                                            className="deal-bar deal-bar-company"
-                                            style={{ width: `${companyPercent}%` }}
-                                        />
-                                        {outcome.status === 'success' && (
-                                            <div
-                                                className="deal-bar deal-bar-overlap absolute top-0"
-                                                style={{ 
-                                                    width: `${overlapPercent}%`,
-                                                    left: '0%'
-                                                }}
-                                            />
-                                        )}
-                                        <div
-                                            className="deal-bar deal-bar-candidate absolute top-0"
-                                            style={{ 
-                                                width: `${candidatePercent}%`,
-                                                left: outcome.status === 'success' ? '0%' : `${companyPercent}%`
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="text-center">
-                                {outcome.status === 'success' ? (
-                                    <div>
-                                        <p className="text-2xl font-bold text-[#A7EF00] mb-1">
-                                            ${outcome.final.toLocaleString()}
-                                        </p>
-                                        <p className="text-xs text-[#CBD5E1]">Final Offer (Surplus: ${outcome.surplus.toLocaleString()})</p>
-                                    </div>
-                                ) : outcome.status === 'close' ? (
-                                    <div>
-                                        <p className="text-lg font-bold text-[#FACC15] mb-1">Bridge Zone</p>
-                                        <p className="text-xs text-[#CBD5E1]">Gap: ${outcome.gap.toLocaleString()} (within 10%)</p>
-                                    </div>
-                                ) : (
-                                    <div>
-                                        <p className="text-lg font-bold text-[#EF4444] mb-1">No Deal</p>
-                                        <p className="text-xs text-[#CBD5E1]">Gap: ${outcome.gap.toLocaleString()} (too large)</p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </GlassCard>
-            );
-        };
 
         // --- COMPANY VIEW ---
 
@@ -1637,28 +1348,15 @@
             return (
                 <div className="max-w-2xl mx-auto animate-enter">
                     {/* Hero Section */}
-                    <div className="text-left mb-8">
-                        <h1 className="hero-heading text-4xl md:text-6xl font-bold mb-6" style={{ textShadow: '0 0 20px rgba(252, 211, 77, 0.3)' }}>
+                    <div className="text-left mb-10">
+                        <h1 className="hero-heading text-4xl md:text-6xl font-bold mb-4" style={{ textShadow: '0 0 20px rgba(252, 211, 77, 0.3)' }}>
                             <span style={{ fontSize: '1.1em' }}>The</span>{' '}
                             <span className="gold-text-gradient" style={{ fontWeight: '800', fontSize: '1.15em' }}>Closing</span>{' '}
                             <span style={{ fontSize: '1.1em' }}>Table</span>
                         </h1>
-                        <p className="hero-subtitle mt-2 text-left leading-relaxed">
-                            One decision. Zero negotiation.
-                            <br />
-                            Commit to your maximum.
+                        <p className="hero-subtitle mt-2 text-left leading-relaxed text-lg">
+                            Set your maximum budget. If the candidate's minimum fits within it, we split the difference 50/50.
                         </p>
-                    </div>
-
-                    {/* Visual Metaphor Bar */}
-                    <div className="mb-10 flex justify-center">
-                        <div className="w-full max-w-md relative">
-                            <div className="visual-metaphor-bar">
-                                <div className="visual-metaphor-overlap"></div>
-                            </div>
-                            <div className="visual-metaphor-marker left"></div>
-                            <div className="visual-metaphor-marker right"></div>
-                        </div>
                     </div>
 
                     {/* Company Input Card - Main Feature */}
@@ -1673,9 +1371,12 @@
                             }
                         }}
                     >
-                        <label className="block text-xs font-bold text-[#A7EF00] uppercase tracking-widest mb-6">
-                            Maximum Offer Limit (CMax)
+                        <label className="block text-sm font-bold text-[#A7EF00] uppercase tracking-widest mb-4">
+                            Your Maximum Budget
                         </label>
+                        <p className="text-xs text-[#CBD5E1] mb-6 opacity-70">
+                            This is your absolute ceiling. The candidate won't see this number until after they submit theirs.
+                        </p>
 
                         <div className="flex items-baseline justify-start mb-4">
                             <span className="text-[#CBD5E1] text-4xl font-bold mr-2">$</span>
@@ -1715,7 +1416,7 @@
                         <div className="space-y-8">
                             <div>
                                 <label className="block text-xs font-bold text-[#CBD5E1] uppercase tracking-widest mb-4">
-                                    Where to send the deal? (for your own reference)
+                                    Your Email
                                 </label>
                                 <div className="relative">
                                     <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#CBD5E1]" />
@@ -1737,7 +1438,7 @@
                                     />
                                 </div>
                                 <p className="mt-3 text-xs text-[#CBD5E1] hush-hint">
-                                    This address is just stored with the offer for your reference. The tool does not send any automatic emails.
+                                    We'll send you the final result here. No spam, no storage beyond 7 days.
                                 </p>
                             </div>
 
@@ -1756,61 +1457,15 @@
                                 <WhisperTooltip text="This locks the terms forever.">
                                     <Icons.Lock className="w-6 h-6 lock-charge-up" />
                                 </WhisperTooltip>
-                                {loading ? 'Creating Offer...' : '🔒 Lock Budget & Create Link'}
+                                {loading ? 'Creating Link...' : 'Create Offer Link'}
                             </Button>
 
-                            <p className="text-center text-xs text-[#CBD5E1]">
-                                Offers expire after 24 hours and are not stored permanently.
+                            <p className="text-center text-xs text-[#CBD5E1] opacity-70">
+                                Link expires in 24 hours. One use only.
                             </p>
                         </div>
                     </GlassCard>
 
-                    {/* Deal Explorer - Collapsed by default */}
-                    <div className="mt-10">
-                        <DealExplorer />
-                    </div>
-
-                    {/* Mechanism Highlights Strip */}
-                    <section className="mt-10 mb-8">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="mechanism-highlight-card">
-                                <div className="h-16 mb-3 relative flex items-center">
-                                    <div className="w-full h-2 bg-[#1D0D32] rounded-full relative">
-                                        <div className="surplus-bar"></div>
-                                    </div>
-                                </div>
-                                <p className="text-xs font-semibold text-[#A7EF00] uppercase tracking-wider">Fair Split</p>
-                                <p className="text-[10px] text-[#CBD5E1] mt-1 opacity-70">Surplus divided 50/50</p>
-                            </div>
-
-                            <div className="mechanism-highlight-card">
-                                <div className="h-16 mb-3 relative flex items-center">
-                                    <div className="w-full h-2 bg-[#1D0D32] rounded-full relative">
-                                        <div className="bridge-bar"></div>
-                                        <div className="bridge-limit"></div>
-                                    </div>
-                                </div>
-                                <p className="text-xs font-semibold text-[#FACC15] uppercase tracking-wider">Bridge Zone (10%)</p>
-                                <p className="text-[10px] text-[#CBD5E1] mt-1 opacity-70">Close but needs human touch</p>
-                            </div>
-
-                            <div className="mechanism-highlight-card">
-                                <div className="h-16 mb-3 relative flex items-center justify-center">
-                                    <div className="no-deal-container">
-                                        <div className="no-deal-bar left"></div>
-                                        <div className="no-deal-bar right"></div>
-                                    </div>
-                                </div>
-                                <p className="text-xs font-semibold text-[#EF4444] uppercase tracking-wider">No Deal Case</p>
-                                <p className="text-[10px] text-[#CBD5E1] mt-1 opacity-70">Gap too large to bridge</p>
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* Mechanism Specification */}
-                    <div className="mt-10">
-                        <MechanismSpec />
-                    </div>
                 </div>
             );
         };
@@ -2076,10 +1731,9 @@
                             </div>
                         </div>
                         <div className="space-y-3 text-lg text-[#CBD5E1]">
-                            <p className="commitment-text font-bold text-[#A7EF00]">CMin Locked.</p>
-                            <p className="commitment-text">Waiting for CMax...</p>
-                            <p className="commitment-text">Running Double-Blind Mechanism...</p>
-                            <p className="commitment-text font-bold text-[#FCD34D]">Calculating Fair Split...</p>
+                            <p className="commitment-text font-bold text-[#A7EF00]">Your number is locked.</p>
+                            <p className="commitment-text">Calculating result...</p>
+                            <p className="commitment-text font-bold text-[#FCD34D]">Almost there...</p>
                         </div>
                     </div>
                 );
@@ -2089,32 +1743,21 @@
                 return (
                     <div className="max-w-3xl mx-auto animate-enter">
                         <div className="text-center mb-12">
-                            <h1 className="hero-heading text-5xl md:text-7xl font-bold mb-6 text-[#F1F5F9]">
-                                The Closing Table: Guarantee Your Fair Deal
+                            <h1 className="hero-heading text-5xl md:text-7xl font-bold mb-4 text-[#F1F5F9]">
+                                The Closing Table
                             </h1>
-                            <p className="hero-subtitle text-xl md:text-2xl max-w-2xl mx-auto mb-6">
-                                Eliminate the Haggle. Commit Your True Minimum & Secure the Highest Possible Offer.
+                            <p className="hero-subtitle text-lg md:text-xl max-w-2xl mx-auto mb-6">
+                                Enter your minimum salary. If it fits within the company's budget, we split the difference 50/50.
                             </p>
-                            <p className="text-base md:text-lg text-[#CBD5E1] max-w-2xl mx-auto leading-relaxed mb-8">
-                                Commit your confidential minimum salary. If your number and the company's maximum overlap, The Closing Table automatically calculates the fair 50/50 split, instantly maximizing your offer.
-                            </p>
-                            <p className="mt-4 text-xs text-[#CBD5E1]">
-                                For broader compensation context, see the{' '}
-                                <a
-                                    href="https://dccr.dragonfly.xyz/report"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="underline text-[#A7EF00] hover:text-[#A7EF00]"
-                                >
-                                    Dragonfly DCCR report
-                                </a>.
+                            <p className="text-sm text-[#CBD5E1] max-w-2xl mx-auto leading-relaxed mb-8 opacity-80">
+                                No negotiation. No back-and-forth. Just one number, one result.
                             </p>
                         </div>
 
                         <GlassCard className="mb-8">
                             <div className="text-center">
                                 <Button onClick={() => setStep('input')} className="w-full md:w-auto">
-                                    Secure Your Offer Now{' '}
+                                    Get Started{' '}
                                     <Icons.ArrowRight className="w-5 h-5" />
                                 </Button>
                             </div>
@@ -2137,39 +1780,31 @@
                                     aria-busy={loadingMarket}
                                     className="w-full"
                                 >
-                                    {loadingMarket ? 'Checking Market Data...' : 'Check Market Data'}
+                                    {loadingMarket ? 'Loading...' : 'Get Market Guidance'}
                                 </Button>
                                 {marketData && (
                                     <div className="mt-3 p-4 bg-[#A7EF00]/10 border border-[#A7EF00]/30 rounded-xl text-left animate-enter">
-                                        <p className="text-sm text-[#CBD5E1] mb-2">
-                                            <strong className="text-[#A7EF00]">Guidance:</strong> ${marketData.toLocaleString()}
-                                            {' '}(illustrative only, not a firm market quote)
+                                        <p className="text-sm text-[#CBD5E1] mb-3">
+                                            <strong className="text-[#A7EF00]">Suggested:</strong> ${marketData.toLocaleString()}
                                         </p>
-                                        <div className="flex gap-2">
-                                            <a
-                                                href="https://dccr.dragonfly.xyz/report"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-xs underline text-[#A7EF00] hover:text-[#A7EF00]"
-                                            >
-                                                Read Dragonfly DCCR report
-                                            </a>
-                                            <button
-                                                onClick={() => setAsk(marketData)}
-                                                aria-label={`Set minimum salary to ${marketData.toLocaleString()}`}
-                                                className="text-xs underline text-[#A7EF00] hover:text-[#A7EF00] transition-colors"
-                                            >
-                                                Use this number
-                                            </button>
-                                        </div>
+                                        <button
+                                            onClick={() => setAsk(marketData)}
+                                            aria-label={`Set minimum salary to ${marketData.toLocaleString()}`}
+                                            className="text-xs text-[#A7EF00] hover:text-[#A7EF00] underline transition-colors"
+                                        >
+                                            Use this amount
+                                        </button>
                                     </div>
                                 )}
                             </div>
 
                             <div className="text-left mb-8">
-                                <label className="block text-xs font-bold text-[#A7EF00] uppercase tracking-widest mb-6">
-                                    Your Walk-Away Number (CMin)
+                                <label className="block text-sm font-bold text-[#A7EF00] uppercase tracking-widest mb-2">
+                                    Your Minimum Salary
                                 </label>
+                                <p className="text-xs text-[#CBD5E1] mb-6 opacity-70">
+                                    The lowest amount you'd accept. The company won't see this until after you submit.
+                                </p>
                                 <div className="flex items-baseline justify-start mb-6">
                                     <span className="text-[#CBD5E1] text-4xl font-bold mr-2">$</span>
                                     <span
@@ -2201,7 +1836,7 @@
                             <div className="space-y-8">
                                 <div className="text-left">
                                     <label className="block text-xs font-medium text-[#CBD5E1] mb-3">
-                                        Private Reference Email
+                                        Your Email
                                     </label>
                                     <input
                                         type="email"
@@ -2220,7 +1855,7 @@
                                         className="w-full frosted-input border border-white/10 rounded-2xl py-4 px-4 text-[#F1F5F9] focus:outline-none focus:border-[#A7EF00] focus:ring-2 focus:ring-[#A7EF00]/30 hover:border-[#A7EF00]/50 transition-all duration-200"
                                     />
                                     <p className="mt-3 text-xs text-[#CBD5E1] hush-hint">
-                                        Private Record: Your email secures your final, official result. Neither the company nor the system will send unsolicited emails or store this long-term.
+                                        We'll send your result here. No spam, no long-term storage.
                                     </p>
                                 </div>
 
@@ -2232,7 +1867,7 @@
                                     disabled={!email} 
                                     className="w-full"
                                 >
-                                    🔒 Commit & See Your Result
+                                    Submit & See Result
                                 </Button>
                             </div>
                         </GlassCard>
@@ -2269,10 +1904,10 @@
 
                         <h2 className="text-5xl font-bold text-[#F1F5F9] mb-6">
                             {isSuccess
-                                ? 'Deal Accepted!'
+                                ? 'Deal Closed'
                                 : result.status === 'close'
-                                ? 'Gap Detected'
-                                : 'No Deal.'}
+                                ? 'Close, But No Deal'
+                                : 'No Deal'}
                         </h2>
 
                         {isSuccess ? (() => {
@@ -2288,19 +1923,18 @@
                                         <div className="mb-6">
                                             <div className="flex justify-between items-center mb-4">
                                                 <div>
-                                                    <p className="text-sm text-[#CBD5E1]">CMin (Your True Minimum)</p>
+                                                    <p className="text-xs text-[#CBD5E1] mb-1">Your Minimum</p>
                                                     <p className="text-xl font-bold text-[#A7EF00]">${cMin.toLocaleString()}</p>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className="text-sm text-[#CBD5E1]">CMax (Company Max)</p>
-                                                    <p className="text-sm text-[#FACC15] mb-1">REVEALED:</p>
+                                                    <p className="text-xs text-[#CBD5E1] mb-1">Company Maximum</p>
                                                     <p className="text-xl font-bold text-[#FCD34D]">${cMax.toLocaleString()}</p>
                                                 </div>
                                             </div>
                                             
                                             <div className="outcome-bar-container">
                                                 <div className="outcome-bar-fair-split">
-                                                    <div className="outcome-bar-split-label">Shared Surplus (50/50)</div>
+                                                    <div className="outcome-bar-split-label">50/50 Split</div>
                                                 </div>
                                                 <div className="outcome-bar-label" style={{ left: '0%' }}>${cMin.toLocaleString()}</div>
                                                 <div className="outcome-bar-label" style={{ left: '50%', transform: 'translateX(-50%)' }}>${result.final.toLocaleString()}</div>
@@ -2311,17 +1945,20 @@
 
                                     {/* Final Offer with Surplus Counter */}
                                     <GlassCard className="border-[#A7EF00]/30">
-                                        <p className="text-2xl font-bold text-[#F1F5F9] mb-2">Final Offer:</p>
+                                        <p className="text-2xl font-bold text-[#F1F5F9] mb-2">Final Salary</p>
                                         <p className="text-7xl font-bold text-[#A7EF00] mb-6 tracking-tighter">
                                             ${result.final.toLocaleString()}
                                         </p>
                                         
                                         <div className="bg-[#A7EF00]/10 rounded-lg p-6 text-left">
-                                            <p className="text-lg font-bold text-[#A7EF00] mb-2">
-                                                🎉 Benefit Above Your Minimum:
+                                            <p className="text-sm text-[#CBD5E1] mb-2">
+                                                Above your minimum:
                                             </p>
-                                            <p className={`text-4xl font-bold text-[#A7EF00] surplus-counter`}>
+                                            <p className={`text-3xl font-bold text-[#A7EF00] surplus-counter`}>
                                                 ${surplusCounter.toLocaleString()}
+                                            </p>
+                                            <p className="text-xs text-[#CBD5E1] mt-2 opacity-70">
+                                                Surplus split 50/50: ${(result.surplus / 2).toLocaleString()} to each side
                                             </p>
                                         </div>
                                     </GlassCard>
@@ -2334,26 +1971,28 @@
                                                     <polyline points="20 6 9 17 4 12"></polyline>
                                                 </svg>
                                             </div>
-                                            <p className="text-2xl font-bold text-[#A7EF00] mb-2">
-                                                Deal Closed at ${result.final.toLocaleString()}!
+                                            <p className="text-xl font-bold text-[#A7EF00] mb-2">
+                                                Deal Closed: ${result.final.toLocaleString()}
                                             </p>
-                                            <p className="text-sm text-[#CBD5E1] mb-4">
-                                                The Closing Table Guarantee
+                                            <p className="text-xs text-[#CBD5E1] mb-4">
+                                                The Closing Table
                                             </p>
-                                            <Button
-                                                variant="outline"
-                                                className="text-xs"
-                                                onClick={async () => {
-                                                    try {
-                                                        await navigator.clipboard.writeText(revealLink || window.location.href);
-                                                        alert('Deal confirmation link copied to clipboard');
-                                                    } catch {
-                                                        alert('Copy failed');
-                                                    }
-                                                }}
-                                            >
-                                                Copy Deal Confirmation Link
-                                            </Button>
+                                            {revealLink && (
+                                                <Button
+                                                    variant="outline"
+                                                    className="text-xs"
+                                                    onClick={async () => {
+                                                        try {
+                                                            await navigator.clipboard.writeText(revealLink);
+                                                            alert('Link copied');
+                                                        } catch {
+                                                            alert('Copy failed');
+                                                        }
+                                                    }}
+                                                >
+                                                    Copy Result Link
+                                                </Button>
+                                            )}
                                         </div>
                                     </GlassCard>
                                 </div>
@@ -2374,12 +2013,11 @@
                                     <div className="mb-6">
                                         <div className="flex justify-between items-center mb-4">
                                             <div>
-                                                <p className="text-sm text-[#CBD5E1]">CMin (Your True Minimum)</p>
+                                                <p className="text-xs text-[#CBD5E1] mb-1">Your Minimum</p>
                                                 <p className="text-xl font-bold text-[#A7EF00]">${cMin.toLocaleString()}</p>
                                             </div>
                                             <div className="text-right">
-                                                <p className="text-sm text-[#CBD5E1]">CMax (Company Max)</p>
-                                                <p className="text-sm text-[#FACC15] mb-1">REVEALED:</p>
+                                                <p className="text-xs text-[#CBD5E1] mb-1">Company Maximum</p>
                                                 <p className="text-xl font-bold text-[#FCD34D]">${cMax.toLocaleString()}</p>
                                             </div>
                                         </div>
@@ -2387,7 +2025,7 @@
                                         <div className="outcome-bar-container">
                                             {result.status === 'close' ? (
                                                 <div className="outcome-bar-bridge">
-                                                    <div className="outcome-bar-split-label">10% Bridge Window</div>
+                                                    <div className="outcome-bar-split-label">Within 10%</div>
                                                 </div>
                                             ) : (
                                                 <div className="outcome-bar-no-deal">
@@ -2400,15 +2038,12 @@
 
                                     {result.status === 'close' && (
                                         <div className="bg-yellow-500/10 border border-[#FACC15]/30 p-6 rounded-xl mb-6 text-left">
-                                            <p className="text-yellow-200 font-bold text-xl mb-2">
-                                                You are very close (within 10%).
-                                            </p>
-                                            <p className="text-yellow-100/70 text-sm mb-2">
-                                                Fair split that would close the deal: <strong className="text-[#FACC15]">${Math.round(bridgeSplit / 1000) * 1000}</strong>
+                                            <p className="text-yellow-200 font-bold text-lg mb-2">
+                                                You're within 10% of a deal.
                                             </p>
                                             <p className="text-yellow-100/70 text-sm mb-4">
-                                                The automated tool couldn't bridge the gap, but you are close enough
-                                                that a short human conversation is highly recommended.
+                                                A fair split would be <strong className="text-[#FACC15]">${Math.round(bridgeSplit / 1000) * 1000}</strong>. 
+                                                Consider a quick conversation to bridge the gap.
                                             </p>
                                             <Button
                                                 variant="gold"
@@ -2430,11 +2065,10 @@
                                     {result.status === 'fail' && (
                                         <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-xl mb-6">
                                             <p className="text-red-200 font-bold">
-                                                Gap too large (&gt;10%).
+                                                Gap too large.
                                             </p>
                                             <p className="text-red-100/70 text-sm mt-1">
-                                                The ranges don't overlap enough for this mechanism to close a deal. It
-                                                may make sense to restart the search.
+                                                Your minimum is more than 10% above their maximum. This deal can't be closed automatically.
                                             </p>
                                         </div>
                                     )}
@@ -2525,63 +2159,46 @@
                     </div>
 
                     <h2 className="hero-heading text-5xl font-bold text-[#F1F5F9] mb-4">
-                        Final Offer Revealed
+                        Final Result
                     </h2>
                     <p className="hero-subtitle mb-8">
-                        This is the final base salary produced by the Closing Table mechanism.
+                        The Closing Table calculation result.
                     </p>
 
                     <div className="space-y-8">
                         {/* II. The Mechanism Run */}
                         <GlassCard className="border-[#A7EF00]/30">
-                            <h3 className="text-lg font-bold text-[#F1F5F9] mb-6 text-left">The Mechanism Run</h3>
-                            
-                            <div className="space-y-4 mb-6">
-                                <div className="flex justify-between items-center">
-                                    <span className="text-sm text-[#CBD5E1]">CMin (Candidate Min)</span>
-                                    <span className="text-xl font-bold text-[#A7EF00]">${data.min.toLocaleString()}</span>
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <span className="text-sm text-[#CBD5E1]">CMax (Company Max)</span>
-                                    <span className="text-xl font-bold text-[#FCD34D]">${data.max.toLocaleString()}</span>
-                                </div>
-                            </div>
-
-                            {/* Visual Calculation Bar */}
                             <div className="mb-6">
-                                <div className="calculation-bar-container" style={{ marginBottom: '32px' }}>
-                                    <div 
-                                        className="calculation-bar-range"
-                                        style={{ 
-                                            left: '0%',
-                                            width: '100%'
-                                        }}
-                                    />
-                                    <div 
-                                        className="calculation-bar-split-point"
-                                        style={{ 
-                                            left: '50%'
-                                        }}
-                                    />
-                                    <div className="calculation-bar-label left">${data.min.toLocaleString()}</div>
-                                    <div className="calculation-bar-label center">${data.final.toLocaleString()}</div>
-                                    <div className="calculation-bar-label right">${data.max.toLocaleString()}</div>
+                                <div className="flex justify-between items-center mb-4">
+                                    <div>
+                                        <p className="text-xs text-[#CBD5E1] mb-1">Candidate Minimum</p>
+                                        <p className="text-xl font-bold text-[#A7EF00]">${data.min.toLocaleString()}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-xs text-[#CBD5E1] mb-1">Company Maximum</p>
+                                        <p className="text-xl font-bold text-[#FCD34D]">${data.max.toLocaleString()}</p>
+                                    </div>
                                 </div>
-                                <p className="text-xs text-[#CBD5E1] text-center mt-2">
-                                    Surplus: ${data.surplus.toLocaleString()} split 50/50
-                                </p>
+                                
+                                <div className="outcome-bar-container">
+                                    <div className="outcome-bar-fair-split">
+                                        <div className="outcome-bar-split-label">50/50 Split</div>
+                                    </div>
+                                    <div className="outcome-bar-label" style={{ left: '0%' }}>${data.min.toLocaleString()}</div>
+                                    <div className="outcome-bar-label" style={{ left: '50%', transform: 'translateX(-50%)' }}>${data.final.toLocaleString()}</div>
+                                    <div className="outcome-bar-label" style={{ right: '0%' }}>${data.max.toLocaleString()}</div>
+                                </div>
                             </div>
                         </GlassCard>
 
-                        {/* III. Final Outcome */}
                         <GlassCard className="border-[#A7EF00]/30">
-                            <h3 className="text-lg font-bold text-[#F1F5F9] mb-4 text-left">Final Outcome</h3>
+                            <h3 className="text-lg font-bold text-[#F1F5F9] mb-4 text-left">Final Salary</h3>
                             <p className="text-7xl font-bold text-[#A7EF00] mb-4 tracking-tighter financial-number">
                                 ${data.final.toLocaleString()}
                             </p>
                             <div className="bg-[#A7EF00]/10 rounded-lg p-4 text-left">
-                                <p className="text-sm text-[#CBD5E1]">
-                                    <strong className="text-[#A7EF00]">Surplus Split:</strong> ${(data.surplus / 2).toLocaleString()} to each side
+                                <p className="text-xs text-[#CBD5E1]">
+                                    Surplus split 50/50: ${(data.surplus / 2).toLocaleString()} to each side
                                 </p>
                             </div>
                         </GlassCard>
@@ -2599,8 +2216,8 @@
                             <p className="text-[11px] text-[#A7EF00] break-all">{revealUrl}</p>
                         </div>
 
-                        <p className="text-[#CBD5E1] text-xs text-center">
-                            This view does not run the mechanism again. It only reveals a stored result.
+                        <p className="text-[#CBD5E1] text-xs text-center opacity-70">
+                            This is a stored result. The mechanism only runs once.
                         </p>
                     </div>
                 </div>
@@ -2608,226 +2225,7 @@
         };
 
         // --- MECHANISM SPEC SECTION ---
-        const MechanismSpec = () => {
-            const [isOpen, setIsOpen] = useState(false);
 
-            if (!isOpen) {
-                return (
-                    <div className="text-center mt-12 mb-8">
-                        <Button
-                            variant="outline"
-                            onClick={() => setIsOpen(true)}
-                            className="text-sm"
-                        >
-                            Learn More About the Mechanism
-                        </Button>
-                    </div>
-                );
-            }
-
-            return (
-                <div className="max-w-4xl mx-auto mt-12 mb-8">
-                    <GlassCard>
-                        <div className="flex justify-between items-center mb-8">
-                            <h2 className="text-2xl font-bold text-[#F1F5F9]">Mechanism Specification</h2>
-                            <button
-                                onClick={() => setIsOpen(false)}
-                                className="text-[#CBD5E1] hover:text-[#F1F5F9] text-sm"
-                            >
-                                Close
-                            </button>
-                        </div>
-
-                        <div className="space-y-8">
-                            <section id="inputs">
-                                <h3 className="text-lg font-bold text-[#A7EF00] mb-4">Inputs</h3>
-                                <div className="bg-[#1D0D32] rounded-lg p-4 mb-4">
-                                    <div className="flex gap-4 items-center">
-                                        <div className="flex-1">
-                                            <div className="h-3 bg-gradient-to-r from-[#FCD34D] to-[#F59E0B] rounded-full mb-2"></div>
-                                            <p className="text-xs text-[#CBD5E1]">Company Maximum</p>
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="h-3 bg-[#A7EF00] rounded-full mb-2"></div>
-                                            <p className="text-xs text-[#CBD5E1]">Candidate Minimum</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <p className="text-sm text-[#CBD5E1]">Both parties submit their walk-away numbers privately. Neither sees the other's input until the mechanism computes the outcome.</p>
-                            </section>
-
-                            <section id="outcomes">
-                                <h3 className="text-lg font-bold text-[#A7EF00] mb-4">Outcomes</h3>
-                                <div className="space-y-3">
-                                    <div className="bg-[#1D0D32] rounded-lg p-4 border border-[#A7EF00]/20">
-                                        <p className="text-sm font-semibold text-[#A7EF00] mb-2">Success</p>
-                                        <p className="text-xs text-[#CBD5E1]">When ranges overlap, the mechanism splits the surplus 50/50 and rounds to the nearest $1,000.</p>
-                                    </div>
-                                    <div className="bg-[#1D0D32] rounded-lg p-4 border border-[#FACC15]/20">
-                                        <p className="text-sm font-semibold text-[#FACC15] mb-2">Bridge Zone (10%)</p>
-                                        <p className="text-xs text-[#CBD5E1]">If the gap is within 10% of the company's maximum, the mechanism flags it for human conversation.</p>
-                                    </div>
-                                    <div className="bg-[#1D0D32] rounded-lg p-4 border border-[#EF4444]/20">
-                                        <p className="text-sm font-semibold text-[#EF4444] mb-2">No Deal</p>
-                                        <p className="text-xs text-[#CBD5E1]">If the gap exceeds 10%, the mechanism cannot bridge it automatically.</p>
-                                    </div>
-                                </div>
-                            </section>
-
-                            <section id="rules">
-                                <h3 className="text-lg font-bold text-[#A7EF00] mb-4">Rules</h3>
-                                <div className="space-y-4">
-                                    <div>
-                                        <p className="text-sm font-semibold text-[#F1F5F9] mb-2">Surplus Calculation</p>
-                                        <p className="text-xs text-[#CBD5E1]">Surplus = Company Max - Candidate Min (when Min ≤ Max)</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-semibold text-[#F1F5F9] mb-2">Split</p>
-                                        <p className="text-xs text-[#CBD5E1]">Final = Candidate Min + (Surplus / 2)</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-semibold text-[#F1F5F9] mb-2">Rounding</p>
-                                        <p className="text-xs text-[#CBD5E1]">Rounded to nearest $1,000 for privacy and simplicity.</p>
-                                    </div>
-                                </div>
-                            </section>
-
-                            <section id="privacy">
-                                <h3 className="text-lg font-bold text-[#A7EF00] mb-4">Privacy Model</h3>
-                                <div className="bg-[#1D0D32] rounded-lg p-4 border border-[#2D1455]">
-                                    <ul className="space-y-2 text-sm text-[#CBD5E1]">
-                                        <li>• No permanent storage of negotiation data</li>
-                                        <li>• Offers expire after 24 hours</li>
-                                        <li>• Results expire after 7 days</li>
-                                        <li>• No negotiation thread or history</li>
-                                        <li>• Single-use mechanism (one shot per offer)</li>
-                                    </ul>
-                                </div>
-                            </section>
-
-                            <section id="edge-cases">
-                                <h3 className="text-lg font-bold text-[#A7EF00] mb-4">Edge Cases</h3>
-                                <div className="space-y-3 text-sm text-[#CBD5E1]">
-                                    <p><strong className="text-[#F1F5F9]">Exact match:</strong> If Min = Max, final equals that value (no surplus to split).</p>
-                                    <p><strong className="text-[#F1F5F9]">Very small surplus:</strong> Still split 50/50, then rounded.</p>
-                                    <p><strong className="text-[#F1F5F9]">Boundary at 10%:</strong> Gap exactly equal to 10% of max triggers bridge zone.</p>
-                                </div>
-                            </section>
-                        </div>
-                    </GlassCard>
-                </div>
-            );
-        };
-
-        // --- SCENARIO CAROUSEL ---
-        const Scenarios = () => {
-            const [currentIndex, setCurrentIndex] = useState(0);
-            const scenarios = [
-                {
-                    role: "Senior Software Engineer",
-                    companyMax: "$180,000 - $220,000",
-                    candidateMin: "$160,000 - $200,000",
-                    outcome: "Success",
-                    insight: "Typical overlap leads to fair split around $190k"
-                },
-                {
-                    role: "Product Manager",
-                    companyMax: "$140,000 - $170,000",
-                    candidateMin: "$150,000 - $180,000",
-                    outcome: "Bridge Zone",
-                    insight: "Close gap often resolved with brief conversation"
-                },
-                {
-                    role: "Design Lead",
-                    companyMax: "$120,000 - $150,000",
-                    candidateMin: "$160,000 - $190,000",
-                    outcome: "No Deal",
-                    insight: "Significant mismatch suggests role/level misalignment"
-                },
-                {
-                    role: "Data Scientist",
-                    companyMax: "$200,000 - $250,000",
-                    candidateMin: "$190,000 - $230,000",
-                    outcome: "Success",
-                    insight: "High-demand roles show consistent overlap patterns"
-                }
-            ];
-
-            const nextScenario = () => {
-                setCurrentIndex((prev) => (prev + 1) % scenarios.length);
-            };
-
-            const prevScenario = () => {
-                setCurrentIndex((prev) => (prev - 1 + scenarios.length) % scenarios.length);
-            };
-
-            const current = scenarios[currentIndex];
-
-            return (
-                <div className="max-w-4xl mx-auto mt-12 mb-8">
-                    <GlassCard>
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-xl font-bold text-[#F1F5F9]">Example Scenarios</h2>
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={prevScenario}
-                                    className="px-3 py-1 text-sm text-[#CBD5E1] hover:text-[#F1F5F9] border border-white/10 rounded hover:border-[#A7EF00]/50 transition"
-                                >
-                                    ←
-                                </button>
-                                <button
-                                    onClick={nextScenario}
-                                    className="px-3 py-1 text-sm text-[#CBD5E1] hover:text-[#F1F5F9] border border-white/10 rounded hover:border-[#A7EF00]/50 transition"
-                                >
-                                    →
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="bg-[#1D0D32] rounded-lg p-6 border border-[#2D1455] transition-all duration-300 hover:scale-[1.02] hover:border-[#A7EF00]/30 hover:shadow-lg hover:shadow-[#A7EF00]/10 scenario-card-enter">
-                            <div className="mb-4">
-                                <h3 className="text-lg font-bold text-[#F1F5F9] mb-2">{current.role}</h3>
-                                <div className="grid grid-cols-2 gap-4 text-sm">
-                                    <div>
-                                        <p className="text-[#CBD5E1] text-xs mb-1">Company Max Range</p>
-                                        <p className="text-[#FCD34D] font-mono">{current.companyMax}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-[#CBD5E1] text-xs mb-1">Candidate Min Range</p>
-                                        <p className="text-[#A7EF00] font-mono">{current.candidateMin}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="mt-4 pt-4 border-t border-white/10">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                                        current.outcome === 'Success' ? 'bg-[#A7EF00]/20 text-[#A7EF00]' :
-                                        current.outcome === 'Bridge Zone' ? 'bg-[#FACC15]/20 text-[#FACC15]' :
-                                        'bg-[#EF4444]/20 text-[#EF4444]'
-                                    }`}>
-                                        {current.outcome}
-                                    </span>
-                                </div>
-                                <p className="text-sm text-[#CBD5E1]">{current.insight}</p>
-                            </div>
-                        </div>
-
-                        <div className="flex justify-center gap-2 mt-4">
-                            {scenarios.map((_, idx) => (
-                                <button
-                                    key={idx}
-                                    onClick={() => setCurrentIndex(idx)}
-                                    className={`w-2 h-2 rounded-full transition ${
-                                        idx === currentIndex ? 'bg-[#A7EF00]' : 'bg-[#CBD5E1]/30'
-                                    }`}
-                                    aria-label={`Go to scenario ${idx + 1}`}
-                                />
-                            ))}
-                        </div>
-                    </GlassCard>
-                </div>
-            );
-        };
 
         // --- ROOT APP ---
 
@@ -2859,10 +2257,7 @@
                         ) : offerId ? (
                             <CandidateView offerId={offerId} />
                         ) : (
-                            <>
-                                <CompanyView />
-                                <Scenarios />
-                            </>
+                            <CompanyView />
                         )}
                     </div>
                 </div>
