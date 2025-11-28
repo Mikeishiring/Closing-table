@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,10 +13,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
-        
+
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #0F0518; /* Deepest Purple Background */
+            background-color: #0F0518;
+            /* Deepest Purple Background */
             color: #E2E8F0;
             min-height: 100vh;
         }
@@ -31,22 +33,45 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        
+
         @keyframes fade-in-up {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
+
         .animate-enter {
             animation: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
     </style>
 </head>
+
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
         // Ensure React hooks are correctly aliased
-        const { useState, useEffect, useCallback } = React;
+        const { useState, useEffect } = React;
+
+        // --- MECHANISM CONSTANTS ---
+        const BRIDGE_ZONE_PCT = 0.10;       // 10% gap treated as "close"
+        const ROUNDING_GRANULARITY = 1000;  // $1,000 rounding
+
+        // --- SIMPLE EVENT LOGGER ---
+        function logEvent(type, payload = {}) {
+            const event = {
+                type,
+                ts: new Date().toISOString(),
+                ...payload,
+            };
+            console.log('[closing-table-event]', event);
+        }
 
         // --- CONFIGURATION ---
         const COLORS = {
@@ -61,17 +86,17 @@
 
         // --- ICONS ---
         const Icons = {
-            Lock: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>,
-            Unlock: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>,
-            Mail: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>,
-            Check: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="20 6 9 17 4 12"/></svg>,
-            Copy: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>,
-            ArrowRight: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>,
-            Handshake: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m11 17 2 2a2 2 0 1 0 2.8-2.8l-6-6-2 2 2 2 2 2a2 2 0 1 1-2.8 2.8L11 17Z"/><path d="m22 11-2-2-6 6-2-2-6 6-2-2a2 2 0 0 1 2.8-2.8l6 6 2-2 6-6 2 2 2 2a2 2 0 0 1 2.8 2.8l-2 2Z"/></svg>,
-            Phone: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>,
-            Shield: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
-            TrendingUp: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="18 7 22 7 22 11"/></svg>,
-            Terminal: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>,
+            Lock: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>,
+            Unlock: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 9.9-1" /></svg>,
+            Mail: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>,
+            Check: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="20 6 9 17 4 12" /></svg>,
+            Copy: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>,
+            ArrowRight: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>,
+            Handshake: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m11 17 2 2a2 2 0 1 0 2.8-2.8l-6-6-2 2 2 2 2 2a2 2 0 1 1-2.8 2.8L11 17Z" /><path d="m22 11-2-2-6 6-2-2-6 6-2-2a2 2 0 0 1 2.8-2.8l6 6 2-2 6-6 2 2 2 2a2 2 0 0 1 2.8 2.8l-2 2Z" /></svg>,
+            Phone: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>,
+            Shield: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>,
+            TrendingUp: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="22 7 13.5 15.5 8.5 10.5 2 17" /><polyline points="18 7 22 7 22 11" /></svg>,
+            Terminal: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="4 17 10 11 4 5" /><line x1="12" y1="19" x2="20" y2="19" /></svg>,
             Info: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>,
         };
 
@@ -82,8 +107,8 @@
             return (
                 <div className="relative w-full h-12 flex items-center">
                     <div className="absolute w-full h-2 bg-gray-800 rounded-full overflow-hidden">
-                        <div 
-                            className="h-full bg-gradient-to-r from-lime-400 to-lime-500" 
+                        <div
+                            className="h-full bg-gradient-to-r from-lime-400 to-lime-500"
                             style={{ width: `${percent}%` }}
                         />
                     </div>
@@ -98,7 +123,7 @@
                         className="absolute w-full h-full opacity-0 cursor-pointer z-20"
                     />
                     {/* Custom Thumb */}
-                    <div 
+                    <div
                         className="absolute h-6 w-6 bg-white border-4 border-lime-400 rounded-full shadow-lg z-10 pointer-events-none transition-all duration-100"
                         style={{ left: `calc(${percent}% - 12px)` }}
                     />
@@ -108,7 +133,7 @@
 
         const Button = ({ children, onClick, disabled, variant = 'primary', className = '' }) => {
             const baseStyle = "relative px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed";
-            
+
             const variants = {
                 primary: "bg-lime-400 text-black hover:bg-lime-300 shadow-lg shadow-lime-400/20 hover:shadow-lime-400/40",
                 secondary: "bg-white/10 text-white border border-white/10 hover:bg-white/20 backdrop-blur-md",
@@ -119,8 +144,8 @@
             };
 
             return (
-                <button 
-                    onClick={onClick} 
+                <button
+                    onClick={onClick}
                     disabled={disabled}
                     className={`${baseStyle} ${variants[variant]} ${className}`}
                 >
@@ -139,7 +164,7 @@
             const bandSize = 10000;
             const lower = Math.floor(value / bandSize) * bandSize;
             const upper = lower + bandSize;
-            
+
             return (
                 <div className="flex justify-center mt-2">
                     <span className="text-xs font-bold text-gray-500 uppercase tracking-widest border border-gray-700 px-3 py-1 rounded-full">
@@ -157,10 +182,10 @@
                 <div className="relative h-16 w-full flex items-center">
                     {/* Track */}
                     <div className="absolute w-full h-2 bg-gray-700 rounded-full"></div>
-                    
+
                     {/* Overlap Zone */}
                     <div className="absolute left-1/4 right-1/4 h-2 bg-gradient-to-r from-lime-400 to-yellow-400 rounded-full opacity-50 animate-pulse"></div>
-                    
+
                     {/* Markers */}
                     <div className="absolute left-1/4 top-[-25px] flex flex-col items-center">
                         <span className="text-xs font-bold text-white mb-1">You</span>
@@ -191,10 +216,16 @@
             const [link, setLink] = useState(null);
 
             const generateLink = () => {
-                const payload = btoa(JSON.stringify({ max: budget, email, ts: Date.now() }));
-                // Construct the full URL with the hash fragment
-                const newLink = `${window.location.origin}${window.location.pathname}#offer=${payload}`;
+                const payload = { max: budget, email, ts: Date.now(), demo: false };
+                const encoded = btoa(JSON.stringify(payload));
+                const newLink = `${window.location.origin}${window.location.pathname}#offer=${encoded}`;
                 setLink(newLink);
+
+                logEvent('offer_created', {
+                    max: budget,
+                    email,
+                    linkLength: newLink.length,
+                });
             };
 
             const copyLink = () => {
@@ -207,8 +238,8 @@
                 textarea.select();
                 try {
                     document.execCommand('copy');
-                    // Custom message box instead of alert
-                    alert("Link copied to clipboard"); 
+                    alert("Link copied to clipboard");
+                    logEvent('offer_link_copied', { linkLength: link.length });
                 } catch (err) {
                     console.error('Could not copy text: ', err);
                 }
@@ -225,8 +256,8 @@
                             Offer Secured.
                         </h1>
                         <p className="text-xl text-gray-300 mb-10 leading-relaxed">
-                            We've locked your limit of <strong className="text-lime-400">${budget.toLocaleString()}</strong> in the vault. 
-                            <br/>Share this private link with the candidate.
+                            We've locked your limit of <strong className="text-lime-400">${budget.toLocaleString()}</strong>.
+                            <br />Share this link with the candidate to run the Closing Table.
                         </p>
 
                         <GlassCard className="mb-8">
@@ -260,7 +291,7 @@
                             The <span className="gold-text-gradient">Closing Table</span>
                         </h1>
                         <p className="text-xl text-gray-300 leading-relaxed">
-                            A fair, private way to close the deal. 
+                            A fair, private way to close the deal.
                             Set your walk-away number. If they fit within it, we split the difference.
                         </p>
                     </div>
@@ -269,7 +300,7 @@
                         <label className="block text-xs font-bold text-lime-400 uppercase tracking-widest mb-4">
                             Maximum Offer Limit (Private)
                         </label>
-                        
+
                         <div className="flex items-baseline justify-center mb-2">
                             <span className="text-gray-500 text-4xl font-bold mr-2">$</span>
                             <span className="text-7xl font-bold text-white tracking-tighter">
@@ -279,12 +310,12 @@
                         <BandIndicator value={budget} />
 
                         <div className="mb-12 px-4 mt-8">
-                            <Slider 
-                                min={50000} 
-                                max={300000} 
-                                step={5000} 
-                                value={budget} 
-                                onChange={(e) => setBudget(parseInt(e.target.value))} 
+                            <Slider
+                                min={50000}
+                                max={300000}
+                                step={5000}
+                                value={budget}
+                                onChange={(e) => setBudget(parseInt(e.target.value))}
                             />
                             <div className="flex justify-between mt-2 text-xs text-gray-500 font-medium uppercase">
                                 <span>Conservative</span>
@@ -295,12 +326,12 @@
                         <div className="space-y-6">
                             <div>
                                 <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
-                                    Where to send the deal?
+                                    Where to send the deal? (for your own reference)
                                 </label>
                                 <div className="relative">
                                     <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-                                    <input 
-                                        type="email" 
+                                    <input
+                                        type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         placeholder="you@company.com"
@@ -313,9 +344,9 @@
                                 <Icons.Lock className="w-5 h-5" />
                                 Lock Budget & Create Link
                             </Button>
-                            
+
                             <p className="text-center text-xs text-gray-500">
-                                The candidate will never see this number unless a deal is reached.
+                                This prototype runs entirely in the browser and does not store offer data on a server.
                             </p>
                         </div>
                     </GlassCard>
@@ -331,51 +362,76 @@
             const [marketData, setMarketData] = useState(null);
             const [loadingMarket, setLoadingMarket] = useState(false);
 
+            const isDemo = data.demo === true;
+
             const fetchMarketData = () => {
                 setLoadingMarket(true);
                 // Mock API call delay
                 setTimeout(() => {
                     // Mock data calculation: slightly below the company max to encourage a reasonable ask
-                    const mockMarketValue = Math.round((data.max * 0.95 + 1000) / 1000) * 1000;
+                    const mockMarketValue = Math.round((data.max * 0.95 + ROUNDING_GRANULARITY) / ROUNDING_GRANULARITY) * ROUNDING_GRANULARITY;
                     setMarketData(mockMarketValue);
                     setLoadingMarket(false);
+                    logEvent('market_data_shown', { max: data.max, suggested: mockMarketValue });
                 }, 1500);
             };
 
             const submit = () => {
                 const cMax = data.max;
                 const cMin = ask;
-                
+
+                let outcome;
+                let surplus = null;
+                let gap = null;
+
                 if (cMin <= cMax) {
                     // Success: Overlap found. Split the difference.
-                    const surplus = cMax - cMin;
+                    surplus = cMax - cMin;
                     const rawFinal = cMin + (surplus / 2);
-                    // ANTI-REVERSE ENGINEERING: Round to nearest $1000 to obscure exact max
-                    const final = Math.round(rawFinal / 1000) * 1000; 
-                    setResult({ status: 'success', final, surplus });
-                } else if (cMin <= cMax * 1.10) { // WIDENED BRIDGE ZONE TO 10%
-                    // Close failure: within 10% -> Recommendation to Talk
-                    setResult({ status: 'close', gap: cMin - cMax });
+                    const final = Math.round(rawFinal / ROUNDING_GRANULARITY) * ROUNDING_GRANULARITY;
+                    outcome = { status: 'success', final, surplus };
+                } else if (cMin <= cMax * (1 + BRIDGE_ZONE_PCT)) {
+                    // Close failure: within bridge zone -> Recommendation to Talk
+                    gap = cMin - cMax;
+                    outcome = { status: 'close', gap };
                 } else {
                     // Hard failure
-                    setResult({ status: 'fail', gap: cMin - cMax });
+                    gap = cMin - cMax;
+                    outcome = { status: 'fail', gap };
                 }
+
+                setResult(outcome);
                 setStep('result');
+
+                logEvent('candidate_submitted', {
+                    max: cMax,
+                    min: cMin,
+                    status: outcome.status,
+                    surplus: surplus,
+                    gap: gap,
+                    emailProvided: !!email,
+                    demo: isDemo,
+                });
             };
 
             if (step === 'intro') {
                 return (
                     <div className="max-w-3xl mx-auto animate-enter">
+                        {isDemo && (
+                            <div className="mb-4 text-xs text-center text-gray-400 uppercase tracking-widest">
+                                Demo Mode – Numbers are for illustration only.
+                            </div>
+                        )}
                         <div className="text-center mb-12">
                             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-lime-400 font-bold mb-6">
-                                <Icons.Lock className="w-4 h-4" /> Double-Blind Secured
+                                <Icons.Lock className="w-4 h-4" /> Single-Step, Private Mechanism
                             </div>
                             <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white tracking-tight">
                                 Fair, Fast, Private Negotiation
                             </h1>
                             <p className="text-xl md:text-2xl text-gray-300 leading-relaxed max-w-2xl mx-auto">
-                                We have the company's best offer locked in a vault. 
-                                <br/>Tell us what you need. If it fits, the deal is done instantly.
+                                The company has set a maximum they're willing to pay.
+                                <br />You set your minimum. If your ranges overlap, the tool splits the surplus and closes the deal.
                             </p>
                         </div>
 
@@ -388,19 +444,19 @@
                                             <div className="w-8 h-8 rounded-full bg-lime-400/10 flex items-center justify-center shrink-0">
                                                 <span className="font-bold text-lime-400">1</span>
                                             </div>
-                                            <p className="text-gray-300">They set a max limit. You never see it.</p>
+                                            <p className="text-gray-300">They set a max limit. You never see it in this interface.</p>
                                         </li>
                                         <li className="flex gap-4">
                                             <div className="w-8 h-8 rounded-full bg-lime-400/10 flex items-center justify-center shrink-0">
                                                 <span className="font-bold text-lime-400">2</span>
                                             </div>
-                                            <p className="text-gray-300">You set your minimum. They never see it.</p>
+                                            <p className="text-gray-300">You set your minimum. They never see it directly.</p>
                                         </li>
                                         <li className="flex gap-4">
                                             <div className="w-8 h-8 rounded-full bg-lime-400/10 flex items-center justify-center shrink-0">
                                                 <span className="font-bold text-lime-400">3</span>
                                             </div>
-                                            <p className="text-gray-300">If there's an overlap, we <strong>split the extra money</strong> 50/50.</p>
+                                            <p className="text-gray-300">If there's overlap, we <strong>split the extra money</strong> 50/50 and round the final number.</p>
                                         </li>
                                     </ul>
                                 </div>
@@ -421,6 +477,11 @@
             if (step === 'input') {
                 return (
                     <div className="max-w-xl mx-auto animate-enter text-center">
+                        {isDemo && (
+                            <div className="mb-4 text-xs text-center text-gray-400 uppercase tracking-widest">
+                                Demo Mode – No real offers are created.
+                            </div>
+                        )}
                         <h2 className="text-3xl font-bold text-white mb-2">What is your minimum?</h2>
                         <p className="text-gray-400 mb-10">The lowest number you'd happily sign for today.</p>
 
@@ -434,12 +495,12 @@
                             <BandIndicator value={ask} />
 
                             <div className="mb-8 mt-8">
-                                <Slider 
-                                    min={80000} 
-                                    max={250000} 
-                                    step={1000} 
-                                    value={ask} 
-                                    onChange={(e) => setAsk(parseInt(e.target.value))} 
+                                <Slider
+                                    min={80000}
+                                    max={250000}
+                                    step={1000}
+                                    value={ask}
+                                    onChange={(e) => setAsk(parseInt(e.target.value))}
                                 />
                             </div>
 
@@ -447,7 +508,7 @@
                             <div className="mb-8 p-4 bg-white/5 rounded-xl border border-white/10">
                                 <div className="flex justify-between items-center">
                                     <span className="text-sm font-bold text-gray-400">Not sure what to ask?</span>
-                                    <button 
+                                    <button
                                         onClick={fetchMarketData}
                                         disabled={loadingMarket || marketData}
                                         className="text-xs font-bold text-lime-400 hover:text-lime-300 uppercase tracking-widest"
@@ -458,7 +519,7 @@
                                 {marketData && (
                                     <div className="mt-3 text-left animate-enter">
                                         <p className="text-sm text-gray-300">
-                                            Market avg for this role is around <strong className="text-white">${marketData.toLocaleString()}</strong>.
+                                            Market-style guidance for this role is around <strong className="text-white">${marketData.toLocaleString()}</strong>.
                                             <button onClick={() => setAsk(marketData)} className="ml-2 underline text-lime-400">Use this</button>
                                         </p>
                                     </div>
@@ -468,10 +529,10 @@
                             <div className="space-y-6">
                                 <div className="text-left">
                                     <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
-                                        Where to send the offer?
+                                        Where should the outcome go?
                                     </label>
-                                    <input 
-                                        type="email" 
+                                    <input
+                                        type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         placeholder="you@email.com"
@@ -490,12 +551,18 @@
 
             if (step === 'result') {
                 const isSuccess = result.status === 'success';
-                
+
                 return (
                     <div className="max-w-xl mx-auto animate-enter text-center">
                         <div className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-8 shadow-2xl ${isSuccess ? 'bg-lime-400 shadow-lime-400/50' : result.status === 'close' ? 'bg-yellow-500 shadow-yellow-500/50' : 'bg-red-500 shadow-red-500/50'}`}>
                             {isSuccess ? <Icons.Handshake className="w-12 h-12 text-black" /> : result.status === 'close' ? <Icons.Phone className="w-12 h-12 text-black" /> : <Icons.Lock className="w-12 h-12 text-white" />}
                         </div>
+
+                        {isDemo && (
+                            <div className="mb-4 text-xs text-center text-gray-400 uppercase tracking-widest">
+                                Demo Mode – Example outcome only.
+                            </div>
+                        )}
 
                         <h2 className="text-5xl font-bold text-white mb-6">
                             {isSuccess ? 'Deal Accepted!' : result.status === 'close' ? 'Gap Detected' : 'No Deal.'}
@@ -503,17 +570,17 @@
 
                         {isSuccess ? (
                             <GlassCard className="border-lime-500/30">
-                                <p className="text-gray-400 text-lg mb-2">Final Binding Offer</p>
+                                <p className="text-gray-400 text-lg mb-2">Final Binding Offer (from the mechanism)</p>
                                 <p className="text-7xl font-bold text-lime-400 mb-4 tracking-tighter">
                                     ${result.final.toLocaleString()}
                                 </p>
                                 <div className="bg-lime-400/10 rounded-lg p-4 inline-block">
                                     <p className="text-lime-200 text-sm font-medium">
-                                        Rounded for privacy. Includes a <strong>${result.surplus.toLocaleString()}</strong> fair split bonus!
+                                        Rounded for privacy. Includes a <strong>${result.surplus.toLocaleString()}</strong> fair split of the surplus between your minimum and their maximum.
                                     </p>
                                 </div>
                                 <p className="mt-8 text-gray-400 text-sm">
-                                    An official offer letter has been sent to {email}.
+                                    In a full system, this is where an official offer workflow (emails, docs) would kick in using the final number and your email: {email}.
                                 </p>
                             </GlassCard>
                         ) : (
@@ -527,9 +594,9 @@
                                             You are very close (Within 10%).
                                         </p>
                                         <p className="text-yellow-100/70 text-sm mb-4">
-                                            The automated tool couldn't bridge the gap, but you are close enough that a human conversation is highly recommended.
+                                            The automated tool couldn't bridge the gap, but you are close enough that a short human conversation is highly recommended.
                                         </p>
-                                        <Button variant="gold" className="w-full justify-center" onClick={() => alert('Meeting request sent to company.')}>
+                                        <Button variant="gold" className="w-full justify-center" onClick={() => alert('In a full system, this would trigger a follow-up or scheduling flow.')}>
                                             Schedule Resolution Call <Icons.Phone className="w-4 h-4" />
                                         </Button>
                                     </div>
@@ -537,10 +604,10 @@
                                 {result.status === 'fail' && (
                                     <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-xl mb-6">
                                         <p className="text-red-200 font-bold">
-                                            Gap too large (>10%).
+                                            Gap too large (&gt;10%).
                                         </p>
                                         <p className="text-red-100/70 text-sm mt-1">
-                                            We recommend restarting the search process.
+                                            The ranges don't overlap enough for this mechanism to close a deal. It may make sense to restart the search.
                                         </p>
                                     </div>
                                 )}
@@ -566,14 +633,26 @@
                         // Decode data passed via URL hash (base64)
                         const decoded = JSON.parse(atob(match[1]));
                         setCompanyData(decoded);
-                    } catch(e) { console.error(e); }
+                        logEvent('offer_viewed', {
+                            hasMax: typeof decoded.max === 'number',
+                            hasEmail: !!decoded.email,
+                            ts: decoded.ts,
+                            demo: !!decoded.demo,
+                        });
+                    } catch (e) {
+                        console.error(e);
+                        logEvent('offer_view_error', { error: String(e) });
+                    }
                 } else {
                     // DEMO MODE: Auto-load candidate view for preview if no hash is present
-                    setCompanyData({
+                    const demoData = {
                         max: 160000,
                         companyEmail: "demo@company.com",
-                        ts: Date.now()
-                    });
+                        ts: Date.now(),
+                        demo: true,
+                    };
+                    setCompanyData(demoData);
+                    logEvent('demo_loaded', { max: demoData.max });
                 }
                 setIsReady(true);
             }, []);
@@ -594,4 +673,5 @@
         root.render(<App />);
     </script>
 </body>
+
 </html>
