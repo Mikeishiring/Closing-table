@@ -33,8 +33,8 @@
     <script src="https://cdn.tailwindcss.com" defer></script>
     <style>
         body {
-            background: linear-gradient(180deg, #1A1A1A 0%, #0F0F0F 100%);
-            color: #ffffff;
+            background: linear-gradient(180deg, #E8E8E8 0%, #E0E0E0 100%);
+            color: #1A1A1A;
             font-family: 'Inter', sans-serif;
         }
 
@@ -44,32 +44,10 @@
             inset: 0;
             pointer-events: none;
             background: url('https://grainy-gradients.vercel.app/noise.svg');
-            opacity: 0.35;
+            opacity: 0.08;
             z-index: 0;
         }
 
-
-        @keyframes floatUp {
-            0% {
-                transform: translateY(0) translateX(0) rotate(0deg);
-                opacity: 0.05;
-            }
-            40% {
-                opacity: 0.15;
-            }
-            100% {
-                transform: translateY(-130vh) translateX(20px) rotate(8deg);
-                opacity: 0;
-            }
-        }
-
-        .floating-symbol {
-            position: fixed;
-            pointer-events: none;
-            z-index: 1;
-            color: #F5C04A;
-            animation: floatUp linear infinite;
-        }
 
         @keyframes goldPulse {
             0% { box-shadow: 0 0 0 0 rgba(245, 192, 74, 0.4); }
@@ -100,15 +78,14 @@
         }
 
         .glass-panel {
-            background: rgba(26, 26, 26, 0.55);
+            background: #E4E4E4;
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(245, 192, 74, 0.25);
+            border: none;
             box-shadow: 
-                0 32px 80px rgba(0, 0, 0, 0.45),
-                0 16px 40px rgba(0, 0, 0, 0.35),
-                0 8px 20px rgba(0, 0, 0, 0.4),
-                0 0 20px rgba(245, 192, 74, 0.15);
-            border-radius: 1rem;
+                8px 8px 16px rgba(163, 163, 163, 0.6),
+                -8px -8px 16px rgba(255, 255, 255, 0.8),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+            border-radius: 1.5rem;
             position: relative;
             padding: 2rem;
         }
@@ -117,8 +94,8 @@
             content: "";
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, rgba(100, 100, 100, 0.05) 0%, transparent 50%);
-            opacity: 0.3;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, transparent 50%);
+            opacity: 0.5;
             pointer-events: none;
             border-radius: inherit;
         }
@@ -902,17 +879,6 @@
             }
         }
 
-        // --- CONFIGURATION (visual only) ---
-        const COLORS = {
-            BG: '#0F0F0F',
-            CARD: '#1A1A1A',
-            ACCENT: '#A7EF00',
-            ACCENT_SEC: '#A7EF00',
-            GOLD: '#FCD34D',
-            TEXT_MAIN: '#F1F5F9',
-            TEXT_MUTED: '#CBD5E1',
-        };
-
         // --- ICONS ---
         const Icons = {
             Lock: ({ className }) => (
@@ -1168,57 +1134,114 @@
             );
         };
 
+        // --- REUSABLE HOW IT WORKS FAQ ---
+        const HowItWorksSection = ({ isCandidate = false }) => (
+            <GlassCard className="border-[#F5C04A]/25">
+                <h3 className="text-base font-bold text-yellow-400 tracking-wide mb-4">
+                    How it works
+                </h3>
 
-        const FloatingSymbols = () => {
-            const symbols = ["🔑", "✨", "💰", "🔒", "👑", "💎", "📈", "🪙"];
-            const items = Array.from({ length: 50 }); // Increase density to 50 floating symbols
-
-            return (
-                <div>
-                    {items.map((_, i) => {
-                        const sym = symbols[Math.floor(Math.random() * symbols.length)];
-                        return (
-                            <div
-                                key={i}
-                                className="floating-symbol"
-                                style={{
-                                    left: `${Math.random() * 100}vw`,
-                                    bottom: "-10vh",
-                                    fontSize: `${8 + Math.random() * 14}px`, // random sizing for depth
-                                    opacity: 0.05 + Math.random() * 0.12, // better depth variation
-                                    animationDuration: `${18 + Math.random() * 25}s`,
-                                    animationDelay: `${Math.random() * 25}s`,
-                                    transform: `translateX(${Math.random() * 20 - 10}px)`,
-                                }}
-                            >
-                                {sym}
+                <ul className="space-y-3 text-sm text-gray-200 mb-6">
+                    <li className="flex items-start gap-2">
+                        <span className="text-yellow-400 mt-1">•</span>
+                        <div>
+                            <span className="font-semibold">No negotiation.</span> Both sides commit {isCandidate ? 'their numbers once' : 'up front'}.
+                        </div>
+                    </li>
+                    <li className="flex items-start gap-2">
+                        <span className="text-yellow-400 mt-1">•</span>
+                        <div>
+                            <span className="font-semibold">Fair split.</span> If {isCandidate ? 'your minimum and their maximum' : 'ranges'} overlap, {isCandidate ? 'we split the surplus' : 'surplus splits'} 50/50.
+                        </div>
+                    </li>
+                    <li className="flex items-start gap-2">
+                        <span className="text-yellow-400 mt-1">•</span>
+                        <div>
+                            <span className="font-semibold">Private.</span> Neither side {isCandidate ? 'ever ' : ''}sees the other's number.
+                        </div>
+                    </li>
+                    {isCandidate && (
+                        <li className="flex items-start gap-2">
+                            <span className="text-yellow-400 mt-1">•</span>
+                            <div>
+                                <span className="font-semibold">Clear outcome.</span> You immediately see whether there's a deal, a close gap, or no deal.
                             </div>
-                        );
-                    })}
-                </div>
-            );
-        };
+                        </li>
+                    )}
+                </ul>
 
-        const SplitDiagram = () => (
-            <div className="my-8 p-6 bg-[#1A1A1A]/50 rounded-2xl border border-[#F5C04A]/20">
-                <div className="relative h-16 w-full flex items-center">
-                    <div className="absolute w-full h-2 bg-[#1A1A1A] rounded-full"></div>
-                    <div className="absolute inset-0 rounded-full bg-yellow-400/40 oracle-glow"></div>
-                    <div className="absolute left-1/4 right-1/4 h-2 bg-[#F5C04A] rounded-full opacity-80"></div>
-                    <div className="absolute left-1/4 top-[-16px] flex flex-col items-center">
-                        <span className="text-xs font-bold text-[#F1F5F9] mb-1">You</span>
-                        <div className="w-4 h-4 bg-[#F5C04A] rounded-full border-2 border-[#F5C04A] shadow-[0_0_8px_rgba(245,192,74,0.6)]"></div>
-                    </div>
-                    <div className="absolute left-1/2 top-4 flex flex-col items-center">
-                        <div className="h-6 w-px bg-[#F5C04A] mb-1" style={{ boxShadow: '0 0 4px rgba(245, 192, 74, 0.8)' }}></div>
-                        <span className="text-xs font-bold text-yellow-400">Split Surplus</span>
-                    </div>
-                    <div className="absolute right-1/4 top-[-16px] flex flex-col items-center">
-                        <span className="text-xs font-bold text-[#CBD5E1] mb-1">Company</span>
-                        <div className="w-4 h-4 bg-[#CBD5E1] rounded-full border-2 border-[#F5C04A] shadow-[0_0_8px_rgba(245,192,74,0.4)]"></div>
-                    </div>
+                <div className="border-t border-gray-700 pt-4 space-y-3 text-sm">
+                    <details className="group">
+                        <summary className="cursor-pointer font-medium text-gray-200 hover:text-yellow-400 transition-colors list-none flex items-center gap-2">
+                            <span className="text-yellow-400 group-open:rotate-90 transition-transform">▶</span>
+                            How is the final salary calculated?
+                        </summary>
+                        <div className="mt-2 text-sm text-gray-300 pl-5">
+                            {isCandidate ? (
+                                <>
+                                    <p className="mb-2">If your minimum (CMin) is less than or equal to the company's maximum (CMax), we:</p>
+                                    <ul className="space-y-1 mb-2">
+                                        <li>• Compute the surplus: CMax − CMin</li>
+                                        <li>• Split it evenly: Final Offer = CMin + (CMax − CMin) / 2</li>
+                                        <li>• Round the result to the nearest $1,000 for privacy</li>
+                                    </ul>
+                                    <p>This guarantees you don't go below your minimum, and the company doesn't go above its maximum.</p>
+                                </>
+                            ) : (
+                                <p>If your CMax meets their CMin, we split the overlap 50/50.</p>
+                            )}
+                        </div>
+                    </details>
+
+                    <details className="group">
+                        <summary className="cursor-pointer font-medium text-gray-200 hover:text-yellow-400 transition-colors list-none flex items-center gap-2">
+                            <span className="text-yellow-400 group-open:rotate-90 transition-transform">▶</span>
+                            What if {isCandidate ? 'our ' : ''}numbers don't overlap?
+                        </summary>
+                        <div className="mt-2 text-sm text-gray-300 pl-5">
+                            {isCandidate ? (
+                                <>
+                                    <p className="mb-2">If your minimum is above the company's maximum, there are two cases:</p>
+                                    <ul className="space-y-1 mb-2">
+                                        <li>• <strong>Bridge zone (close):</strong> If the gap is small (within 10% of their maximum), we flag that a human conversation might bridge it.</li>
+                                        <li>• <strong>No deal:</strong> If the gap is larger than 10%, we show that the ranges are too far apart for this mechanism to close a deal.</li>
+                                    </ul>
+                                    <p>In both cases, your number stays private. The company never sees what you entered.</p>
+                                </>
+                            ) : (
+                                <p>No deal. Neither side sees the other's number.</p>
+                            )}
+                        </div>
+                    </details>
+
+                    {isCandidate ? (
+                        <details className="group">
+                            <summary className="cursor-pointer font-medium text-gray-200 hover:text-yellow-400 transition-colors list-none flex items-center gap-2">
+                                <span className="text-yellow-400 group-open:rotate-90 transition-transform">▶</span>
+                                Who can see my number?
+                            </summary>
+                            <div className="mt-2 text-sm text-gray-300 pl-5">
+                                <p className="mb-2">Only the mechanism. Neither the company nor any individual sees your exact CMin.</p>
+                                <ul className="space-y-1">
+                                    <li>• The company sees only the final salary (if there's a deal) or that no deal was possible.</li>
+                                    <li>• You see the same: the computed offer, a 'close gap' signal, or a 'no deal' result.</li>
+                                    <li>• All inputs are stored temporarily and auto-deleted after a short window as described in the project documentation.</li>
+                                </ul>
+                            </div>
+                        </details>
+                    ) : (
+                        <details className="group">
+                            <summary className="cursor-pointer font-medium text-gray-200 hover:text-yellow-400 transition-colors list-none flex items-center gap-2">
+                                <span className="text-yellow-400 group-open:rotate-90 transition-transform">▶</span>
+                                What happens to our data?
+                            </summary>
+                            <p className="mt-2 text-sm text-gray-300 pl-5">
+                                Auto-deleted after 7 days.
+                            </p>
+                        </details>
+                    )}
                 </div>
-            </div>
+            </GlassCard>
         );
 
         // --- COMPANY VIEW ---
@@ -1519,64 +1542,7 @@
                     </GlassCard>
 
                     {/* Assurance / Details zone */}
-                    <GlassCard className="border-[#F5C04A]/25">
-                        <h3 className="text-base font-bold text-yellow-400 tracking-wide mb-4">
-                            How it works
-                        </h3>
-
-                        <ul className="space-y-3 text-sm text-gray-200 mb-6">
-                            <li className="flex items-start gap-2">
-                                <span className="text-yellow-400 mt-1">•</span>
-                                <div>
-                                    <span className="font-semibold">No negotiation.</span> Both sides commit up front.
-                                </div>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <span className="text-yellow-400 mt-1">•</span>
-                                <div>
-                                    <span className="font-semibold">Fair split.</span> If ranges overlap, surplus splits 50/50.
-                                </div>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <span className="text-yellow-400 mt-1">•</span>
-                                <div>
-                                    <span className="font-semibold">Private.</span> Neither side sees the other's number.
-                                </div>
-                            </li>
-                        </ul>
-
-                        <div className="border-t border-gray-700 pt-4 space-y-3 text-sm">
-                            <details className="group">
-                                <summary className="cursor-pointer font-medium text-gray-200 hover:text-yellow-400 transition-colors list-none flex items-center gap-2">
-                                    <span className="text-yellow-400 group-open:rotate-90 transition-transform">▶</span>
-                                    How is the final salary calculated?
-                                </summary>
-                                <p className="mt-2 text-sm text-gray-300 pl-5">
-                                    If your CMax meets their CMin, we split the overlap 50/50.
-                                </p>
-                            </details>
-
-                            <details className="group">
-                                <summary className="cursor-pointer font-medium text-gray-200 hover:text-yellow-400 transition-colors list-none flex items-center gap-2">
-                                    <span className="text-yellow-400 group-open:rotate-90 transition-transform">▶</span>
-                                    What if numbers don't overlap?
-                                </summary>
-                                <p className="mt-2 text-sm text-gray-300 pl-5">
-                                    No deal. Neither side sees the other's number.
-                                </p>
-                            </details>
-
-                            <details className="group">
-                                <summary className="cursor-pointer font-medium text-gray-200 hover:text-yellow-400 transition-colors list-none flex items-center gap-2">
-                                    <span className="text-yellow-400 group-open:rotate-90 transition-transform">▶</span>
-                                    What happens to our data?
-                                </summary>
-                                <p className="mt-2 text-sm text-gray-300 pl-5">
-                                    Auto-deleted after 7 days.
-                                </p>
-                            </details>
-                        </div>
-                    </GlassCard>
+                    <HowItWorksSection isCandidate={false} />
 
                 </div>
             );
@@ -1589,11 +1555,8 @@
             const [email, setEmail] = useState('');
             const [step, setStep] = useState('loading');
             const [result, setResult] = useState(null);
-            const [marketData, setMarketData] = useState(null);
-            const [loadingMarket, setLoadingMarket] = useState(false);
             const [offerStatus, setOfferStatus] = useState(null);
             const [error, setError] = useState(null);
-            const marketDataTimeoutRef = useRef(null);
             const [askAnimating, setAskAnimating] = useState(false);
             const [ledFlicker, setLedFlicker] = useState(false);
             const [greenFlash, setGreenFlash] = useState(false);
@@ -1685,37 +1648,6 @@
                     setGreenFlash(false);
                 }, 800);
             };
-
-            const fetchMarketData = () => {
-                if (loadingMarket || marketData) return;
-                setLoadingMarket(true);
-                // Use a reasonable default for mock data (actual max not available from API)
-                // In a real system, this would use the actual offer max from the API
-                const defaultMax = 120000;
-                // Clear any existing timeout
-                if (marketDataTimeoutRef.current) {
-                    clearTimeout(marketDataTimeoutRef.current);
-                }
-                marketDataTimeoutRef.current = setTimeout(() => {
-                    // Mock market data - in real system this would come from API
-                    const mockMarketValue =
-                        Math.round((defaultMax * 0.95 + ROUNDING_GRANULARITY) / ROUNDING_GRANULARITY) *
-                        ROUNDING_GRANULARITY;
-                    setMarketData(mockMarketValue);
-                    setLoadingMarket(false);
-                    logEvent('market_data_shown', { suggested: mockMarketValue });
-                    marketDataTimeoutRef.current = null;
-                }, 1500);
-            };
-
-            // Cleanup timeout on unmount
-            useEffect(() => {
-                return () => {
-                    if (marketDataTimeoutRef.current) {
-                        clearTimeout(marketDataTimeoutRef.current);
-                    }
-                };
-            }, []);
 
             const submit = async () => {
                 // Validate offerId before submitting
@@ -1853,125 +1785,47 @@
 
             if (step === 'intro') {
                 return (
-                    <div className="max-w-6xl mx-auto animate-enter p-8">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-                            {/* Left Side */}
-                            <div>
-                                <h2 className="text-5xl font-extrabold text-yellow-400">Fair, Fast, Private</h2>
-                                <p className="text-gray-200/80 mt-4 text-lg leading-relaxed">
-                                    Set your minimum. If it aligns with the company's maximum, you get a fair offer instantly. No haggling.
-                                </p>
-
-                                <ul className="mt-10 space-y-6 text-gray-300">
-                                    <li className="flex items-start gap-3">
-                                        <span className="text-yellow-400 text-xl mt-1">1.</span>
-                                        <span>Company commits <strong>CMax</strong> (maximum budget).</span>
-                                    </li>
-                                    <li className="flex items-start gap-3">
-                                        <span className="text-yellow-400 text-xl mt-1">2.</span>
-                                        <span>You commit <strong>CMin</strong> (minimum salary).</span>
-                                    </li>
-                                    <li className="flex items-start gap-3">
-                                        <span className="text-yellow-400 text-xl mt-1">3.</span>
-                                        <span>If they overlap (<strong>CMin ≤ CMax</strong>), surplus splits 50/50.</span>
-                                    </li>
-                                </ul>
+                    <div className="max-w-4xl mx-auto animate-enter px-4 py-16">
+                        {/* Hero / Intro zone */}
+                        <div className="text-center mb-10">
+                            <div className="relative inline-block mb-4">
+                                <div className="absolute inset-0 blur-3xl opacity-20 bg-yellow-300 rounded-full"></div>
+                                <h1 className="relative text-6xl font-extrabold text-yellow-400 tracking-tight drop-shadow-[0_0_10px_rgba(245,192,74,0.4)]">
+                                    The Closing Table
+                                </h1>
                             </div>
-
-                            {/* Right Side */}
-                            <div>
-                                <SplitDiagram />
-
-                                <div className="mt-8 text-sm text-gray-300 bg-black/40 p-5 rounded-xl border border-white/10">
-                                    <p className="font-semibold text-yellow-400 mb-2">The Formula:</p>
-                                    <p>If CMin ≤ CMax, then:</p>
-                                    <p className="mt-1 text-yellow-300 font-medium">
-                                        Final Offer = CMin + (CMax - CMin) / 2
-                                    </p>
-                                        <p className="mt-2 text-xs text-gray-500">
-                                            Rounded to $1,000 for privacy.
-                                        </p>
-                                </div>
-                            </div>
+                            <p className="text-xl text-gray-200/80 mt-4 leading-relaxed mb-4">
+                                Set your true minimum salary. No haggling, no anchoring, no games.
+                            </p>
+                            <p className="text-sm text-gray-300 opacity-60 tracking-wide">
+                                Fair · Fast · Private
+                            </p>
                         </div>
 
-                        {/* Security & Action Block */}
-                        <div className="mt-12 max-w-2xl mx-auto">
-                            <GlassCard className="border-[#F5C04A]/25">
-                                <div className="text-center mb-6">
-                                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#F5C04A]/10 border border-[#F5C04A]/30 mb-4">
-                                        <Icons.Lock className="w-5 h-5 text-yellow-400" />
-                                        <span className="text-sm font-bold text-yellow-400">Your Number is Private</span>
-                                    </div>
-                                    <p className="text-sm text-gray-300 max-w-xl mx-auto leading-relaxed">
-                                        The company can't see your CMin. You can't see their CMax. No gamesmanship.
-                                    </p>
-                                </div>
-                                <div className="text-center">
-                                    <Button onClick={() => setStep('input')} className="w-full md:w-auto text-lg font-bold py-4 px-8">
-                                        Continue{' '}
-                                        <Icons.ArrowRight className="w-5 h-5" />
-                                    </Button>
-                                </div>
-                            </GlassCard>
-                        </div>
-                    </div>
-                );
-            }
-
-            if (step === 'input') {
-                return (
-                    <div className="max-w-xl mx-auto animate-enter">
-                        <GlassCard>
-                            {/* Check Market Data Button - Above Input */}
+                        {/* Action zone - Main Feature Card */}
+                        <GlassCard className="border-l-4 border-yellow-400/40 mb-8">
                             <div className="mb-6">
-                                <Button
-                                    variant="outline"
-                                    onClick={fetchMarketData}
-                                    disabled={loadingMarket || marketData}
-                                    aria-label="Check market data for salary guidance"
-                                    aria-busy={loadingMarket}
-                                    className="w-full"
-                                >
-                                    {loadingMarket ? 'Loading...' : 'Get Market Guidance'}
-                                </Button>
-                                {marketData && (
-                                    <div className="mt-3 p-4 bg-[#A7EF00]/10 border border-[#A7EF00]/30 rounded-xl text-left animate-enter">
-                                        <p className="text-sm text-[#CBD5E1] mb-3">
-                                            <strong className="text-[#A7EF00]">Suggested:</strong> ${marketData.toLocaleString()}
-                                        </p>
-                                        <button
-                                            onClick={() => setAsk(marketData)}
-                                            aria-label={`Set minimum salary to ${marketData.toLocaleString()}`}
-                                            className="text-xs text-[#A7EF00] hover:text-[#A7EF00] underline transition-colors"
-                                        >
-                                            Use this amount
-                                        </button>
-                                    </div>
-                                )}
+                                <h2 className="text-base font-bold text-yellow-400 tracking-wide mb-2">
+                                    Your Minimum (CMin)
+                                </h2>
+                                <p className="text-sm text-gray-300">
+                                    Your walk-away base salary. The company never sees this number.
+                                </p>
                             </div>
 
-                            <div className="text-left mb-8">
-                                <label className="block text-sm font-extrabold text-yellow-400 uppercase tracking-widest mb-2">
-                                    YOUR MINIMUM (CMin)
-                                </label>
-                                <p className="text-xs text-[#CBD5E1] mb-6 opacity-70">
-                                    The lowest you'd accept. The company won't see this.
-                                </p>
-                                <div className="flex items-baseline justify-start mb-6">
-                                    <span className="text-[#CBD5E1] text-4xl font-bold mr-2">$</span>
-                                    <span
-                                        className={
-                                            "text-7xl font-bold tracking-tighter jackpot-number financial-number " +
-                                            (askAnimating ? "jackpot-active" : "") +
-                                            (ledFlicker ? " led-flicker" : "") +
-                                            (greenFlash ? " candidate-confirm-flash" : " text-[#F1F5F9]")
-                                        }
-                                        style={{ transform: `scale(${askScale})` }}
-                                    >
-                                        {ask.toLocaleString()}
-                                    </span>
-                                </div>
+                            <div className="flex items-baseline justify-start mb-4">
+                                <span className="text-gray-300 text-4xl font-bold mr-2">$</span>
+                                <span
+                                    className={
+                                        "text-7xl font-bold text-white tracking-tighter jackpot-number financial-number " +
+                                        (askAnimating ? "jackpot-active" : "") +
+                                        (ledFlicker ? " led-flicker" : "") +
+                                        (greenFlash ? " candidate-confirm-flash" : "")
+                                    }
+                                    style={{ transform: `scale(${askScale})` }}
+                                >
+                                    {ask.toLocaleString()}
+                                </span>
                             </div>
 
                             <div className="mb-10 px-4 mt-8">
@@ -1986,44 +1840,136 @@
                                 />
                             </div>
 
-                            <div className="space-y-8">
-                                <div className="text-left">
-                                    <label className="block text-xs font-medium text-[#CBD5E1] mb-3">
-                                        Your Email
+                            <p className="text-sm text-gray-300 mb-6 text-center">
+                                Choose the minimum salary you'd be genuinely happy to accept for this role.
+                            </p>
+
+                            <div className="text-center">
+                                <Button onClick={() => setStep('input')} className="w-full text-lg font-bold">
+                                    Continue to Email{' '}
+                                    <Icons.ArrowRight className="w-5 h-5" />
+                                </Button>
+                            </div>
+
+                            <p className="text-center text-xs text-gray-300 opacity-80 mt-6">
+                                Your number is encrypted and never shared. The company only sees whether a deal is possible and the final salary we compute.
+                            </p>
+                        </GlassCard>
+
+                        {/* Assurance / Details zone */}
+                        <HowItWorksSection isCandidate={true} />
+
+                    </div>
+                );
+            }
+
+            if (step === 'input') {
+                return (
+                    <div className="max-w-2xl mx-auto animate-enter">
+                        {/* Hero / Intro zone */}
+                        <div className="text-center mb-10">
+                            <div className="relative inline-block mb-4">
+                                <div className="absolute inset-0 blur-3xl opacity-20 bg-yellow-300 rounded-full"></div>
+                                <h1 className="relative text-6xl font-extrabold text-yellow-400 tracking-tight drop-shadow-[0_0_10px_rgba(245,192,74,0.4)]">
+                                    The Closing Table
+                                </h1>
+                            </div>
+                            <p className="text-xl text-gray-200/80 mt-4 leading-relaxed mb-4">
+                                Set your true minimum salary. No haggling, no anchoring, no games.
+                            </p>
+                        </div>
+
+                        {/* Action zone - Main Feature Card */}
+                        <GlassCard className="border-l-4 border-yellow-400/40 mb-8">
+                            <div className="mb-6">
+                                <h2 className="text-base font-bold text-yellow-400 tracking-wide mb-2">
+                                    Your Minimum (CMin)
+                                </h2>
+                                <p className="text-sm text-gray-300">
+                                    Your walk-away base salary. The company never sees this number.
+                                </p>
+                            </div>
+
+                            <div className="flex items-baseline justify-start mb-4">
+                                <span className="text-gray-300 text-4xl font-bold mr-2">$</span>
+                                <span
+                                    className={
+                                        "text-7xl font-bold text-white tracking-tighter jackpot-number financial-number " +
+                                        (askAnimating ? "jackpot-active" : "") +
+                                        (ledFlicker ? " led-flicker" : "") +
+                                        (greenFlash ? " candidate-confirm-flash" : "")
+                                    }
+                                    style={{ transform: `scale(${askScale})` }}
+                                >
+                                    {ask.toLocaleString()}
+                                </span>
+                            </div>
+
+                            <div className="mb-10 px-4 mt-8">
+                                <Slider
+                                    min={80000}
+                                    max={250000}
+                                    step={1000}
+                                    value={ask}
+                                    onChange={handleAskChange}
+                                    onDragStart={() => {}}
+                                    onDragEnd={handleSliderRelease}
+                                />
+                            </div>
+
+                            <p className="text-sm text-gray-300 mb-6 text-center">
+                                Choose the minimum salary you'd be genuinely happy to accept for this role.
+                            </p>
+
+                            <div className="space-y-6">
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-300 mb-3">
+                                        Your email
                                     </label>
-                                    <input
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        onFocus={(e) => {
-                                            const hint = e.target.nextElementSibling;
-                                            if (hint) {
-                                                hint.classList.add('hidden');
-                                                setTimeout(() => hint.classList.remove('hidden'), 300);
-                                            }
-                                        }}
-                                        placeholder="you@email.com"
-                                        aria-label="Candidate email address"
-                                        autoComplete="email"
-                                        className="w-full frosted-input border border-white/10 rounded-2xl py-4 px-4 text-[#F1F5F9] focus:outline-none focus:border-[#F5C04A] focus:ring-2 focus:ring-[#F5C04A]/30 hover:border-[#F5C04A]/50 transition-all duration-200"
-                                    />
-                                    <p className="mt-3 text-xs text-[#CBD5E1] hush-hint">
-                                        We'll send your result here. No spam.
+                                    <div className="relative">
+                                        <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                        <input
+                                            type="email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            placeholder="you@email.com"
+                                            aria-label="Candidate email address"
+                                            autoComplete="email"
+                                            className="w-full frosted-input border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder-gray-400 focus:outline-none focus:border-[#F5C04A] focus:ring-2 focus:ring-[#F5C04A]/30 hover:border-[#F5C04A]/50 transition-all duration-200"
+                                        />
+                                    </div>
+                                    <p className="mt-2 text-xs text-gray-400">
+                                        We'll email you the result. No spam. Data auto-deletes after 7 days.
                                     </p>
                                 </div>
 
-                                <Button 
+                                {error && (
+                                    <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-xl">
+                                        <p className="text-red-200 text-sm">{error}</p>
+                                    </div>
+                                )}
+
+                                <button 
                                     onClick={() => {
                                         playMagneticLatchSound();
                                         submit();
                                     }} 
-                                    disabled={!email} 
-                                    className="w-full"
+                                    disabled={!email}
+                                    className="w-full bg-gradient-to-r from-yellow-300 to-amber-400 text-black font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(245,192,74,0.5)] hover:shadow-[0_0_30px_rgba(245,192,74,0.7)] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    🔒 Commit Min & Reveal Deal
-                                </Button>
+                                    <span className="text-xl">🔒</span>
+                                    Commit Minimum & See Result
+                                </button>
+
+                                <p className="text-center text-xs text-gray-300 opacity-80">
+                                    Your number is encrypted and never shared. The company only sees whether a deal is possible and the final salary we compute.
+                                </p>
                             </div>
                         </GlassCard>
+
+                        {/* Assurance / Details zone */}
+                        <HowItWorksSection isCandidate={true} />
+
                     </div>
                 );
             }
@@ -2405,7 +2351,6 @@
 
             return (
                 <div className="app-shell min-h-screen w-full flex flex-col items-center p-4 md:p-8 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]">
-                    <FloatingSymbols />
                     <div className="w-full max-w-6xl relative z-10 flex-1">
                         {resultId ? (
                             <ResultView resultId={resultId} />

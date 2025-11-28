@@ -103,4 +103,146 @@
                                          aria-label="Company email address"[m
                                          autoComplete="email"[m
 [31m-                                        className="w-full frosted-input border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-[#F1F5F9] placeholder-[#CBD5E1] focus:outline-none focus:border-[#F5C04A] focus:ring-2 focus:ring-[#F5C04A]/30 hover:border-[#F5C04A]/50 transition-all duration-200"[m
-[32m+[m[32m                           
+[32m+[m[32m                                        className="w-full frosted-input border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder-gray-400 focus:outline-none focus:border-[#F5C04A] focus:ring-2 focus:ring-[#F5C04A]/30 hover:border-[#F5C04A]/50 transition-all duration-200"[m
+                                     />[m
+                                 </div>[m
+[31m-                                <p className="mt-3 text-xs text-[#CBD5E1] hush-hint">[m
+[31m-                                    We'll send you the final result here. No spam, no storage beyond 7 days.[m
+[32m+[m[32m                                <p className="mt-2 text-xs text-gray-400">[m
+[32m+[m[32m                                    We'll email you the final agreed salary once both sides submit. No spam; data auto-deletes after 7 days.[m
+                                 </p>[m
+                             </div>[m
+ [m
+[36m@@ -1525,11 +1513,131 @@[m
+                             </button>[m
+ [m
+                             <p className="text-center text-xs text-gray-300 opacity-80">[m
+[31m-                                The candidate will never see your CMax. This mechanism protects your budget from negotiation gamesmanship.[m
+[32m+[m[32m                                The candidate will never see your CMax. This protects your budget from negotiation gamesmanship.[m
+                             </p>[m
+                         </div>[m
+                     </GlassCard>[m
+ [m
+[32m+[m[32m                    {/* Assurance / Details zone */}[m
+[32m+[m[32m                    <GlassCard className="border-[#F5C04A]/25">[m
+[32m+[m[32m                        <h3 className="text-base font-bold text-yellow-400 tracking-wide mb-4">[m
+[32m+[m[32m                            Why this is fair and safe[m
+[32m+[m[32m                        </h3>[m
+[32m+[m
+[32m+[m[32m                        <ul className="space-y-3 text-sm text-gray-200 mb-6">[m
+[32m+[m[32m                            <li className="flex items-start gap-2">[m
+[32m+[m[32m                                <span className="text-yellow-400 mt-1">•</span>[m
+[32m+[m[32m                                <div>[m
+[32m+[m[32m                                    <span className="font-semibold">No negotiation or anchoring.</span> Both sides commit their true numbers up front.[m
+[32m+[m[32m                                </div>[m
+[32m+[m[32m                            </li>[m
+[32m+[m[32m                            <li className="flex items-start gap-2">[m
+[32m+[m[32m                                <span className="text-yellow-400 mt-1">•</span>[m
+[32m+[m[32m                                <div>[m
+[32m+[m[32m                                    <span className="font-semibold">Fair to both parties.</span> If your CMax and their CMin overlap, the surplus is split 50/50.[m
+[32m+[m[32m                                </div>[m
+[32m+[m[32m                            </li>[m
+[32m+[m[32m                            <li className="flex items-start gap-2">[m
+[32m+[m[32m                                <span className="text-yellow-400 mt-1">•</span>[m
+[32m+[m[32m                                <div>[m
+[32m+[m[32m                                    <span className="font-semibold">Private by design.</span> Neither side ever sees the other's number; only the final result is shown.[m
+[32m+[m[32m                                </div>[m
+[32m+[m[32m                            </li>[m
+[32m+[m[32m                        </ul>[m
+[32m+[m
+[32m+[m[32m                        <div className="border-t border-gray-700 pt-4 space-y-3 text-sm">[m
+[32m+[m[32m                            <details className="group">[m
+[32m+[m[32m                                <summary className="cursor-pointer font-medium text-gray-200 hover:text-yellow-400 transition-colors list-none flex items-center gap-2">[m
+[32m+[m[32m                                    <span className="text-yellow-400 group-open:rotate-90 transition-transform">▶</span>[m
+[32m+[m[32m                                    How exactly is the final salary calculated?[m
+[32m+[m[32m                                </summary>[m
+[32m+[m[32m                                <p className="mt-2 text-sm text-gray-300 pl-5">[m
+[32m+[m[32m                                    We compare your CMax to the candidate's CMin. If your CMax is at or above their minimum, we take the overlap and split it 50/50. The result is the binding final salary.[m
+[32m+[m[32m                                </p>[m
+[32m+[m[32m                            </details>[m
+[32m+[m
+[32m+[m[32m                            <details className="group">[m
+[32m+[m[32m                                <summary className="cursor-pointer font-medium text-gray-200 hover:text-yellow-400 transition-colors list-none flex items-center gap-2">[m
+[32m+[m[32m                                    <span className="text-yellow-400 group-open:rotate-90 transition-transform">▶</span>[m
+[32m+[m[32m                                    What if our numbers don't overlap?[m
+[32m+[m[32m                                </summary>[m
+[32m+[m[32m                                <p className="mt-2 text-sm text-gray-300 pl-5">[m
+[32m+[m[32m                                    If your CMax is below the candidate's minimum, there is no overlap and the tool simply reports that there is no fair agreement. No one sees the other side's number.[m
+[32m+[m[32m                                </p>[m
+[32m+[m[32m                            </details>[m
+[32m+[m
+[32m+[m[32m                            <details className="group">[m
+[32m+[m[32m                                <summary className="cursor-pointer font-medium text-gray-200 hover:text-yellow-400 transition-colors list-none flex items-center gap-2">[m
+[32m+[m[32m                                    <span className="text-yellow-400 group-open:rotate-90 transition-transform">▶</span>[m
+[32m+[m[32m                                    What happens to our data?[m
+[32m+[m[32m                                </summary>[m
+[32m+[m[32m                                <p className="mt-2 text-sm text-gray-300 pl-5">[m
+[32m+[m[32m                                    We only store the numbers long enough to run the comparison and send the final result. All data is automatically deleted after 7 days.[m
+[32m+[m[32m                                </p>[m
+[32m+[m[32m                            </details>[m
+[32m+[m[32m                        </div>[m
+[32m+[m[32m                    </GlassCard>[m
+[32m+[m
+[32m+[m[32m                    {/* Assurance / Details zone */}[m
+[32m+[m[32m                    <GlassCard className="border-[#F5C04A]/25">[m
+[32m+[m[32m                        <h3 className="text-base font-bold text-yellow-400 tracking-wide mb-4">[m
+[32m+[m[32m                            Why this is fair and safe[m
+[32m+[m[32m                        </h3>[m
+[32m+[m
+[32m+[m[32m                        <ul className="space-y-3 text-sm text-gray-200 mb-6">[m
+[32m+[m[32m                            <li className="flex items-start gap-2">[m
+[32m+[m[32m                                <span className="text-yellow-400 mt-1">•</span>[m
+[32m+[m[32m                                <div>[m
+[32m+[m[32m                                    <span className="font-semibold">No negotiation or anchoring.</span> Both sides commit their true numbers up front.[m
+[32m+[m[32m                                </div>[m
+[32m+[m[32m                            </li>[m
+[32m+[m[32m                            <li className="flex items-start gap-2">[m
+[32m+[m[32m                                <span className="text-yellow-400 mt-1">•</span>[m
+[32m+[m[32m                                <div>[m
+[32m+[m[32m                                    <span className="font-semibold">Fair to both parties.</span> If your CMax and their CMin overlap, the surplus is split 50/50.[m
+[32m+[m[32m                                </div>[m
+[32m+[m[32m                            </li>[m
+[32m+[m[32m                            <li className="flex items-start gap-2">[m
+[32m+[m[32m                                <span className="text-yellow-400 mt-1">•</span>[m
+[32m+[m[32m                                <div>[m
+[32m+[m[32m                                    <span className="font-semibold">Private by design.</span> Neither side ever sees the other's number; only the final result is shown.[m
+[32m+[m[32m                                </div>[m
+[32m+[m[32m                            </li>[m
+[32m+[m[32m                        </ul>[m
+[32m+[m
+[32m+[m[32m                        <div className="border-t border-gray-700 pt-4 space-y-3 text-sm">[m
+[32m+[m[32m                            <details className="group">[m
+[32m+[m[32m                                <summary className="cursor-pointer font-medium text-gray-200 hover:text-yellow-400 transition-colors list-none flex items-center gap-2">[m
+[32m+[m[32m                                    <span className="text-yellow-400 group-open:rotate-90 transition-transform">▶</span>[m
+[32m+[m[32m                                    How exactly is the final salary calculated?[m
+[32m+[m[32m                                </summary>[m
+[32m+[m[32m                                <p className="mt-2 text-sm text-gray-300 pl-5">[m
+[32m+[m[32m                                    We compare your CMax to the candidate's CMin. If your CMax is at or above their minimum, we take the overlap and split it 50/50. The result is the binding final salary.[m
+[32m+[m[32m                                </p>[m
+[32m+[m[32m                            </details>[m
+[32m+[m
+[32m+[m[32m                            <details className="group">[m
+[32m+[m[32m                                <summary className="cursor-pointer font-medium text-gray-200 hover:text-yellow-400 transition-colors list-none flex items-center gap-2">[m
+[32m+[m[32m                                    <span className="text-yellow-400 group-open:rotate-90 transition-transform">▶</span>[m
+[32m+[m[32m                                    What if our numbers don't overlap?[m
+[32m+[m[32m                                </summary>[m
+[32m+[m[32m                                <p className="mt-2 text-sm text-gray-300 pl-5">[m
+[32m+[m[32m                                    If your CMax is below the candidate's minimum, there is no overlap and the tool simply reports that there is no fair agreement. No one sees the other side's number.[m
+[32m+[m[32m                                </p>[m
+[32m+[m[32m                            </details>[m
+[32m+[m
+[32m+[m[32m                            <details className="group">[m
+[32m+[m[32m                                <summary className="cursor-pointer font-medium text-gray-200 hover:text-yellow-400 transition-colors list-none flex items-center gap-2">[m
+[32m+[m[32m                                    <span className="text-yellow-400 group-open:rotate-90 transition-transform">▶</span>[m
+[32m+[m[32m                                    What happens to our data?[m
+[32m+[m[32m                                </summary>[m
+[32m+[m[32m                                <p className="mt-2 text-sm text-gray-300 pl-5">[m
+[32m+[m[32m                                    We only store the numbers long enough to run the comparison and send the final result. All data is automatically deleted after 7 days.[m
+[32m+[m[32m                                </p>[m
+[32m+[m[32m                            </details>[m
+[32m+[m[32m                        </div>[m
+[32m+[m[32m                    </GlassCard>[m
+[32m+[m
+                 </div>[m
+             );[m
+         };[m
