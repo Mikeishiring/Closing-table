@@ -522,15 +522,15 @@
                         const data = await response.json();
                         
                         if (data.status === 'invalid') {
-                            setError('This offer link is invalid or has expired.');
+                            setError('This offer link is not valid. It may have been typed incorrectly.');
                             setStep('error');
                             logEvent('offer_check_invalid', { offerId });
                         } else if (data.status === 'expired') {
-                            setError('This offer has expired. Please request a new link.');
+                            setError('This offer has expired. Ask the company to generate a new link.');
                             setStep('error');
                             logEvent('offer_check_expired', { offerId });
                         } else if (data.status === 'used') {
-                            setError('This offer has already been used.');
+                            setError('This link has already been used once. The mechanism only runs a single time per offer.');
                             setStep('error');
                             logEvent('offer_check_used', { offerId });
                         } else {
@@ -575,8 +575,18 @@
 
                     const data = await response.json();
 
-                    if (data.status === 'invalid' || data.status === 'expired' || data.status === 'used') {
-                        setError(`This offer is ${data.status}.`);
+                    if (data.status === 'invalid') {
+                        setError('This offer link is not valid. It may have been typed incorrectly.');
+                        setStep('error');
+                        logEvent('submit_rejected', { offerId, status: data.status });
+                        return;
+                    } else if (data.status === 'expired') {
+                        setError('This offer has expired. Ask the company to generate a new link.');
+                        setStep('error');
+                        logEvent('submit_rejected', { offerId, status: data.status });
+                        return;
+                    } else if (data.status === 'used') {
+                        setError('This link has already been used once. The mechanism only runs a single time per offer.');
                         setStep('error');
                         logEvent('submit_rejected', { offerId, status: data.status });
                         return;
@@ -617,8 +627,11 @@
                             </div>
                             <h2 className="text-3xl font-bold text-white mb-4">Unable to Load Offer</h2>
                             <p className="text-gray-300 mb-6">{error}</p>
-                            <Button variant="outline" onClick={() => window.location.href = '/'}>
-                                Start Over
+                            <Button variant="outline" onClick={() => {
+                                window.location.hash = '';
+                                window.location.reload();
+                            }}>
+                                Back to Start
                             </Button>
                         </GlassCard>
                     </div>

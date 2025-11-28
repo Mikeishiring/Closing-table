@@ -1,146 +1,132 @@
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-const { v4: uuidv4 } = require('uuid');
+import express from "express";
+import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// -----------------------------
+// In-memory Offer Store
+// -----------------------------
+const offers = new Map(); // offerId -> { max, email, createdAt, used, expiresAt }
+const OFFER_TTL_MS = 1000 * 60 * 60 * 4; // 4 hours
+
+// -----------------------------
+// Express App
+// -----------------------------
 const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Middleware
-app.use(cors());
 app.use(express.json());
-app.use(express.static('.'));
+app.use(express.static("."));
 
-// In-memory store: Map<offerId, Offer>
-const offers = new Map();
+// CORS
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "*",
+    methods: ["GET", "POST"],
+  })
+);
 
-// Cleanup expired offers every 5 minutes
-setInterval(() => {
-    const now = Date.now();
-    for (const [offerId, offer] of offers.entries()) {
-        if (offer.expiresAt < now) {
-            offers.delete(offerId);
-        }
-    }
-}, 5 * 60 * 1000);
+// -----------------------------
+// Helpers
+// -----------------------------
+function generateId() {
+  return Math.random().toString(36).substring(2, 12);
+}
 
-// POST /api/offers - Create a new offer
-app.post('/api/offers', (req, res) => {
-    const { max, email } = req.body;
+function roundToK(value) {
+  return Math.round(value / 1000) * 1000;
+}
 
-    // Validation
-    if (typeof max !== 'number' || max <= 0 || max > 10000000) {
-        return res.status(400).json({ 
-            error: 'Invalid max: must be a positive number less than 10,000,000' 
-        });
-    }
+// -----------------------------
+// API ENDPOINTS
+// -----------------------------
 
-    if (email && typeof email !== 'string') {
-        return res.status(400).json({ error: 'Invalid email format' });
-    }
+// 1. Create offer (company)
+app.post("/api/offers", (req, res) => {
+  const { max, email } = req.body;
 
-    // Create offer
-    const offerId = uuidv4();
-    const now = Date.now();
-    const offer = {
-        max,
-        email: email || null,
-        createdAt: now,
-        expiresAt: now + 24 * 60 * 60 * 1000, // 24 hours
-        used: false,
-    };
+  if (!max || typeof max !== "number") {
+    return res.status(400).json({ error: "Invalid max number" });
+  }
 
-    offers.set(offerId, offer);
+  const id = generateId();
+  const offer = {
+    max,
+    email: email || null,
+    createdAt: Date.now(),
+    used: false,
+    expiresAt: Date.now() + OFFER_TTL_MS,
+  };
 
-    res.json({ offerId });
+  offers.set(id, offer);
+
+  res.json({ offerId: id });
 });
 
-// GET /api/offers/:offerId - Check offer status
-app.get('/api/offers/:offerId', (req, res) => {
-    const { offerId } = req.params;
-    const offer = offers.get(offerId);
+// 2. Validate offer (candidate loads link)
+app.get("/api/offers/:id", (req, res) => {
+  const offer = offers.get(req.params.id);
 
-    if (!offer) {
-        return res.json({ status: 'invalid' });
-    }
+  if (!offer) return res.json({ status: "invalid" });
+  if (Date.now() > offer.expiresAt) return res.json({ status: "expired" });
+  if (offer.used) return res.json({ status: "used" });
 
-    const now = Date.now();
-    if (offer.expiresAt < now) {
-        offers.delete(offerId);
-        return res.json({ status: 'expired' });
-    }
-
-    if (offer.used) {
-        return res.json({ status: 'used' });
-    }
-
-    res.json({ status: 'ok' });
+  res.json({
+    status: "ok",
+    max: offer.max,
+  });
 });
 
-// POST /api/offers/:offerId/submit - Submit candidate's minimum and run mechanism
-app.post('/api/offers/:offerId/submit', (req, res) => {
-    const { offerId } = req.params;
-    const { min, email } = req.body;
+// 3. Submit candidate minimum
+app.post("/api/offers/:id/submit", (req, res) => {
+  const offer = offers.get(req.params.id);
+  if (!offer) return res.json({ status: "invalid" });
 
-    // Validation
-    if (typeof min !== 'number' || min <= 0) {
-        return res.status(400).json({ error: 'Invalid min: must be a positive number' });
-    }
+  if (Date.now() > offer.expiresAt)
+    return res.json({ status: "expired" });
 
-    // Look up offer
-    const offer = offers.get(offerId);
-    if (!offer) {
-        return res.json({ status: 'invalid' });
-    }
+  if (offer.used)
+    return res.json({ status: "used" });
 
-    const now = Date.now();
-    if (offer.expiresAt < now) {
-        offers.delete(offerId);
-        return res.json({ status: 'expired' });
-    }
+  const { min, email } = req.body;
 
-    if (offer.used) {
-        return res.json({ status: 'used' });
-    }
+  if (!min || typeof min !== "number") {
+    return res.status(400).json({ error: "Invalid minimum number" });
+  }
 
-    // Run the mechanism
-    const cMax = offer.max;
-    const cMin = min;
-    const BRIDGE_ZONE_PCT = 0.10;
-    const ROUNDING_GRANULARITY = 1000;
+  const cMax = offer.max;
+  const cMin = min;
 
-    let result;
-    let surplus = null;
-    let gap = null;
+  let outcome;
 
-    if (cMin <= cMax) {
-        // Success: Overlap found. Split the difference.
-        surplus = cMax - cMin;
-        const rawFinal = cMin + (surplus / 2);
-        const final = Math.round(rawFinal / ROUNDING_GRANULARITY) * ROUNDING_GRANULARITY;
-        result = { status: 'success', final, surplus };
-    } else if (cMin <= cMax * (1 + BRIDGE_ZONE_PCT)) {
-        // Close failure: within bridge zone -> Recommendation to Talk
-        gap = cMin - cMax;
-        result = { status: 'close', gap };
-    } else {
-        // Hard failure
-        gap = cMin - cMax;
-        result = { status: 'fail', gap };
-    }
+  if (cMin <= cMax) {
+    const surplus = cMax - cMin;
+    const raw = cMin + surplus / 2;
+    const final = roundToK(raw);
+    outcome = { status: "success", final, surplus };
+  } else if (cMin <= cMax * 1.1) {
+    const gap = cMin - cMax;
+    outcome = { status: "close", gap };
+  } else {
+    const gap = cMin - cMax;
+    outcome = { status: "fail", gap };
+  }
 
-    // Mark offer as used
-    offer.used = true;
+  offer.used = true; // one-shot
 
-    res.json(result);
+  res.json(outcome);
 });
 
 // Serve index.html for all other routes (SPA routing)
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
+// -----------------------------
+// Server Start
+// -----------------------------
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
-    console.log(`Closing Table server running on http://localhost:${PORT}`);
+  console.log("Closing Table backend running on port", PORT);
 });
-

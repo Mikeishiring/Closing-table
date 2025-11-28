@@ -1,24 +1,13 @@
 {
-  "name": "closing-table",
+  "name": "closing-table-backend",
   "version": "1.0.0",
-  "description": "A fair, private way to close salary negotiations",
+  "type": "module",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "node server.js"
   },
-  "keywords": [
-    "salary",
-    "negotiation",
-    "closing",
-    "double-blind"
-  ],
-  "author": "",
-  "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
     "cors": "^2.8.5",
-    "uuid": "^9.0.1"
+    "express": "^4.18.2"
   }
 }
-
