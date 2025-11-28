@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Closing Table</title>
+    <!-- Core React Imports -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0F0518; /* Deepest Purple Background */
+            color: #E2E8F0;
+            min-height: 100vh;
+        }
+
+        .glass-panel {
+            background: rgba(30, 10, 60, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .gold-text-gradient {
+            background: linear-gradient(to right, #FCD34D, #F59E0B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        @keyframes fade-in-up {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-enter {
+            animation: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // Ensure React hooks are correctly aliased
+        const { useState, useEffect, useCallback } = React;
+
+        // --- CONFIGURATION ---
+        const COLORS = {
+            BG: '#0F0518',
+            CARD: 'rgba(45, 20, 85, 0.4)',
+            ACCENT: '#A7EF00', // Lime
+            ACCENT_SEC: '#E879F9', // Fuchsia/Pink (Replaces Blue)
+            GOLD: '#FCD34D', // Gold
+            TEXT_MAIN: '#FFFFFF',
+            TEXT_MUTED: '#94A3B8',
+        };
+
+        // --- ICONS ---
+        const Icons = {
+            Lock: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>,
+            Unlock: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>,
+            Mail: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>,
+            Check: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="20 6 9 17 4 12"/></svg>,
+            Copy: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>,
+            ArrowRight: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>,
+            Handshake: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m11 17 2 2a2 2 0 1 0 2.8-2.8l-6-6-2 2 2 2 2 2a2 2 0 1 1-2.8 2.8L11 17Z"/><path d="m22 11-2-2-6 6-2-2-6 6-2-2a2 2 0 0 1 2.8-2.8l6 6 2-2 6-6 2 2 2 2a2 2 0 0 1 2.8 2.8l-2 2Z"/></svg>,
+            Phone: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>,
+            Shield: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
+            TrendingUp: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="18 7 22 7 22 11"/></svg>,
+            Terminal: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>,
+            Info: ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>,
+        };
+
+        // --- COMPONENTS ---
+
+        const Slider = ({ value, onChange, min, max, step }) => {
+            const percent = ((value - min) / (max - min)) * 100;
+            return (
+                <div className="relative w-full h-12 flex items-center">
+                    <div className="absolute w-full h-2 bg-gray-800 rounded-full overflow-hidden">
+                        <div 
+                            className="h-full bg-gradient-to-r from-lime-400 to-lime-500" 
+                            style={{ width: `${percent}%` }}
+                        />
+                    </div>
+                    {/* Invisible Range Input */}
+                    <input
+                        type="range"
+                        min={min}
+                        max={max}
+                        step={step}
+                        value={value}
+                        onChange={onChange}
+                        className="absolute w-full h-full opacity-0 cursor-pointer z-20"
+                    />
+                    {/* Custom Thumb */}
+                    <div 
+                        className="absolute h-6 w-6 bg-white border-4 border-lime-400 rounded-full shadow-lg z-10 pointer-events-none transition-all duration-100"
+                        style={{ left: `calc(${percent}% - 12px)` }}
+                    />
+                </div>
+            );
+        };
+
+        const Button = ({ children, onClick, disabled, variant = 'primary', className = '' }) => {
+            const baseStyle = "relative px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed";
+            
+            const variants = {
+                primary: "bg-lime-400 text-black hover:bg-lime-300 shadow-lg shadow-lime-400/20 hover:shadow-lime-400/40",
+                secondary: "bg-white/10 text-white border border-white/10 hover:bg-white/20 backdrop-blur-md",
+                outline: "border-2 border-gray-700 text-gray-300 hover:border-lime-400 hover:text-lime-400",
+                gold: "bg-gradient-to-r from-amber-300 to-yellow-500 text-black shadow-lg shadow-amber-400/20 hover:shadow-amber-400/40",
+                danger: "bg-red-500 text-white shadow-lg shadow-red-500/20 hover:bg-red-400",
+                ai: "bg-emerald-900/40 text-emerald-400 border border-emerald-700 hover:bg-emerald-900/60 shadow-md shadow-emerald-900/50",
+            };
+
+            return (
+                <button 
+                    onClick={onClick} 
+                    disabled={disabled}
+                    className={`${baseStyle} ${variants[variant]} ${className}`}
+                >
+                    {children}
+                </button>
+            );
+        };
+
+        const GlassCard = ({ children, className = '' }) => (
+            <div className={`glass-panel rounded-3xl p-8 md:p-12 shadow-2xl ${className}`}>
+                {children}
+            </div>
+        );
+
+        const BandIndicator = ({ value }) => {
+            const bandSize = 10000;
+            const lower = Math.floor(value / bandSize) * bandSize;
+            const upper = lower + bandSize;
+            
+            return (
+                <div className="flex justify-center mt-2">
+                    <span className="text-xs font-bold text-gray-500 uppercase tracking-widest border border-gray-700 px-3 py-1 rounded-full">
+                        Band: ${lower.toLocaleString()} - ${upper.toLocaleString()}
+                    </span>
+                </div>
+            );
+        };
+
+        // --- VISUALS ---
+
+        const SplitDiagram = () => (
+            <div className="my-8 p-6 bg-white/5 rounded-2xl border border-white/10">
+                <h3 className="text-lime-400 font-bold mb-4 text-sm tracking-widest uppercase">The Fair Split Logic</h3>
+                <div className="relative h-16 w-full flex items-center">
+                    {/* Track */}
+                    <div className="absolute w-full h-2 bg-gray-700 rounded-full"></div>
+                    
+                    {/* Overlap Zone */}
+                    <div className="absolute left-1/4 right-1/4 h-2 bg-gradient-to-r from-lime-400 to-yellow-400 rounded-full opacity-50 animate-pulse"></div>
+                    
+                    {/* Markers */}
+                    <div className="absolute left-1/4 top-[-25px] flex flex-col items-center">
+                        <span className="text-xs font-bold text-white mb-1">You</span>
+                        <div className="w-4 h-4 bg-lime-400 rounded-full border-4 border-gray-900"></div>
+                    </div>
+
+                    <div className="absolute left-1/2 top-4 flex flex-col items-center">
+                        <div className="h-6 w-px bg-white/20 mb-1"></div>
+                        <span className="text-xs font-bold text-yellow-400">Split Surplus</span>
+                    </div>
+
+                    <div className="absolute right-1/4 top-[-25px] flex flex-col items-center">
+                        <span className="text-xs font-bold text-gray-400 mb-1">Company</span>
+                        <div className="w-4 h-4 bg-gray-600 rounded-full border-4 border-gray-900"></div>
+                    </div>
+                </div>
+                <p className="text-gray-400 text-sm mt-4 text-center">
+                    We calculate the surplus overlap and split it 50/50. The final number is rounded to protect privacy.
+                </p>
+            </div>
+        );
+
+        // --- APP LOGIC ---
+
+        const CompanyView = () => {
+            const [budget, setBudget] = useState(140000);
+            const [email, setEmail] = useState('');
+            const [link, setLink] = useState(null);
+
+            const generateLink = () => {
+                const payload = btoa(JSON.stringify({ max: budget, email, ts: Date.now() }));
+                // Construct the full URL with the hash fragment
+                const newLink = `${window.location.origin}${window.location.pathname}#offer=${payload}`;
+                setLink(newLink);
+            };
+
+            const copyLink = () => {
+                // Use document.execCommand('copy') as navigator.clipboard might fail in iFrames
+                const textarea = document.createElement('textarea');
+                textarea.value = link;
+                textarea.style.position = 'fixed';
+                document.body.appendChild(textarea);
+                textarea.focus();
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    // Custom message box instead of alert
+                    alert("Link copied to clipboard"); 
+                } catch (err) {
+                    console.error('Could not copy text: ', err);
+                }
+                document.body.removeChild(textarea);
+            };
+
+            if (link) {
+                return (
+                    <div className="max-w-2xl mx-auto animate-enter text-center">
+                        <div className="mb-8 inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-lime-400 to-green-500 shadow-2xl shadow-lime-400/30 mx-auto">
+                            <Icons.Lock className="w-10 h-10 text-black" />
+                        </div>
+                        <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white">
+                            Offer Secured.
+                        </h1>
+                        <p className="text-xl text-gray-300 mb-10 leading-relaxed">
+                            We've locked your limit of <strong className="text-lime-400">${budget.toLocaleString()}</strong> in the vault. 
+                            <br/>Share this private link with the candidate.
+                        </p>
+
+                        <GlassCard className="mb-8">
+                            <div className="bg-black/30 p-4 rounded-xl border border-white/10 flex items-center justify-between gap-4 mb-6">
+                                <code className="text-lime-400 truncate flex-1 text-left font-mono text-sm">{link}</code>
+                                <button onClick={copyLink} className="p-2 hover:bg-white/10 rounded-lg transition">
+                                    <Icons.Copy className="w-5 h-5 text-gray-400" />
+                                </button>
+                            </div>
+                            <div className="grid gap-4">
+                                <Button onClick={copyLink} variant="gold">
+                                    Copy Link & Close
+                                </Button>
+                                <Button variant="secondary" onClick={() => {
+                                    window.location.hash = `#offer=${link.split('offer=')[1]}`;
+                                    window.location.reload();
+                                }}>
+                                    <Icons.ArrowRight className="w-5 h-5" />
+                                    Preview Candidate View
+                                </Button>
+                            </div>
+                        </GlassCard>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="max-w-2xl mx-auto animate-enter">
+                    <div className="text-center mb-12">
+                        <h1 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight">
+                            The <span className="gold-text-gradient">Closing Table</span>
+                        </h1>
+                        <p className="text-xl text-gray-300 leading-relaxed">
+                            A fair, private way to close the deal. 
+                            Set your walk-away number. If they fit within it, we split the difference.
+                        </p>
+                    </div>
+
+                    <GlassCard>
+                        <label className="block text-xs font-bold text-lime-400 uppercase tracking-widest mb-4">
+                            Maximum Offer Limit (Private)
+                        </label>
+                        
+                        <div className="flex items-baseline justify-center mb-2">
+                            <span className="text-gray-500 text-4xl font-bold mr-2">$</span>
+                            <span className="text-7xl font-bold text-white tracking-tighter">
+                                {budget.toLocaleString()}
+                            </span>
+                        </div>
+                        <BandIndicator value={budget} />
+
+                        <div className="mb-12 px-4 mt-8">
+                            <Slider 
+                                min={50000} 
+                                max={300000} 
+                                step={5000} 
+                                value={budget} 
+                                onChange={(e) => setBudget(parseInt(e.target.value))} 
+                            />
+                            <div className="flex justify-between mt-2 text-xs text-gray-500 font-medium uppercase">
+                                <span>Conservative</span>
+                                <span>Aggressive</span>
+                            </div>
+                        </div>
+
+                        <div className="space-y-6">
+                            <div>
+                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
+                                    Where to send the deal?
+                                </label>
+                                <div className="relative">
+                                    <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                                    <input 
+                                        type="email" 
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        placeholder="you@company.com"
+                                        className="w-full bg-black/30 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors"
+                                    />
+                                </div>
+                            </div>
+
+                            <Button onClick={generateLink} disabled={!email} variant="gold" className="w-full">
+                                <Icons.Lock className="w-5 h-5" />
+                                Lock Budget & Create Link
+                            </Button>
+                            
+                            <p className="text-center text-xs text-gray-500">
+                                The candidate will never see this number unless a deal is reached.
+                            </p>
+                        </div>
+                    </GlassCard>
+                </div>
+            );
+        };
+
+        const CandidateView = ({ data }) => {
+            const [ask, setAsk] = useState(120000);
+            const [email, setEmail] = useState('');
+            const [step, setStep] = useState('intro');
+            const [result, setResult] = useState(null);
+            const [marketData, setMarketData] = useState(null);
+            const [loadingMarket, setLoadingMarket] = useState(false);
+
+            const fetchMarketData = () => {
+                setLoadingMarket(true);
+                // Mock API call delay
+                setTimeout(() => {
+                    // Mock data calculation: slightly below the company max to encourage a reasonable ask
+                    const mockMarketValue = Math.round((data.max * 0.95 + 1000) / 1000) * 1000;
+                    setMarketData(mockMarketValue);
+                    setLoadingMarket(false);
+                }, 1500);
+            };
+
+            const submit = () => {
+                const cMax = data.max;
+                const cMin = ask;
+                
+                if (cMin <= cMax) {
+                    // Success: Overlap found. Split the difference.
+                    const surplus = cMax - cMin;
+                    const rawFinal = cMin + (surplus / 2);
+                    // ANTI-REVERSE ENGINEERING: Round to nearest $1000 to obscure exact max
+                    const final = Math.round(rawFinal / 1000) * 1000; 
+                    setResult({ status: 'success', final, surplus });
+                } else if (cMin <= cMax * 1.10) { // WIDENED BRIDGE ZONE TO 10%
+                    // Close failure: within 10% -> Recommendation to Talk
+                    setResult({ status: 'close', gap: cMin - cMax });
+                } else {
+                    // Hard failure
+                    setResult({ status: 'fail', gap: cMin - cMax });
+                }
+                setStep('result');
+            };
+
+            if (step === 'intro') {
+                return (
+                    <div className="max-w-3xl mx-auto animate-enter">
+                        <div className="text-center mb-12">
+                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-lime-400 font-bold mb-6">
+                                <Icons.Lock className="w-4 h-4" /> Double-Blind Secured
+                            </div>
+                            <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white tracking-tight">
+                                Fair, Fast, Private Negotiation
+                            </h1>
+                            <p className="text-xl md:text-2xl text-gray-300 leading-relaxed max-w-2xl mx-auto">
+                                We have the company's best offer locked in a vault. 
+                                <br/>Tell us what you need. If it fits, the deal is done instantly.
+                            </p>
+                        </div>
+
+                        <GlassCard className="mb-8">
+                            <div className="grid md:grid-cols-2 gap-12 items-center">
+                                <div>
+                                    <h3 className="text-2xl font-bold text-white mb-4">How it works</h3>
+                                    <ul className="space-y-6">
+                                        <li className="flex gap-4">
+                                            <div className="w-8 h-8 rounded-full bg-lime-400/10 flex items-center justify-center shrink-0">
+                                                <span className="font-bold text-lime-400">1</span>
+                                            </div>
+                                            <p className="text-gray-300">They set a max limit. You never see it.</p>
+                                        </li>
+                                        <li className="flex gap-4">
+                                            <div className="w-8 h-8 rounded-full bg-lime-400/10 flex items-center justify-center shrink-0">
+                                                <span className="font-bold text-lime-400">2</span>
+                                            </div>
+                                            <p className="text-gray-300">You set your minimum. They never see it.</p>
+                                        </li>
+                                        <li className="flex gap-4">
+                                            <div className="w-8 h-8 rounded-full bg-lime-400/10 flex items-center justify-center shrink-0">
+                                                <span className="font-bold text-lime-400">3</span>
+                                            </div>
+                                            <p className="text-gray-300">If there's an overlap, we <strong>split the extra money</strong> 50/50.</p>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div className="bg-black/20 p-6 rounded-2xl border border-white/5">
+                                    <SplitDiagram />
+                                </div>
+                            </div>
+                            <div className="mt-10 text-center">
+                                <Button onClick={() => setStep('input')} className="w-full md:w-auto">
+                                    Take Your Seat at the Table <Icons.ArrowRight className="w-5 h-5" />
+                                </Button>
+                            </div>
+                        </GlassCard>
+                    </div>
+                );
+            }
+
+            if (step === 'input') {
+                return (
+                    <div className="max-w-xl mx-auto animate-enter text-center">
+                        <h2 className="text-3xl font-bold text-white mb-2">What is your minimum?</h2>
+                        <p className="text-gray-400 mb-10">The lowest number you'd happily sign for today.</p>
+
+                        <GlassCard>
+                            <div className="flex items-baseline justify-center mb-2">
+                                <span className="text-gray-500 text-4xl font-bold mr-2">$</span>
+                                <span className="text-7xl font-bold text-white tracking-tighter">
+                                    {ask.toLocaleString()}
+                                </span>
+                            </div>
+                            <BandIndicator value={ask} />
+
+                            <div className="mb-8 mt-8">
+                                <Slider 
+                                    min={80000} 
+                                    max={250000} 
+                                    step={1000} 
+                                    value={ask} 
+                                    onChange={(e) => setAsk(parseInt(e.target.value))} 
+                                />
+                            </div>
+
+                            {/* Market Data Feature */}
+                            <div className="mb-8 p-4 bg-white/5 rounded-xl border border-white/10">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-sm font-bold text-gray-400">Not sure what to ask?</span>
+                                    <button 
+                                        onClick={fetchMarketData}
+                                        disabled={loadingMarket || marketData}
+                                        className="text-xs font-bold text-lime-400 hover:text-lime-300 uppercase tracking-widest"
+                                    >
+                                        {loadingMarket ? 'Checking...' : 'Check Market Data'}
+                                    </button>
+                                </div>
+                                {marketData && (
+                                    <div className="mt-3 text-left animate-enter">
+                                        <p className="text-sm text-gray-300">
+                                            Market avg for this role is around <strong className="text-white">${marketData.toLocaleString()}</strong>.
+                                            <button onClick={() => setAsk(marketData)} className="ml-2 underline text-lime-400">Use this</button>
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="space-y-6">
+                                <div className="text-left">
+                                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
+                                        Where to send the offer?
+                                    </label>
+                                    <input 
+                                        type="email" 
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        placeholder="you@email.com"
+                                        className="w-full bg-black/30 border border-white/10 rounded-xl py-4 px-4 text-white focus:outline-none focus:border-lime-400 transition-colors"
+                                    />
+                                </div>
+
+                                <Button onClick={submit} disabled={!email} className="w-full">
+                                    Submit Final Number
+                                </Button>
+                            </div>
+                        </GlassCard>
+                    </div>
+                );
+            }
+
+            if (step === 'result') {
+                const isSuccess = result.status === 'success';
+                
+                return (
+                    <div className="max-w-xl mx-auto animate-enter text-center">
+                        <div className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-8 shadow-2xl ${isSuccess ? 'bg-lime-400 shadow-lime-400/50' : result.status === 'close' ? 'bg-yellow-500 shadow-yellow-500/50' : 'bg-red-500 shadow-red-500/50'}`}>
+                            {isSuccess ? <Icons.Handshake className="w-12 h-12 text-black" /> : result.status === 'close' ? <Icons.Phone className="w-12 h-12 text-black" /> : <Icons.Lock className="w-12 h-12 text-white" />}
+                        </div>
+
+                        <h2 className="text-5xl font-bold text-white mb-6">
+                            {isSuccess ? 'Deal Accepted!' : result.status === 'close' ? 'Gap Detected' : 'No Deal.'}
+                        </h2>
+
+                        {isSuccess ? (
+                            <GlassCard className="border-lime-500/30">
+                                <p className="text-gray-400 text-lg mb-2">Final Binding Offer</p>
+                                <p className="text-7xl font-bold text-lime-400 mb-4 tracking-tighter">
+                                    ${result.final.toLocaleString()}
+                                </p>
+                                <div className="bg-lime-400/10 rounded-lg p-4 inline-block">
+                                    <p className="text-lime-200 text-sm font-medium">
+                                        Rounded for privacy. Includes a <strong>${result.surplus.toLocaleString()}</strong> fair split bonus!
+                                    </p>
+                                </div>
+                                <p className="mt-8 text-gray-400 text-sm">
+                                    An official offer letter has been sent to {email}.
+                                </p>
+                            </GlassCard>
+                        ) : (
+                            <GlassCard className={result.status === 'close' ? 'border-yellow-500/30' : 'border-red-500/30'}>
+                                <p className="text-gray-300 text-lg mb-6">
+                                    Your minimum was higher than the company's maximum budget.
+                                </p>
+                                {result.status === 'close' && (
+                                    <div className="bg-yellow-500/10 border border-yellow-500/30 p-6 rounded-xl mb-6 text-left">
+                                        <p className="text-yellow-200 font-bold text-xl mb-2">
+                                            You are very close (Within 10%).
+                                        </p>
+                                        <p className="text-yellow-100/70 text-sm mb-4">
+                                            The automated tool couldn't bridge the gap, but you are close enough that a human conversation is highly recommended.
+                                        </p>
+                                        <Button variant="gold" className="w-full justify-center" onClick={() => alert('Meeting request sent to company.')}>
+                                            Schedule Resolution Call <Icons.Phone className="w-4 h-4" />
+                                        </Button>
+                                    </div>
+                                )}
+                                {result.status === 'fail' && (
+                                    <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-xl mb-6">
+                                        <p className="text-red-200 font-bold">
+                                            Gap too large (>10%).
+                                        </p>
+                                        <p className="text-red-100/70 text-sm mt-1">
+                                            We recommend restarting the search process.
+                                        </p>
+                                    </div>
+                                )}
+                                <Button variant="outline" onClick={() => window.location.reload()}>
+                                    Start Over
+                                </Button>
+                            </GlassCard>
+                        )}
+                    </div>
+                );
+            }
+        };
+
+        const App = () => {
+            const [companyData, setCompanyData] = useState(null);
+            const [isReady, setIsReady] = useState(false);
+
+            useEffect(() => {
+                const hash = window.location.hash;
+                const match = hash.match(/#offer=(.*)/);
+                if (match) {
+                    try {
+                        // Decode data passed via URL hash (base64)
+                        const decoded = JSON.parse(atob(match[1]));
+                        setCompanyData(decoded);
+                    } catch(e) { console.error(e); }
+                } else {
+                    // DEMO MODE: Auto-load candidate view for preview if no hash is present
+                    setCompanyData({
+                        max: 160000,
+                        companyEmail: "demo@company.com",
+                        ts: Date.now()
+                    });
+                }
+                setIsReady(true);
+            }, []);
+
+            if (!isReady) return null;
+
+            return (
+                <div className="min-h-screen w-full flex items-center justify-center p-4 md:p-8 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]">
+                    <div className="w-full max-w-6xl relative z-10">
+                        {/* Render Candidate View if data exists, otherwise Company View */}
+                        {companyData ? <CandidateView data={companyData} /> : <CompanyView />}
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
