@@ -1254,6 +1254,7 @@
             const [error, setError] = useState(null);
             const marketDataTimeoutRef = useRef(null);
             const [askAnimating, setAskAnimating] = useState(false);
+            const [ledFlicker, setLedFlicker] = useState(false);
             const [greenFlash, setGreenFlash] = useState(false);
 
             const ASK_MIN = 80000;
