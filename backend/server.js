@@ -15,9 +15,9 @@ const OFFER_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const BRIDGE_ZONE_MULTIPLIER = 1.1; // 10% above max is "close"
 const ROUNDING_GRANULARITY = 1000; // Round to nearest $1,000
 
-// NEW: short-lived result store (no DB)
-const RESULT_TTL_MS = OFFER_TTL_MS;
-const results = new Map(); // key: resultId, value: { outcome, createdAt, expiresAt }
+// Result store + TTL
+const RESULT_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+const results = new Map(); // resultId -> { status, final, surplus, min, max, createdAt }
 
 // Cleanup loop (every 15 mins)
 setInterval(() => {
@@ -32,7 +32,7 @@ setInterval(() => {
 
   // Results
   for (const [id, entry] of results.entries()) {
-    if (entry.expiresAt <= now) {
+    if (isExpired(entry.createdAt, RESULT_TTL_MS)) {
       results.delete(id);
     }
   }
@@ -85,6 +85,36 @@ function isValidSalary(value, fieldName) {
  */
 function isValidEmail(email) {
   return email === null || email === undefined || typeof email === "string";
+}
+
+/**
+ * Generates a unique ID with optional prefix
+ * @param {string} prefix - Optional prefix (e.g., 'r' for result)
+ * @returns {string} Unique ID
+ */
+function generateId(prefix = '') {
+  return prefix + Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
+
+/**
+ * Checks if a timestamp is expired based on TTL
+ * @param {number} createdAt - Timestamp when created
+ * @param {number} ttlMs - Time to live in milliseconds
+ * @returns {boolean} True if expired
+ */
+function isExpired(createdAt, ttlMs) {
+  return Date.now() > createdAt + ttlMs;
+}
+
+/**
+ * Stub for sending result email (to be implemented later)
+ * @param {string} email - Candidate email
+ * @param {string} revealLink - Link to reveal the result
+ * @param {number} final - Final offer amount
+ */
+async function sendResultEmail(email, revealLink, final) {
+  // Stub implementation - can be replaced with actual email service
+  console.log(`[Email stub] Would send to ${email}: Reveal link ${revealLink} for final offer $${final}`);
 }
 
 // Error handler for JSON parsing failures
@@ -153,46 +183,63 @@ app.post("/api/offers/:id/submit", (req, res) => {
     return res.status(400).json({ error: "Invalid email: must be a string or omitted" });
   }
 
-  // Mark as used before computing outcome (prevents race conditions)
+  // Compute outcome using extracted helper
+  const outcome = computeOutcome(offer.max, min); // { status, final, surplus, gap }
+  const { status, final, surplus, gap } = outcome;
+
+  let resultId = null;
+
+  if (status === 'success') {
+    resultId = generateId('r');
+    const createdAt = Date.now();
+
+    results.set(resultId, {
+      status,
+      final,
+      surplus,
+      min,
+      max: offer.max,
+      createdAt,
+    });
+
+    const frontendBase = process.env.FRONTEND_BASE || 'https://closing-table.pages.dev';
+    const revealLink = `${frontendBase}#result=${encodeURIComponent(resultId)}`;
+
+    await sendResultEmail(email, revealLink, final); // stub is fine
+  }
+
+  // Mark as used before returning (prevents race conditions)
   offer.used = true;
 
-  // Compute outcome using extracted helper (unchanged)
-  const outcome = computeOutcome(offer.max, min); // { status, final, surplus, gap }
-
-  // NEW: create short-lived result token
-  const resultId = crypto.randomUUID();
-
-  results.set(resultId, {
-    outcome,
-    createdAt: Date.now(),
-    expiresAt: Date.now() + RESULT_TTL_MS,
-  });
-
-  // Return previous payload + resultId (front-end keeps working as-is)
-  res.json({
-    ...outcome,
+  return res.json({
+    status,
+    final,
+    surplus,
+    gap,
     resultId,
   });
 });
 
 app.get("/api/results/:resultId", (req, res) => {
   const { resultId } = req.params;
-  const entry = results.get(resultId);
+  const result = results.get(resultId);
 
-  if (!entry) {
+  if (!result) {
     return res.json({ status: "invalid" });
   }
 
-  const now = Date.now();
-  if (entry.expiresAt <= now) {
+  if (isExpired(result.createdAt, RESULT_TTL_MS)) {
     results.delete(resultId);
     return res.json({ status: "expired" });
   }
 
-  // Happy path
   return res.json({
-    status: "ok",
-    result: entry.outcome, // { status, final, surplus, gap }
+    status: result.status,
+    final: result.final,
+    surplus: result.surplus,
+    min: result.min,
+    max: result.max,
+    createdAt: result.createdAt,
   });
 });
 
