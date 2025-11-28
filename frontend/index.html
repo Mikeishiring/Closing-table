@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="A fair, private way to close salary negotiations. Double-blind mechanism that splits the difference when ranges overlap.">
-    <meta name="theme-color" content="#0F0518">
+    <meta name="theme-color" content="#261436">
     <meta name="robots" content="noindex, nofollow">
     
     <!-- Security Headers -->
@@ -34,9 +34,9 @@
     <style>
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #181A22;
+            background: #261436;
             background-attachment: fixed;
-            color: #E2E8F0;
+            color: #F8F0E3;
             min-height: 100vh;
             position: relative;
         }
@@ -50,14 +50,30 @@
             z-index: 0;
         }
 
+        /* Subtle fingerprint-smudged polished glass texture for candidate view */
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.015) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.01) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.008) 0%, transparent 60%);
+            background-size: 200% 200%, 180% 180%, 150% 150%;
+            background-position: 0% 0%, 100% 100%, 50% 50%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
         .glass-panel {
-            background: #232943;
+            background: #4A2A64;
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 
-                0 20px 60px rgba(0, 0, 0, 0.4), 
+                0 20px 60px rgba(0, 0, 0, 0.5), 
                 0 0 0 1px rgba(255, 255, 255, 0.05) inset,
-                0 2px 8px rgba(0, 0, 0, 0.3) inset,
+                0 2px 8px rgba(0, 0, 0, 0.4) inset,
                 0 -2px 8px rgba(255, 255, 255, 0.02) inset;
             position: relative;
         }
@@ -72,8 +88,8 @@
             border-radius: inherit;
         }
 
-        .gold-text-gradient {
-            background: linear-gradient(to right, #C09A4D, #B89040);
+        .emerald-text-gradient {
+            background: linear-gradient(to right, #008060, #00BF9A);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -99,10 +115,10 @@
             position: fixed;
             inset: -35%;
             background:
-                radial-gradient(circle at 0% 0%, rgba(167, 239, 0, 0.14), transparent 55%),
-                radial-gradient(circle at 100% 100%, rgba(232, 121, 249, 0.12), transparent 55%);
+                radial-gradient(circle at 0% 0%, rgba(0, 191, 154, 0.12), transparent 55%),
+                radial-gradient(circle at 100% 100%, rgba(74, 42, 100, 0.15), transparent 55%);
             filter: blur(40px);
-            opacity: 0.9;
+            opacity: 0.8;
             animation: float-bg 26s ease-in-out infinite alternate;
             pointer-events: none;
             z-index: -1;
@@ -134,7 +150,7 @@
 
         .hero-subtitle {
             font-size: clamp(1.05rem, 1.4vw, 1.3rem);
-            color: #94A3B8;
+            color: #A08DAE;
             max-width: 36rem;
             margin-inline: auto;
         }
@@ -232,18 +248,18 @@
         }
 
         .lock-charge-up:hover {
-            filter: drop-shadow(0 0 8px #C09A4D) drop-shadow(0 0 12px rgba(192, 154, 77, 0.6));
+            filter: drop-shadow(0 0 8px #DAA520) drop-shadow(0 0 12px rgba(218, 165, 32, 0.6));
             transform: scale(1.05);
         }
 
-        .btn-gold-sweep::before {
+        .btn-emerald-sweep::before {
             content: "";
             position: absolute;
             inset: 0;
             background: linear-gradient(
                 120deg,
                 transparent 0%,
-                rgba(192, 154, 77, 0.2) 30%,
+                rgba(0, 191, 154, 0.3) 30%,
                 transparent 60%
             );
             transform: translate3d(-120%, 0, 0);
@@ -252,7 +268,7 @@
             transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease-out;
         }
 
-        .btn-gold-sweep:hover::before {
+        .btn-emerald-sweep:hover::before {
             opacity: 1;
             transform: translate3d(120%, 0, 0);
         }
@@ -265,7 +281,7 @@
             }
             50% {
                 transform: rotateY(90deg);
-                background: #C09A4D;
+                background: #00BF9A;
             }
             100% {
                 transform: rotateY(0deg);
@@ -295,6 +311,30 @@
         @keyframes checkmark-fade {
             0%, 100% { opacity: 0; transform: scale(0.5); }
             50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* --- CANDIDATE GREEN FLASH (Personal Confirmation) --- */
+        @keyframes candidate-green-flash {
+            0% {
+                color: #F8F0E3;
+                filter: drop-shadow(0 0 0px rgba(0, 191, 154, 0));
+            }
+            30% {
+                color: #00BF9A;
+                filter: drop-shadow(0 0 12px rgba(0, 191, 154, 0.6)) drop-shadow(0 0 24px rgba(0, 191, 154, 0.3));
+            }
+            70% {
+                color: #00BF9A;
+                filter: drop-shadow(0 0 8px rgba(0, 191, 154, 0.4)) drop-shadow(0 0 16px rgba(0, 191, 154, 0.2));
+            }
+            100% {
+                color: #F8F0E3;
+                filter: drop-shadow(0 0 0px rgba(0, 191, 154, 0));
+            }
+        }
+
+        .candidate-confirm-flash {
+            animation: candidate-green-flash 0.8s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         /* --- INTERACTIVE VIGNETTE --- */
@@ -370,7 +410,7 @@
             padding: 8px 12px;
             border-radius: 6px;
             font-size: 0.75rem;
-            color: #94A3B8;
+            color: #A08DAE;
             white-space: nowrap;
             opacity: 0;
             pointer-events: none;
@@ -399,11 +439,11 @@
             position: relative;
             width: 32px;
             height: 32px;
-            background: linear-gradient(135deg, #4a5568 0%, #2d3748 50%, #1a202c 100%);
+            background: linear-gradient(135deg, #4A2A64 0%, #3C1C52 50%, #261436 100%);
             border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: 50%;
             box-shadow: 
-                0 0 12px rgba(192, 154, 77, 0.6),
+                0 0 12px rgba(0, 191, 154, 0.6),
                 0 2px 8px rgba(0, 0, 0, 0.5),
                 inset 0 2px 4px rgba(255, 255, 255, 0.1),
                 inset 0 -2px 4px rgba(0, 0, 0, 0.3);
@@ -519,6 +559,32 @@
             oscillator.stop(audioContext.currentTime + 0.1);
         }
 
+        function playMagneticLatchSound() {
+            initAudio();
+            if (!audioContext) return;
+
+            // Heavier, deeper sound for candidate's "Lock In" action
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.setValueAtTime(45, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(25, audioContext.currentTime + 0.15);
+            oscillator.type = 'sawtooth';
+            gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.005, audioContext.currentTime + 0.2);
+
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.2);
+
+            // Haptic feedback
+            if (navigator.vibrate) {
+                navigator.vibrate([50, 30, 50]);
+            }
+        }
+
         // --- HAPTIC FEEDBACK ---
         function triggerHaptic() {
             if (navigator.vibrate) {
@@ -529,12 +595,12 @@
         // --- CONFIGURATION (visual only) ---
         const COLORS = {
             BG: '#0F0518',
-            CARD: 'rgba(45, 20, 85, 0.4)',
-            ACCENT: '#A7EF00',
-            ACCENT_SEC: '#E879F9',
-            GOLD: '#FCD34D',
-            TEXT_MAIN: '#FFFFFF',
-            TEXT_MUTED: '#94A3B8',
+            CARD: '#4A2A64',
+            ACCENT: '#00BF9A',
+            ACCENT_SEC: '#008060',
+            GOLD: '#DAA520',
+            TEXT_MAIN: '#F8F0E3',
+            TEXT_MUTED: '#A08DAE',
         };
 
         // --- ICONS ---
@@ -698,9 +764,9 @@
 
             return (
                 <div className="relative w-full h-12 flex items-center group" onMouseUp={handleMouseUp} onTouchEnd={handleMouseUp}>
-                    <div className="absolute w-full h-3 bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 rounded-full overflow-hidden" style={{ boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.3)' }}>
+                    <div className="absolute w-full h-3 bg-gradient-to-r from-[#3C1C52] via-[#4A2A64] to-[#5A3A74] rounded-full overflow-hidden" style={{ boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.4)' }}>
                         <div
-                            className="h-full bg-gradient-to-r from-[#C09A4D] to-[#B89040]"
+                            className="h-full bg-gradient-to-r from-[#008060] to-[#00BF9A]"
                             style={{ width: `${percent}%` }}
                         />
                     </div>
@@ -733,15 +799,15 @@
                 "flex items-center justify-center gap-3 " +
                 "hover:-translate-y-0.5 active:translate-y-0 active:scale-95 " +
                 "disabled:opacity-50 disabled:cursor-not-allowed " +
-                "focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C09A4D]/80 " +
-                "focus-visible:ring-offset-2 focus-visible:ring-offset-[#0F0518]";
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00BF9A]/80 " +
+                "focus-visible:ring-offset-2 focus-visible:ring-offset-[#261436]";
 
             const variants = {
-                primary: "bg-[#C09A4D] text-black hover:bg-[#B89040] shadow-lg shadow-[#C09A4D]/30 hover:shadow-2xl hover:shadow-[#C09A4D]/40",
-                secondary: "bg-white/10 text-white border border-white/10 hover:bg-white/20 backdrop-blur-md",
-                outline: "border-2 border-gray-700 text-gray-300 hover:border-[#C09A4D] hover:text-[#C09A4D]",
-                gold: "bg-gradient-to-r from-[#C09A4D] to-[#B89040] text-black shadow-lg shadow-[#C09A4D]/25 hover:shadow-2xl hover:shadow-[#C09A4D]/45 btn-gold-sweep",
-                danger: "bg-red-500 text-white shadow-lg shadow-red-500/20 hover:bg-red-400",
+                primary: "bg-gradient-to-r from-[#008060] to-[#00BF9A] text-[#F8F0E3] hover:from-[#00A389] hover:to-[#00D4B3] shadow-lg shadow-[#00BF9A]/30 hover:shadow-2xl hover:shadow-[#00BF9A]/40 btn-emerald-sweep",
+                secondary: "bg-white/10 text-[#F8F0E3] border border-white/10 hover:bg-white/20 backdrop-blur-md",
+                outline: "border-2 border-[#A08DAE] text-[#A08DAE] hover:border-[#00BF9A] hover:text-[#00BF9A]",
+                gold: "bg-gradient-to-r from-[#008060] to-[#00BF9A] text-[#F8F0E3] shadow-lg shadow-[#00BF9A]/25 hover:shadow-2xl hover:shadow-[#00BF9A]/45 btn-emerald-sweep",
+                danger: "bg-red-500 text-[#F8F0E3] shadow-lg shadow-red-500/20 hover:bg-red-400",
                 ai: "bg-emerald-900/40 text-emerald-400 border border-emerald-700 hover:bg-emerald-900/60 shadow-md shadow-emerald-900/50",
             };
 
@@ -799,7 +865,7 @@
 
             return (
                 <div className="flex justify-center mt-2">
-                    <span className="text-xs font-medium text-gray-600 uppercase tracking-wider border border-gray-700/50 px-3 py-1 rounded-full">
+                    <span className="text-xs font-medium text-[#A08DAE] uppercase tracking-wider border border-[#A08DAE]/50 px-3 py-1 rounded-full">
                         Band: <span className="financial-number">${lower.toLocaleString()} - ${upper.toLocaleString()}</span>
                     </span>
                 </div>
@@ -808,26 +874,26 @@
 
         const SplitDiagram = () => (
             <div className="my-8 p-6 bg-white/5 rounded-2xl border border-white/10">
-                <h3 className="text-[#C09A4D] font-bold mb-4 text-sm tracking-widest uppercase">
+                <h3 className="text-[#00BF9A] font-bold mb-4 text-sm tracking-widest uppercase">
                     The Fair Split Logic
                 </h3>
                 <div className="relative h-16 w-full flex items-center">
                     <div className="absolute w-full h-2 bg-gray-700 rounded-full"></div>
-                    <div className="absolute left-1/4 right-1/4 h-2 bg-gradient-to-r from-[#C09A4D] to-[#B89040] rounded-full opacity-50 animate-pulse"></div>
+                    <div className="absolute left-1/4 right-1/4 h-2 bg-gradient-to-r from-[#008060] to-[#00BF9A] rounded-full opacity-50 animate-pulse"></div>
                     <div className="absolute left-1/4 top-[-25px] flex flex-col items-center">
-                        <span className="text-xs font-bold text-white mb-1">You</span>
-                        <div className="w-4 h-4 bg-[#C09A4D] rounded-full border-4 border-gray-900"></div>
+                        <span className="text-xs font-bold text-[#F8F0E3] mb-1">You</span>
+                        <div className="w-4 h-4 bg-[#00BF9A] rounded-full border-4 border-[#261436]"></div>
                     </div>
                     <div className="absolute left-1/2 top-4 flex flex-col items-center">
                         <div className="h-6 w-px bg-white/20 mb-1"></div>
                         <span className="text-xs font-bold text-yellow-400">Split Surplus</span>
                     </div>
                     <div className="absolute right-1/4 top-[-25px] flex flex-col items-center">
-                        <span className="text-xs font-bold text-gray-400 mb-1">Company</span>
-                        <div className="w-4 h-4 bg-gray-600 rounded-full border-4 border-gray-900"></div>
+                        <span className="text-xs font-bold text-[#A08DAE] mb-1">Company</span>
+                        <div className="w-4 h-4 bg-[#A08DAE] rounded-full border-4 border-[#261436]"></div>
                     </div>
                 </div>
-                <p className="text-gray-400 text-sm mt-4 text-center">
+                <p className="text-[#A08DAE] text-sm mt-4 text-center">
                     We calculate the surplus overlap and split it 50/50. The final number is rounded to protect privacy.
                 </p>
             </div>
@@ -967,23 +1033,23 @@
             if (link) {
                 return (
                     <div className="max-w-2xl mx-auto animate-enter text-center">
-                        <div className="mb-8 inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-[#C09A4D] to-[#B89040] shadow-2xl shadow-[#C09A4D]/30 mx-auto">
+                        <div className="mb-8 inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-[#008060] to-[#00BF9A] shadow-2xl shadow-[#00BF9A]/30 mx-auto">
                             <Icons.Lock className="w-10 h-10 text-black" />
                         </div>
-                        <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white">
+                        <h1 className="text-4xl md:text-6xl font-bold mb-6 text-[#F8F0E3]">
                             Terms Locked.
                         </h1>
-                        <p className="text-xl text-gray-300 mb-10 leading-relaxed">
+                        <p className="text-xl text-[#A08DAE] mb-10 leading-relaxed">
                             Your maximum terms are now fixed and prepared for the candidate.
                         </p>
 
                         <GlassCard className="mb-8">
                             <div className="bg-black/30 p-4 rounded-xl border border-white/10 flex items-center justify-between gap-4 mb-6 relative" id="url-container">
-                                <code className="text-[#C09A4D] truncate flex-1 text-left font-mono text-sm">
+                                <code className="text-[#00BF9A] truncate flex-1 text-left font-mono text-sm">
                                     {link}
                                 </code>
                                 <div className="url-checkmark">
-                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#181A22" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#261436" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                                         <polyline points="20 6 9 17 4 12"></polyline>
                                     </svg>
                                 </div>
@@ -992,7 +1058,7 @@
                                     aria-label="Copy link to clipboard"
                                     className="p-2 hover:bg-white/10 rounded-lg transition"
                                 >
-                                    <Icons.Copy className="w-5 h-5 text-gray-400" />
+                                    <Icons.Copy className="w-5 h-5 text-[#A08DAE]" />
                                 </button>
                             </div>
                             <div className="grid gap-4">
@@ -1047,15 +1113,15 @@
                             }
                         }}
                     >
-                        <label className="block text-xs font-bold text-[#C09A4D] uppercase tracking-widest mb-6">
+                        <label className="block text-xs font-bold text-[#00BF9A] uppercase tracking-widest mb-6">
                             Maximum Offer Limit (Private)
                         </label>
 
                         <div className="flex items-baseline justify-start mb-4">
-                            <span className="text-gray-500 text-4xl font-bold mr-2">$</span>
+                            <span className="text-[#A08DAE] text-4xl font-bold mr-2">$</span>
                             <span
                                 className={
-                                    "text-7xl font-bold text-white tracking-tighter jackpot-number financial-number " +
+                                    "text-7xl font-bold text-[#F8F0E3] tracking-tighter jackpot-number financial-number " +
                                     (budgetAnimating ? "jackpot-active" : "") +
                                     (ledFlicker ? " led-flicker" : "")
                                 }
@@ -1076,7 +1142,7 @@
                                 onDragStart={() => {}}
                                 onDragEnd={() => {}}
                             />
-                            <div className="flex justify-between mt-3 text-xs text-gray-400 font-semibold uppercase tracking-wider" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", letterSpacing: '0.1em' }}>
+                            <div className="flex justify-between mt-3 text-xs text-[#A08DAE] font-semibold uppercase tracking-wider" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", letterSpacing: '0.1em' }}>
                                 <WhisperTooltip text="Lower risk, conservative approach">
                                     <span>Conservative</span>
                                 </WhisperTooltip>
@@ -1088,11 +1154,11 @@
 
                         <div className="space-y-8">
                             <div>
-                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">
+                                <label className="block text-xs font-bold text-[#A08DAE] uppercase tracking-widest mb-4">
                                     Where to send the deal? (for your own reference)
                                 </label>
                                 <div className="relative">
-                                    <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                                    <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#A08DAE]" />
                                     <input
                                         type="email"
                                         value={email}
@@ -1107,10 +1173,10 @@
                                         placeholder="you@company.com"
                                         aria-label="Company email address"
                                         autoComplete="email"
-                                        className="w-full bg-black/30 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-[#C09A4D] focus:ring-2 focus:ring-[#C09A4D]/30 hover:border-[#C09A4D]/50 transition-all duration-200"
+                                        className="w-full bg-black/30 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-[#F8F0E3] placeholder-[#A08DAE] focus:outline-none focus:border-[#00BF9A] focus:ring-2 focus:ring-[#00BF9A]/30 hover:border-[#00BF9A]/50 transition-all duration-200"
                                     />
                                 </div>
-                                <p className="mt-3 text-xs text-gray-500 hush-hint">
+                                <p className="mt-3 text-xs text-[#A08DAE] hush-hint">
                                     This address is just stored with the offer for your reference. The tool does not send any automatic emails.
                                 </p>
                             </div>
@@ -1133,7 +1199,7 @@
                                 {loading ? 'Creating Offer...' : 'Lock Budget & Create Link'}
                             </Button>
 
-                            <p className="text-center text-xs text-gray-500">
+                            <p className="text-center text-xs text-[#A08DAE]">
                                 Offers expire after 24 hours and are not stored permanently.
                             </p>
                         </div>
@@ -1155,6 +1221,7 @@
             const [error, setError] = useState(null);
             const marketDataTimeoutRef = useRef(null);
             const [askAnimating, setAskAnimating] = useState(false);
+            const [greenFlash, setGreenFlash] = useState(false);
 
             const ASK_MIN = 80000;
             const ASK_MAX = 250000;
@@ -1233,6 +1300,14 @@
                     }
                     return value;
                 });
+            };
+
+            const handleSliderRelease = () => {
+                // Trigger green flash animation on slider release (personal confirmation)
+                setGreenFlash(true);
+                setTimeout(() => {
+                    setGreenFlash(false);
+                }, 800);
             };
 
             const fetchMarketData = () => {
@@ -1331,7 +1406,7 @@
             if (step === 'loading') {
                 return (
                     <div className="max-w-xl mx-auto animate-enter text-center">
-                        <div className="text-gray-400">Loading offer...</div>
+                        <div className="text-[#A08DAE]">Loading offer...</div>
                     </div>
                 );
             }
@@ -1343,8 +1418,8 @@
                             <div className="w-24 h-24 mx-auto rounded-full bg-red-500/20 flex items-center justify-center mb-8">
                                 <Icons.Lock className="w-12 h-12 text-red-400" />
                             </div>
-                            <h2 className="text-3xl font-bold text-white mb-4">Unable to Load Offer</h2>
-                            <p className="text-gray-300 mb-6">{error}</p>
+                            <h2 className="text-3xl font-bold text-[#F8F0E3] mb-4">Unable to Load Offer</h2>
+                            <p className="text-[#A08DAE] mb-6">{error}</p>
                             <Button variant="outline" onClick={() => {
                                 window.location.hash = '';
                                 window.location.reload();
@@ -1359,7 +1434,7 @@
             if (step === 'submitting') {
                 return (
                     <div className="max-w-xl mx-auto animate-enter text-center">
-                        <div className="text-gray-400">Processing your submission...</div>
+                        <div className="text-[#A08DAE]">Processing your submission...</div>
                     </div>
                 );
             }
@@ -1368,25 +1443,22 @@
                 return (
                     <div className="max-w-3xl mx-auto animate-enter">
                         <div className="text-center mb-12">
-                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-[#C09A4D] font-bold mb-6">
+                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-[#00BF9A] font-bold mb-6">
                                 <Icons.Lock className="w-4 h-4" /> Single-Step, Private Mechanism
                             </div>
-                            <h1 className="hero-heading text-5xl md:text-7xl font-bold mb-6 text-white">
-                                Fair, Fast, Private Negotiation
+                            <h1 className="hero-heading text-5xl md:text-7xl font-bold mb-6 text-[#F8F0E3]">
+                                Set Your Walk-Away Number
                             </h1>
                             <p className="hero-subtitle text-xl md:text-2xl max-w-2xl mx-auto">
-                                The company has set a maximum they're willing to pay.
-                                <br />
-                                You set your minimum. If your ranges overlap, the tool splits the surplus
-                                and closes the deal in a single step.
+                                Enter the lowest base salary you would happily sign for today. Your number remains private until the system determines the final, closed deal.
                             </p>
-                            <p className="mt-4 text-xs text-gray-500">
+                            <p className="mt-8 text-xs text-[#A08DAE]">
                                 For broader compensation context, see the{' '}
                                 <a
                                     href="https://dccr.dragonfly.xyz/report"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="underline text-[#C09A4D] hover:text-[#B89040]"
+                                    className="underline text-[#00BF9A] hover:text-[#00BF9A]"
                                 >
                                     Dragonfly DCCR report
                                 </a>.
@@ -1394,43 +1466,7 @@
                         </div>
 
                         <GlassCard className="mb-8">
-                            <div className="grid md:grid-cols-2 gap-12 items-center">
-                                <div>
-                                    <h3 className="text-2xl font-bold text-white mb-4">How it works</h3>
-                                    <ul className="space-y-6">
-                                        <li className="flex gap-4">
-                                            <div className="w-8 h-8 rounded-full bg-[#C09A4D]/10 flex items-center justify-center shrink-0">
-                                                <span className="font-bold text-[#C09A4D]">1</span>
-                                            </div>
-                                            <p className="text-gray-300">
-                                                They set a max limit. You never see it in this interface.
-                                            </p>
-                                        </li>
-                                        <li className="flex gap-4">
-                                            <div className="w-8 h-8 rounded-full bg-[#C09A4D]/10 flex items-center justify-center shrink-0">
-                                                <span className="font-bold text-[#C09A4D]">2</span>
-                                            </div>
-                                            <p className="text-gray-300">
-                                                You set your minimum. They never see it directly.
-                                            </p>
-                                        </li>
-                                        <li className="flex gap-4">
-                                            <div className="w-8 h-8 rounded-full bg-[#C09A4D]/10 flex items-center justify-center shrink-0">
-                                                <span className="font-bold text-[#C09A4D]">3</span>
-                                            </div>
-                                            <p className="text-gray-300">
-                                                If there's overlap, we{' '}
-                                                <strong>split the extra money</strong> 50/50, round to the nearest
-                                                thousand, and show the final base salary.
-                                            </p>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div className="bg-black/20 p-6 rounded-2xl border border-white/5">
-                                    <SplitDiagram />
-                                </div>
-                            </div>
-                            <div className="mt-10 text-center">
+                            <div className="text-center">
                                 <Button onClick={() => setStep('input')} className="w-full md:w-auto">
                                     Take Your Seat at the Table{' '}
                                     <Icons.ArrowRight className="w-5 h-5" />
@@ -1443,27 +1479,28 @@
 
             if (step === 'input') {
                 return (
-                    <div className="max-w-xl mx-auto animate-enter text-center">
-                        <h2 className="text-3xl font-bold text-white mb-2">What is your minimum?</h2>
-                        <p className="text-gray-400 mb-10">
-                            The lowest base salary you would happily sign for today.
-                        </p>
-
+                    <div className="max-w-xl mx-auto animate-enter">
                         <GlassCard>
-                            <div className="flex items-baseline justify-start mb-6">
-                                <span className="text-gray-500 text-4xl font-bold mr-2">$</span>
-                                <span
-                                    className={
-                                        "text-7xl font-bold text-white tracking-tighter jackpot-number financial-number " +
-                                        (askAnimating ? "jackpot-active" : "") +
-                                        (ledFlicker ? " led-flicker" : "")
-                                    }
-                                    style={{ transform: `scale(${askScale})` }}
-                                >
-                                    {ask.toLocaleString()}
-                                </span>
+                            <div className="text-left mb-8">
+                                <label className="block text-sm font-medium text-[#A08DAE] mb-4">
+                                    Your Minimum Acceptable Base Salary:
+                                </label>
+                                <div className="flex items-baseline justify-start mb-6">
+                                    <span className="text-[#A08DAE] text-4xl font-bold mr-2">$</span>
+                                    <span
+                                        className={
+                                            "text-7xl font-bold tracking-tighter jackpot-number financial-number " +
+                                            (askAnimating ? "jackpot-active" : "") +
+                                            (ledFlicker ? " led-flicker" : "") +
+                                            (greenFlash ? " candidate-confirm-flash" : " text-[#F8F0E3]")
+                                        }
+                                        style={{ transform: `scale(${askScale})` }}
+                                    >
+                                        {ask.toLocaleString()}
+                                    </span>
+                                </div>
+                                <BandIndicator value={ask} />
                             </div>
-                            <BandIndicator value={ask} />
 
                             <div className="mb-10 mt-8">
                                 <Slider
@@ -1473,13 +1510,13 @@
                                     value={ask}
                                     onChange={handleAskChange}
                                     onDragStart={() => {}}
-                                    onDragEnd={() => {}}
+                                    onDragEnd={handleSliderRelease}
                                 />
                             </div>
 
                             <div className="mb-8 p-4 bg-white/5 rounded-xl border border-white/10">
                                 <div className="flex justify-between items-center">
-                                    <span className="text-sm font-bold text-gray-400">
+                                    <span className="text-sm font-bold text-[#A08DAE]">
                                         Not sure what to ask?
                                     </span>
                                     <button
@@ -1487,16 +1524,16 @@
                                         disabled={loadingMarket || marketData}
                                         aria-label="Check market data for salary guidance"
                                         aria-busy={loadingMarket}
-                                        className="text-xs font-bold text-[#C09A4D] hover:text-[#B89040] uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="text-xs font-bold text-[#00BF9A] hover:text-[#00BF9A] uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         {loadingMarket ? 'Checking...' : 'Check Market Data'}
                                     </button>
                                 </div>
                                 {marketData && (
                                     <div className="mt-3 text-left animate-enter">
-                                        <p className="text-sm text-gray-300">
+                                        <p className="text-sm text-[#A08DAE]">
                                             For this prototype, we show a rough, illustrative guidance number of{' '}
-                                            <strong className="text-white">
+                                            <strong className="text-[#F8F0E3]">
                                                 ${marketData.toLocaleString()}
                                             </strong>
                                             {' '}to help you sanity-check your ask. It is not a firm market quote.
@@ -1505,7 +1542,7 @@
                                                 href="https://dccr.dragonfly.xyz/report"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="underline text-[#C09A4D] hover:text-[#B89040]"
+                                                className="underline text-[#00BF9A] hover:text-[#00BF9A]"
                                             >
                                                 Read the Dragonfly DCCR report
                                             </a>
@@ -1513,7 +1550,7 @@
                                             <button
                                                 onClick={() => setAsk(marketData)}
                                                 aria-label={`Set minimum salary to ${marketData.toLocaleString()}`}
-                                                className="ml-2 underline text-[#C09A4D] hover:text-[#B89040] transition-colors"
+                                                className="ml-2 underline text-[#00BF9A] hover:text-[#00BF9A] transition-colors"
                                             >
                                                 Use this
                                             </button>
@@ -1524,8 +1561,8 @@
 
                             <div className="space-y-8">
                                 <div className="text-left">
-                                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">
-                                        Where should the outcome go?
+                                    <label className="block text-xs font-medium text-[#A08DAE] mb-3">
+                                        Private Reference Email
                                     </label>
                                     <input
                                         type="email"
@@ -1541,15 +1578,22 @@
                                         placeholder="you@email.com"
                                         aria-label="Candidate email address"
                                         autoComplete="email"
-                                        className="w-full bg-black/30 border border-white/10 rounded-2xl py-4 px-4 text-white focus:outline-none focus:border-[#C09A4D] focus:ring-2 focus:ring-[#C09A4D]/30 hover:border-[#C09A4D]/50 transition-all duration-200"
+                                        className="w-full bg-black/30 border border-white/10 rounded-2xl py-4 px-4 text-[#F8F0E3] focus:outline-none focus:border-[#00BF9A] focus:ring-2 focus:ring-[#00BF9A]/30 hover:border-[#00BF9A]/50 transition-all duration-200"
                                     />
-                                    <p className="mt-3 text-xs text-gray-500 hush-hint">
-                                        For this prototype, your email is only shown in the explanation text. No messages are sent automatically.
+                                    <p className="mt-3 text-xs text-[#A08DAE] hush-hint">
+                                        The deal details will be sent here, securing your record. No messages are sent automatically in this prototype.
                                     </p>
                                 </div>
 
-                                <Button onClick={submit} disabled={!email} className="w-full">
-                                    Submit Final Number
+                                <Button 
+                                    onClick={() => {
+                                        playMagneticLatchSound();
+                                        submit();
+                                    }} 
+                                    disabled={!email} 
+                                    className="w-full"
+                                >
+                                    Lock In My Minimum
                                 </Button>
                             </div>
                         </GlassCard>
@@ -1568,7 +1612,7 @@
                         <div
                             className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-8 shadow-2xl ${
                                 isSuccess
-                                    ? 'bg-[#C09A4D] shadow-[#C09A4D]/50'
+                                    ? 'bg-[#00BF9A] shadow-[#00BF9A]/50'
                                     : result.status === 'close'
                                     ? 'bg-yellow-500 shadow-yellow-500/50'
                                     : 'bg-red-500 shadow-red-500/50'
@@ -1579,11 +1623,11 @@
                             ) : result.status === 'close' ? (
                                 <Icons.Phone className="w-12 h-12 text-black" />
                             ) : (
-                                <Icons.Lock className="w-12 h-12 text-white" />
+                                <Icons.Lock className="w-12 h-12 text-[#F8F0E3]" />
                             )}
                         </div>
 
-                        <h2 className="text-5xl font-bold text-white mb-6">
+                        <h2 className="text-5xl font-bold text-[#F8F0E3] mb-6">
                             {isSuccess
                                 ? 'Deal Accepted!'
                                 : result.status === 'close'
@@ -1592,15 +1636,15 @@
                         </h2>
 
                         {isSuccess ? (
-                            <GlassCard className="border-[#C09A4D]/30">
-                                <p className="text-gray-400 text-lg mb-2">
+                            <GlassCard className="border-[#00BF9A]/30">
+                                <p className="text-[#A08DAE] text-lg mb-2">
                                     Final Binding Offer (from the mechanism)
                                 </p>
-                                <p className="text-7xl font-bold text-[#C09A4D] mb-4 tracking-tighter">
+                                <p className="text-7xl font-bold text-[#00BF9A] mb-4 tracking-tighter">
                                     ${result.final.toLocaleString()}
                                 </p>
-                                <div className="bg-[#C09A4D]/10 rounded-lg p-4 inline-block">
-                                    <p className="text-[#C09A4D]/90 text-sm font-medium">
+                                <div className="bg-[#00BF9A]/10 rounded-lg p-4 inline-block">
+                                    <p className="text-[#00BF9A]/90 text-sm font-medium">
                                         Rounded for privacy. Includes a{' '}
                                         <strong>
                                             ${result.surplus.toLocaleString()}
@@ -1608,16 +1652,16 @@
                                         fair split of the surplus between your minimum and their maximum.
                                     </p>
                                 </div>
-                                <p className="mt-8 text-gray-400 text-sm">
+                                <p className="mt-8 text-[#A08DAE] text-sm">
                                     In a future full system, this is where an official offer workflow (emails, docs)
                                     would kick in using the final number and your email: {email}. This prototype does not send emails automatically.
                                 </p>
                                 {revealLink && (
                                     <div className="mt-8 bg-black/30 border border-white/10 rounded-xl p-4 text-left">
-                                        <p className="text-xs font-semibold text-gray-300 mb-2">
+                                        <p className="text-xs font-semibold text-[#A08DAE] mb-2">
                                             Shareable reveal link
                                         </p>
-                                        <p className="text-[11px] text-[#C09A4D] break-all mb-2">
+                                        <p className="text-[11px] text-[#00BF9A] break-all mb-2">
                                             {revealLink}
                                         </p>
                                         <Button
@@ -1645,7 +1689,7 @@
                                         : 'border-red-500/30'
                                 }
                             >
-                                <p className="text-gray-300 text-lg mb-6">
+                                <p className="text-[#A08DAE] text-lg mb-6">
                                     Your minimum was higher than the company's maximum budget.
                                 </p>
                                 {result.status === 'close' && (
@@ -1734,7 +1778,7 @@
             if (step === 'loading') {
                 return (
                     <div className="max-w-xl mx-auto animate-enter text-center">
-                        <div className="text-gray-400">Loading result…</div>
+                        <div className="text-[#A08DAE]">Loading result…</div>
                     </div>
                 );
             }
@@ -1746,8 +1790,8 @@
                             <div className="w-24 h-24 mx-auto rounded-full bg-red-500/20 flex items-center justify-center mb-8">
                                 <Icons.Lock className="w-12 h-12 text-red-400" />
                             </div>
-                            <h2 className="text-3xl font-bold text-white mb-4">Result Not Available</h2>
-                            <p className="text-gray-300 mb-6">{error}</p>
+                            <h2 className="text-3xl font-bold text-[#F8F0E3] mb-4">Result Not Available</h2>
+                            <p className="text-[#A08DAE] mb-6">{error}</p>
                             <Button
                                 variant="outline"
                                 onClick={() => {
@@ -1766,38 +1810,38 @@
 
             return (
                 <div className="max-w-xl mx-auto animate-enter text-center">
-                    <div className="w-24 h-24 mx-auto rounded-full bg-[#C09A4D] shadow-2xl shadow-[#C09A4D]/50 flex items-center justify-center mb-8">
+                    <div className="w-24 h-24 mx-auto rounded-full bg-[#00BF9A] shadow-2xl shadow-[#00BF9A]/50 flex items-center justify-center mb-8">
                         <Icons.Handshake className="w-12 h-12 text-black" />
                     </div>
 
-                    <h2 className="hero-heading text-5xl font-bold text-white mb-4">
+                    <h2 className="hero-heading text-5xl font-bold text-[#F8F0E3] mb-4">
                         Final Offer Revealed
                     </h2>
                     <p className="hero-subtitle mb-8">
                         This is the final base salary produced by the Closing Table mechanism.
                     </p>
 
-                    <GlassCard className="border-[#C09A4D]/30">
-                        <p className="text-gray-400 text-lg mb-2">
+                    <GlassCard className="border-[#00BF9A]/30">
+                        <p className="text-[#A08DAE] text-lg mb-2">
                             Final Binding Offer (from the mechanism)
                         </p>
-                        <p className="text-7xl font-bold text-[#C09A4D] mb-4 tracking-tighter financial-number">
+                        <p className="text-7xl font-bold text-[#00BF9A] mb-4 tracking-tighter financial-number">
                             ${data.final.toLocaleString()}
                         </p>
-                        <div className="bg-[#C09A4D]/10 rounded-lg p-4 inline-block">
-                            <p className="text-[#C09A4D]/90 text-sm font-medium">
+                        <div className="bg-[#00BF9A]/10 rounded-lg p-4 inline-block">
+                            <p className="text-[#00BF9A]/90 text-sm font-medium">
                                 Rounded for privacy. Includes a{' '}
                                 <strong>${data.surplus.toLocaleString()}</strong> fair split
                                 of the surplus between the candidate's minimum and the company's maximum.
                             </p>
                         </div>
 
-                        <div className="mt-8 p-4 bg-black/30 rounded-xl border border-white/10 text-left text-xs text-gray-400 space-y-1">
-                            <p className="font-semibold text-gray-300">Shareable link</p>
-                            <p className="text-[11px] text-[#C09A4D] break-all">{revealUrl}</p>
+                        <div className="mt-8 p-4 bg-black/30 rounded-xl border border-white/10 text-left text-xs text-[#A08DAE] space-y-1">
+                            <p className="font-semibold text-[#A08DAE]">Shareable link</p>
+                            <p className="text-[11px] text-[#00BF9A] break-all">{revealUrl}</p>
                         </div>
 
-                        <p className="mt-6 text-gray-500 text-xs">
+                        <p className="mt-6 text-[#A08DAE] text-xs">
                             This view does not run the mechanism again. It only reveals a stored result.
                         </p>
                     </GlassCard>
