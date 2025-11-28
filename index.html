@@ -69,6 +69,9 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
+        // --- API CONFIGURATION ---
+        const API_BASE = 'https://closing-table-backend.onrender.com';
+
         // --- MECHANISM CONSTANTS ---
         const BRIDGE_ZONE_PCT = 0.10;       // 10% gap treated as "close, talk"
         const ROUNDING_GRANULARITY = 1000;  // $1,000 rounding
@@ -319,7 +322,7 @@
                 setLoading(true);
                 setError(null);
                 try {
-                    const response = await fetch('/api/offers', {
+                    const response = await fetch(`${API_BASE}/api/offers`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ max: budget, email }),
@@ -518,7 +521,7 @@
             useEffect(() => {
                 const checkOffer = async () => {
                     try {
-                        const response = await fetch(`/api/offers/${offerId}`);
+                        const response = await fetch(`${API_BASE}/api/offers/${offerId}`);
                         const data = await response.json();
                         
                         if (data.status === 'invalid') {
@@ -567,7 +570,7 @@
             const submit = async () => {
                 setStep('submitting');
                 try {
-                    const response = await fetch(`/api/offers/${offerId}/submit`, {
+                    const response = await fetch(`${API_BASE}/api/offers/${offerId}/submit`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ min: ask, email }),
