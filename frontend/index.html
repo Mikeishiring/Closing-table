@@ -1359,10 +1359,10 @@
                             <Icons.Lock className="w-10 h-10 text-black" />
                         </div>
                         <h1 className="text-4xl md:text-6xl font-bold mb-6 text-[#F1F5F9]">
-                            Terms Locked.
+                            Terms Locked
                         </h1>
                         <p className="text-xl text-[#CBD5E1] mb-10 leading-relaxed">
-                            Your maximum terms are now fixed and prepared for the candidate.
+                            Your maximum is locked and ready for the candidate.
                         </p>
 
                         <GlassCard className="mb-8">
@@ -1421,10 +1421,10 @@
                             </h1>
                         </div>
                         <p className="text-xl text-gray-200/80 mt-4 leading-relaxed mb-4">
-                            A single-shot, private way to close compensation offers without negotiation or anchoring.
+                            Close salary negotiations fairly. No back-and-forth, no anchoring.
                         </p>
                         <p className="text-base text-gray-300 leading-relaxed max-w-2xl mx-auto">
-                            Enter your true maximum salary budget. The candidate enters their minimum acceptable salary. If the numbers overlap, the tool instantly calculates a fair final offer by splitting the surplus 50/50. Neither side ever sees the other's number.
+                            Set your maximum. The candidate sets their minimum. If they overlap, we split the difference. Neither side sees the other's number.
                         </p>
                     </div>
 
@@ -1442,10 +1442,10 @@
                     >
                         <div className="mb-6">
                             <h2 className="text-base font-bold text-yellow-400 tracking-wide mb-2">
-                                Your True Maximum (CMax)
+                                Your Maximum (CMax)
                             </h2>
                             <p className="text-sm text-gray-300">
-                                This is your absolute ceiling. It's private — the candidate never sees this number.
+                                Your ceiling. The candidate never sees this.
                             </p>
                         </div>
 
@@ -1493,7 +1493,7 @@
                                     />
                                 </div>
                                 <p className="mt-2 text-xs text-gray-400">
-                                    We'll email you the final agreed salary once both sides submit. No spam; data auto-deletes after 7 days.
+                                    We'll email you the result. No spam. Data auto-deletes after 7 days.
                                 </p>
                             </div>
 
@@ -1513,7 +1513,7 @@
                             </button>
 
                             <p className="text-center text-xs text-gray-300 opacity-80">
-                                The candidate will never see your CMax. This protects your budget from negotiation gamesmanship.
+                                The candidate never sees your CMax. This protects your budget.
                             </p>
                         </div>
                     </GlassCard>
@@ -1521,26 +1521,26 @@
                     {/* Assurance / Details zone */}
                     <GlassCard className="border-[#F5C04A]/25">
                         <h3 className="text-base font-bold text-yellow-400 tracking-wide mb-4">
-                            Why this is fair and safe
+                            How it works
                         </h3>
 
                         <ul className="space-y-3 text-sm text-gray-200 mb-6">
                             <li className="flex items-start gap-2">
                                 <span className="text-yellow-400 mt-1">•</span>
                                 <div>
-                                    <span className="font-semibold">No negotiation or anchoring.</span> Both sides commit their true numbers up front.
+                                    <span className="font-semibold">No negotiation.</span> Both sides commit up front.
                                 </div>
                             </li>
                             <li className="flex items-start gap-2">
                                 <span className="text-yellow-400 mt-1">•</span>
                                 <div>
-                                    <span className="font-semibold">Fair to both parties.</span> If your CMax and their CMin overlap, the surplus is split 50/50.
+                                    <span className="font-semibold">Fair split.</span> If ranges overlap, surplus splits 50/50.
                                 </div>
                             </li>
                             <li className="flex items-start gap-2">
                                 <span className="text-yellow-400 mt-1">•</span>
                                 <div>
-                                    <span className="font-semibold">Private by design.</span> Neither side ever sees the other's number; only the final result is shown.
+                                    <span className="font-semibold">Private.</span> Neither side sees the other's number.
                                 </div>
                             </li>
                         </ul>
@@ -1549,20 +1549,20 @@
                             <details className="group">
                                 <summary className="cursor-pointer font-medium text-gray-200 hover:text-yellow-400 transition-colors list-none flex items-center gap-2">
                                     <span className="text-yellow-400 group-open:rotate-90 transition-transform">▶</span>
-                                    How exactly is the final salary calculated?
+                                    How is the final salary calculated?
                                 </summary>
                                 <p className="mt-2 text-sm text-gray-300 pl-5">
-                                    We compare your CMax to the candidate's CMin. If your CMax is at or above their minimum, we take the overlap and split it 50/50. The result is the binding final salary.
+                                    If your CMax meets their CMin, we split the overlap 50/50.
                                 </p>
                             </details>
 
                             <details className="group">
                                 <summary className="cursor-pointer font-medium text-gray-200 hover:text-yellow-400 transition-colors list-none flex items-center gap-2">
                                     <span className="text-yellow-400 group-open:rotate-90 transition-transform">▶</span>
-                                    What if our numbers don't overlap?
+                                    What if numbers don't overlap?
                                 </summary>
                                 <p className="mt-2 text-sm text-gray-300 pl-5">
-                                    If your CMax is below the candidate's minimum, there is no overlap and the tool simply reports that there is no fair agreement. No one sees the other side's number.
+                                    No deal. Neither side sees the other's number.
                                 </p>
                             </details>
 
@@ -1572,7 +1572,7 @@
                                     What happens to our data?
                                 </summary>
                                 <p className="mt-2 text-sm text-gray-300 pl-5">
-                                    We only store the numbers long enough to run the comparison and send the final result. All data is automatically deleted after 7 days.
+                                    Auto-deleted after 7 days.
                                 </p>
                             </details>
                         </div>
@@ -1633,15 +1633,15 @@
                         }
                         
                         if (data.status === 'invalid') {
-                            setError('This offer link is not valid. It may have been typed incorrectly.');
+                            setError('Invalid offer link.');
                             setStep('error');
                             logEvent('offer_check_invalid', { offerId });
                         } else if (data.status === 'expired') {
-                            setError('This offer has expired. Ask the company to generate a new link.');
+                            setError('Offer expired. Ask for a new link.');
                             setStep('error');
                             logEvent('offer_check_expired', { offerId });
                         } else if (data.status === 'used') {
-                            setError('This link has already been used once. The mechanism only runs a single time per offer.');
+                            setError('Link already used. The mechanism runs once per offer.');
                             setStep('error');
                             logEvent('offer_check_used', { offerId });
                         } else {
@@ -1650,7 +1650,7 @@
                             logEvent('offer_viewed', { offerId, status: 'ok' });
                         }
                     } catch (err) {
-                        setError('Failed to load offer. Please check your connection.');
+                        setError('Failed to load offer. Check your connection.');
                         setStep('error');
                         logEvent('offer_check_error', { offerId, error: err.message });
                     }
@@ -1745,17 +1745,17 @@
                     }
 
                     if (data.status === 'invalid') {
-                        setError('This offer link is not valid. It may have been typed incorrectly.');
+                        setError('Invalid offer link.');
                         setStep('error');
                         logEvent('submit_rejected', { offerId, status: data.status });
                         return;
                     } else if (data.status === 'expired') {
-                        setError('This offer has expired. Ask the company to generate a new link.');
+                        setError('Offer expired. Ask for a new link.');
                         setStep('error');
                         logEvent('submit_rejected', { offerId, status: data.status });
                         return;
                     } else if (data.status === 'used') {
-                        setError('This link has already been used once. The mechanism only runs a single time per offer.');
+                        setError('Link already used. The mechanism runs once per offer.');
                         setStep('error');
                         logEvent('submit_rejected', { offerId, status: data.status });
                         return;
@@ -1792,7 +1792,7 @@
                         emailProvided: !!email,
                     });
                 } catch (err) {
-                    setError('Failed to submit. Please try again.');
+                    setError('Failed to submit. Try again.');
                     setStep('error');
                     logEvent('submit_error', { offerId, error: err.message });
                 }
@@ -1813,7 +1813,7 @@
                             <div className="w-24 h-24 mx-auto rounded-full bg-red-500/20 flex items-center justify-center mb-8">
                                 <Icons.Lock className="w-12 h-12 text-red-400" />
                             </div>
-                            <h2 className="text-3xl font-bold text-[#F1F5F9] mb-4">Unable to Load Offer</h2>
+                            <h2 className="text-3xl font-bold text-[#F1F5F9] mb-4">Unable to Load</h2>
                             <p className="text-[#CBD5E1] mb-6">{error}</p>
                             <Button variant="outline" onClick={() => {
                                 window.location.hash = '';
@@ -1843,8 +1843,8 @@
                             </div>
                         </div>
                         <div className="space-y-3 text-lg text-[#CBD5E1]">
-                            <p className="commitment-text font-bold text-yellow-400">Your number is locked.</p>
-                            <p className="commitment-text">Calculating result...</p>
+                            <p className="commitment-text font-bold text-yellow-400">Number locked.</p>
+                            <p className="commitment-text">Calculating...</p>
                             <p className="commitment-text font-bold text-[#FCD34D]">Almost there...</p>
                         </div>
                     </div>
@@ -1857,23 +1857,23 @@
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
                             {/* Left Side */}
                             <div>
-                                <h2 className="text-5xl font-extrabold text-yellow-400">Fair, Fast, Private Negotiation</h2>
+                                <h2 className="text-5xl font-extrabold text-yellow-400">Fair, Fast, Private</h2>
                                 <p className="text-gray-200/80 mt-4 text-lg leading-relaxed">
-                                    Your true salary is secured here. Commit your minimum, and if it aligns with the company's maximum, the final, fairest offer is instantly secured. Zero Haggling. Zero Regrets.
+                                    Set your minimum. If it aligns with the company's maximum, you get a fair offer instantly. No haggling.
                                 </p>
 
                                 <ul className="mt-10 space-y-6 text-gray-300">
                                     <li className="flex items-start gap-3">
                                         <span className="text-yellow-400 text-xl mt-1">1.</span>
-                                        <span>The Company commits their <strong>CMax</strong> (Maximum Budget), sealed in the system.</span>
+                                        <span>Company commits <strong>CMax</strong> (maximum budget).</span>
                                     </li>
                                     <li className="flex items-start gap-3">
                                         <span className="text-yellow-400 text-xl mt-1">2.</span>
-                                        <span>You commit your <strong>CMin</strong> (Minimum Acceptable Salary), secured in the system.</span>
+                                        <span>You commit <strong>CMin</strong> (minimum salary).</span>
                                     </li>
                                     <li className="flex items-start gap-3">
                                         <span className="text-yellow-400 text-xl mt-1">3.</span>
-                                        <span>If ranges overlap (<strong>CMin ≤ CMax</strong>), the Surplus is split 50/50 for a binding offer.</span>
+                                        <span>If they overlap (<strong>CMin ≤ CMax</strong>), surplus splits 50/50.</span>
                                     </li>
                                 </ul>
                             </div>
@@ -1883,14 +1883,14 @@
                                 <SplitDiagram />
 
                                 <div className="mt-8 text-sm text-gray-300 bg-black/40 p-5 rounded-xl border border-white/10">
-                                    <p className="font-semibold text-yellow-400 mb-2">The Algorithm for Fairness:</p>
+                                    <p className="font-semibold text-yellow-400 mb-2">The Formula:</p>
                                     <p>If CMin ≤ CMax, then:</p>
                                     <p className="mt-1 text-yellow-300 font-medium">
                                         Final Offer = CMin + (CMax - CMin) / 2
                                     </p>
-                                    <p className="mt-2 text-xs text-gray-500">
-                                        *Rounded to the nearest $1,000 for privacy.
-                                    </p>
+                                        <p className="mt-2 text-xs text-gray-500">
+                                            Rounded to $1,000 for privacy.
+                                        </p>
                                 </div>
                             </div>
                         </div>
@@ -1904,12 +1904,12 @@
                                         <span className="text-sm font-bold text-yellow-400">Your Number is Private</span>
                                     </div>
                                     <p className="text-sm text-gray-300 max-w-xl mx-auto leading-relaxed">
-                                        The company cannot see your CMin before you submit it, and you cannot see their CMax. This mechanism protects you from gamesmanship.
+                                        The company can't see your CMin. You can't see their CMax. No gamesmanship.
                                     </p>
                                 </div>
                                 <div className="text-center">
                                     <Button onClick={() => setStep('input')} className="w-full md:w-auto text-lg font-bold py-4 px-8">
-                                        Take Your Seat at the Table{' '}
+                                        Continue{' '}
                                         <Icons.ArrowRight className="w-5 h-5" />
                                     </Button>
                                 </div>
@@ -1953,10 +1953,10 @@
 
                             <div className="text-left mb-8">
                                 <label className="block text-sm font-extrabold text-yellow-400 uppercase tracking-widest mb-2">
-                                    YOUR TRUE MINIMUM (CMin)
+                                    YOUR MINIMUM (CMin)
                                 </label>
                                 <p className="text-xs text-[#CBD5E1] mb-6 opacity-70">
-                                    The lowest amount you'd accept. The company won't see this until after you submit.
+                                    The lowest you'd accept. The company won't see this.
                                 </p>
                                 <div className="flex items-baseline justify-start mb-6">
                                     <span className="text-[#CBD5E1] text-4xl font-bold mr-2">$</span>
@@ -2008,7 +2008,7 @@
                                         className="w-full frosted-input border border-white/10 rounded-2xl py-4 px-4 text-[#F1F5F9] focus:outline-none focus:border-[#F5C04A] focus:ring-2 focus:ring-[#F5C04A]/30 hover:border-[#F5C04A]/50 transition-all duration-200"
                                     />
                                     <p className="mt-3 text-xs text-[#CBD5E1] hush-hint">
-                                        We'll send your result here. No spam, no long-term storage.
+                                        We'll send your result here. No spam.
                                     </p>
                                 </div>
 
@@ -2192,11 +2192,11 @@
                                     {result.status === 'close' && (
                                         <div className="bg-yellow-500/10 border border-[#FACC15]/30 p-6 rounded-xl mb-6 text-left">
                                             <p className="text-yellow-200 font-bold text-lg mb-2">
-                                                You're within 10% of a deal.
+                                                Within 10% of a deal.
                                             </p>
                                             <p className="text-yellow-100/70 text-sm mb-4">
                                                 A fair split would be <strong className="text-[#FACC15]">${Math.round(bridgeSplit / 1000) * 1000}</strong>. 
-                                                Consider a quick conversation to bridge the gap.
+                                                Consider a conversation to close the gap.
                                             </p>
                                             <Button
                                                 variant="gold"
@@ -2221,7 +2221,7 @@
                                                 Gap too large.
                                             </p>
                                             <p className="text-red-100/70 text-sm mt-1">
-                                                Your minimum is more than 10% above their maximum. This deal can't be closed automatically.
+                                                Your minimum is more than 10% above their maximum.
                                             </p>
                                         </div>
                                     )}
@@ -2251,20 +2251,20 @@
                         const json = await res.json();
 
                         if (json.status === 'invalid') {
-                            setError('This result link is not valid.');
+                            setError('Invalid result link.');
                             setStep('error');
                         } else if (json.status === 'expired') {
-                            setError('This result has expired. Ask the company to run a new Closing Table.');
+                            setError('Result expired. Ask for a new Closing Table.');
                             setStep('error');
                         } else if (json.status !== 'success') {
-                            setError('This result is not available.');
+                            setError('Result not available.');
                             setStep('error');
                         } else {
                             setData(json);
                             setStep('ready');
                         }
                     } catch (e) {
-                        setError('Failed to load result. Please check your connection.');
+                        setError('Failed to load result. Check your connection.');
                         setStep('error');
                     }
                 };
@@ -2287,7 +2287,7 @@
                             <div className="w-24 h-24 mx-auto rounded-full bg-red-500/20 flex items-center justify-center mb-8">
                                 <Icons.Lock className="w-12 h-12 text-red-400" />
                             </div>
-                            <h2 className="text-3xl font-bold text-[#F1F5F9] mb-4">Result Not Available</h2>
+                            <h2 className="text-3xl font-bold text-[#F1F5F9] mb-4">Not Available</h2>
                             <p className="text-[#CBD5E1] mb-6">{error}</p>
                             <Button
                                 variant="outline"
@@ -2315,7 +2315,7 @@
                         Final Result
                     </h2>
                     <p className="hero-subtitle mb-8">
-                        The Closing Table calculation result.
+                        The Closing Table result.
                     </p>
 
                     <div className="space-y-8">
@@ -2370,7 +2370,7 @@
                         </div>
 
                         <p className="text-[#CBD5E1] text-xs text-center opacity-70">
-                            This is a stored result. The mechanism only runs once.
+                            This result is stored. The mechanism runs once.
                         </p>
                     </div>
                 </div>
