@@ -67,7 +67,7 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useRef } = React;
 
         // --- API CONFIGURATION ---
         const API_BASE = 'https://closing-table-backend.onrender.com';
@@ -329,11 +329,22 @@
                     });
 
                     if (!response.ok) {
-                        const data = await response.json();
-                        throw new Error(data.error || 'Failed to create offer');
+                        let errorData;
+                        try {
+                            errorData = await response.json();
+                        } catch (jsonErr) {
+                            throw new Error(`HTTP ${response.status}: Failed to create offer`);
+                        }
+                        throw new Error(errorData.error || 'Failed to create offer');
                     }
 
-                    const { offerId } = await response.json();
+                    let responseData;
+                    try {
+                        responseData = await response.json();
+                    } catch (jsonErr) {
+                        throw new Error('Invalid response from server');
+                    }
+                    const { offerId } = responseData;
                     const newLink = `${window.location.origin}${window.location.pathname}#offer=${offerId}`;
                     setLink(newLink);
 
@@ -458,7 +469,12 @@
                                 max={300000}
                                 step={5000}
                                 value={budget}
-                                onChange={(e) => setBudget(parseInt(e.target.value))}
+                                onChange={(e) => {
+                                    const value = parseInt(e.target.value);
+                                    if (!isNaN(value)) {
+                                        setBudget(value);
+                                    }
+                                }}
                             />
                             <div className="flex justify-between mt-2 text-xs text-gray-500 font-medium uppercase">
                                 <span>Conservative</span>
@@ -516,13 +532,29 @@
             const [loadingMarket, setLoadingMarket] = useState(false);
             const [offerStatus, setOfferStatus] = useState(null);
             const [error, setError] = useState(null);
+            const marketDataTimeoutRef = useRef(null);
 
             // Check offer status on load
             useEffect(() => {
+                // Validate offerId before making API call
+                if (!offerId || typeof offerId !== 'string' || offerId.trim() === '') {
+                    setError('Invalid offer link.');
+                    setStep('error');
+                    return;
+                }
+
                 const checkOffer = async () => {
                     try {
                         const response = await fetch(`${API_BASE}/api/offers/${offerId}`);
-                        const data = await response.json();
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}`);
+                        }
+                        let data;
+                        try {
+                            data = await response.json();
+                        } catch (jsonErr) {
+                            throw new Error('Invalid response from server');
+                        }
                         
                         if (data.status === 'invalid') {
                             setError('This offer link is not valid. It may have been typed incorrectly.');
@@ -556,18 +588,42 @@
             const fetchMarketData = () => {
                 if (loadingMarket || marketData) return;
                 setLoadingMarket(true);
-                setTimeout(() => {
+                // Use a reasonable default for mock data (actual max not available from API)
+                // In a real system, this would use the actual offer max from the API
+                const defaultMax = 120000;
+                // Clear any existing timeout
+                if (marketDataTimeoutRef.current) {
+                    clearTimeout(marketDataTimeoutRef.current);
+                }
+                marketDataTimeoutRef.current = setTimeout(() => {
                     // Mock market data - in real system this would come from API
                     const mockMarketValue =
-                        Math.round((120000 * 0.95 + ROUNDING_GRANULARITY) / ROUNDING_GRANULARITY) *
+                        Math.round((defaultMax * 0.95 + ROUNDING_GRANULARITY) / ROUNDING_GRANULARITY) *
                         ROUNDING_GRANULARITY;
                     setMarketData(mockMarketValue);
                     setLoadingMarket(false);
                     logEvent('market_data_shown', { suggested: mockMarketValue });
+                    marketDataTimeoutRef.current = null;
                 }, 1500);
             };
 
+            // Cleanup timeout on unmount
+            useEffect(() => {
+                return () => {
+                    if (marketDataTimeoutRef.current) {
+                        clearTimeout(marketDataTimeoutRef.current);
+                    }
+                };
+            }, []);
+
             const submit = async () => {
+                // Validate offerId before submitting
+                if (!offerId || typeof offerId !== 'string' || offerId.trim() === '') {
+                    setError('Invalid offer link.');
+                    setStep('error');
+                    return;
+                }
+
                 setStep('submitting');
                 try {
                     const response = await fetch(`${API_BASE}/api/offers/${offerId}/submit`, {
@@ -576,7 +632,16 @@
                         body: JSON.stringify({ min: ask, email }),
                     });
 
-                    const data = await response.json();
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+
+                    let data;
+                    try {
+                        data = await response.json();
+                    } catch (jsonErr) {
+                        throw new Error('Invalid response from server');
+                    }
 
                     if (data.status === 'invalid') {
                         setError('This offer link is not valid. It may have been typed incorrectly.');
@@ -749,7 +814,12 @@
                                     max={250000}
                                     step={1000}
                                     value={ask}
-                                    onChange={(e) => setAsk(parseInt(e.target.value))}
+                                    onChange={(e) => {
+                                        const value = parseInt(e.target.value);
+                                        if (!isNaN(value)) {
+                                            setAsk(value);
+                                        }
+                                    }}
                                 />
                             </div>
 
