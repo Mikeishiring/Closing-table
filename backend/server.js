@@ -9,7 +9,8 @@ app.use(express.json());
 const offers = new Map();
 
 // Config
-const OFFER_TTL_MS = 1000 * 60 * 60; // 1 hour
+// Offers live in memory only, TTL 24 hours
+const OFFER_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const BRIDGE_ZONE_MULTIPLIER = 1.1; // 10% above max is "close"
 const ROUNDING_GRANULARITY = 1000; // Round to nearest $1,000
 

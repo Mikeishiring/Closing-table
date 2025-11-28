@@ -499,6 +499,9 @@
                                         className="w-full bg-black/30 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors"
                                     />
                                 </div>
+                                <p className="mt-2 text-xs text-gray-500">
+                                    This address is just stored with the offer for your reference. The tool does not send any automatic emails.
+                                </p>
                             </div>
 
                             {error && (
@@ -841,11 +844,21 @@
                                 {marketData && (
                                     <div className="mt-3 text-left animate-enter">
                                         <p className="text-sm text-gray-300">
-                                            Market-style guidance for this role is around{' '}
+                                            For this prototype, we show a rough, illustrative guidance number of{' '}
                                             <strong className="text-white">
                                                 ${marketData.toLocaleString()}
                                             </strong>
-                                            .
+                                            {' '}to help you sanity-check your ask. It is not a firm market quote.
+                                            {' '}
+                                            <a
+                                                href="https://dccr.dragonfly.xyz/report"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="underline text-lime-400 hover:text-lime-300"
+                                            >
+                                                Read the Dragonfly DCCR report
+                                            </a>
+                                            {' '}for deeper benchmark context.
                                             <button
                                                 onClick={() => setAsk(marketData)}
                                                 aria-label={`Set minimum salary to ${marketData.toLocaleString()}`}
@@ -872,6 +885,9 @@
                                         autoComplete="email"
                                         className="w-full bg-black/30 border border-white/10 rounded-xl py-4 px-4 text-white focus:outline-none focus:border-lime-400 transition-colors"
                                     />
+                                    <p className="mt-2 text-xs text-gray-500">
+                                        For this prototype, your email is only shown in the explanation text. No messages are sent automatically.
+                                    </p>
                                 </div>
 
                                 <Button onClick={submit} disabled={!email} className="w-full">
@@ -932,8 +948,8 @@
                                     </p>
                                 </div>
                                 <p className="mt-8 text-gray-400 text-sm">
-                                    In a full system, this is where an official offer workflow (emails, docs)
-                                    would kick in using the final number and your email: {email}.
+                                    In a future full system, this is where an official offer workflow (emails, docs)
+                                    would kick in using the final number and your email: {email}. This prototype does not send emails automatically.
                                 </p>
                             </GlassCard>
                         ) : (
