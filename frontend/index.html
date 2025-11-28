@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="A fair, private way to close salary negotiations. Double-blind mechanism that splits the difference when ranges overlap.">
-    <meta name="theme-color" content="#0F0F0F">
+    <meta name="theme-color" content="#F8F8F8">
     <meta name="robots" content="noindex, nofollow">
     
     <!-- Security Headers -->
@@ -32,632 +32,270 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com" defer></script>
     <style>
+        /* === iPhone Sleek Design System === */
+        
+        /* --- CSS Variables for Design System --- */
+        :root {
+            --bg-page: #F8F8F8;
+            --bg-card: #FFFFFF;
+            --text-primary: #1C1C1E;
+            --text-secondary: #666666;
+            --accent-primary: #00C4CC;
+            --accent-hover: #00B0B8;
+            --bg-input: #EFF3F6;
+            --hover-highlight: #E5F2F9;
+            --shadow-light: #d9d9d9;
+            --shadow-white: #ffffff;
+            --success-color: #34C759;
+            --warning-color: #FF9500;
+            --error-color: #FF3B30;
+        }
+
         body {
-            background: linear-gradient(180deg, #E8E8E8 0%, #E0E0E0 100%);
-            color: #1A1A1A;
-            font-family: 'Inter', sans-serif;
+            background: var(--bg-page);
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
+        /* Remove grainy texture for cleaner look */
         body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            background: url('https://grainy-gradients.vercel.app/noise.svg');
-            opacity: 0.08;
-            z-index: 0;
+            display: none;
         }
 
-
-        @keyframes goldPulse {
-            0% { box-shadow: 0 0 0 0 rgba(245, 192, 74, 0.4); }
-            100% { box-shadow: 0 0 30px 20px rgba(245, 192, 74, 0); }
-        }
-
-        .gold-pulse {
-            animation: goldPulse 1.6s ease-out infinite;
-        }
-
-        @keyframes sliderGlow {
-            0% { filter: drop-shadow(0 0 4px rgba(245,192,74,0.4)); }
-            50% { filter: drop-shadow(0 0 10px rgba(245,192,74,0.8)); }
-            100% { filter: drop-shadow(0 0 4px rgba(245,192,74,0.4)); }
-        }
-
-        .slider-glow {
-            animation: sliderGlow 2.5s ease-in-out infinite;
-        }
-
-        @keyframes illuminate {
-            0% { opacity: .4; transform: scale(.95); }
-            100% { opacity: .8; transform: scale(1.05); }
-        }
-
-        .oracle-glow {
-            animation: illuminate 1.8s ease-in-out infinite alternate;
-        }
-
+        /* --- Neumorphic Card Styles --- */
         .glass-panel {
-            background: #E4E4E4;
-            backdrop-filter: blur(12px);
+            background: var(--bg-card);
             border: none;
             box-shadow: 
-                8px 8px 16px rgba(163, 163, 163, 0.6),
-                -8px -8px 16px rgba(255, 255, 255, 0.8),
-                inset 0 0 0 1px rgba(255, 255, 255, 0.3);
-            border-radius: 1.5rem;
+                10px 10px 20px var(--shadow-light),
+                -10px -10px 20px var(--shadow-white);
+            border-radius: 20px;
             position: relative;
             padding: 2rem;
         }
 
         .glass-panel::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, transparent 50%);
-            opacity: 0.5;
-            pointer-events: none;
-            border-radius: inherit;
+            display: none;
         }
 
-        .lime-text-gradient {
-            background: linear-gradient(to right, #A7EF00, #C8FF4D);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
+        /* --- Animations --- */
         @keyframes fade-in-up {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         .animate-enter {
-            animation: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        /* --- APP SHELL & BACKGROUND GLOW --- */
+        @keyframes subtle-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
+
+        .gold-pulse {
+            animation: subtle-pulse 2s ease-in-out infinite;
+        }
+
+        /* --- APP SHELL --- */
         .app-shell {
             position: relative;
             overflow: hidden;
+            background: var(--bg-page);
         }
 
         .app-shell::before {
-            content: "";
-            position: fixed;
-            inset: -35%;
-            background:
-                radial-gradient(circle at 0% 0%, rgba(167, 239, 0, 0.15), transparent 55%),
-                radial-gradient(circle at 100% 100%, rgba(45, 20, 85, 0.12), transparent 55%);
-            filter: blur(40px);
-            opacity: 0.6;
-            animation: float-bg 26s ease-in-out infinite alternate;
-            pointer-events: none;
-            z-index: -1;
+            display: none;
         }
 
-        @keyframes float-bg {
-            from {
-                transform: translate3d(-24px, 14px, 0) scale(1);
-            }
-            to {
-                transform: translate3d(28px, -20px, 0) scale(1.04);
-            }
-        }
-
-        /* --- TYPOGRAPHY POLISH --- */
+        /* --- TYPOGRAPHY --- */
         .hero-heading {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(2.8rem, 4vw, 3.8rem);
-            letter-spacing: -0.04em;
-            line-height: 1.03;
-            font-weight: 700;
-            background: linear-gradient(90deg, #FCD34D 0%, #F59E0B 25%, #FCD34D 50%, #F59E0B 75%, #FCD34D 100%);
-            background-size: 200% 100%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: title-light-sweep 10s linear infinite;
-        }
-
-        @keyframes title-light-sweep {
-            0% {
-                background-position: -200% 0;
-            }
-            100% {
-                background-position: 200% 0;
-            }
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: clamp(2.4rem, 4vw, 3.2rem);
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            font-weight: 800;
+            color: var(--text-primary);
         }
 
         .financial-number {
-            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-family: 'JetBrains Mono', 'SF Mono', 'Menlo', monospace;
             font-weight: 600;
-            letter-spacing: 0.02em;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
         }
 
         .hero-subtitle {
-            font-size: clamp(1.05rem, 1.4vw, 1.3rem);
-            color: #CBD5E1;
+            font-size: clamp(1rem, 1.3vw, 1.15rem);
+            color: var(--text-secondary);
             max-width: 36rem;
             margin-inline: auto;
+            line-height: 1.6;
         }
 
         .section-label {
-            font-size: 0.7rem;
-            letter-spacing: 0.22em;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
+            color: var(--text-secondary);
+            font-weight: 600;
         }
 
-        /* --- INPUT MATERIALITY (Frosted Glass) --- */
-        .frosted-input {
-            background: rgba(0, 0, 0, 0.3) !important;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+        /* --- INPUT STYLES (Neumorphic Indented) --- */
+        .frosted-input,
+        .neu-input {
+            background: var(--bg-input) !important;
+            border: none !important;
+            box-shadow: inset 3px 3px 6px #d1d9e6, inset -3px -3px 6px #ffffff;
+            border-radius: 12px;
         }
 
-        /* --- BUTTON MICRO-ANIMATION --- */
+        .frosted-input:focus,
+        .neu-input:focus {
+            outline: none;
+            box-shadow: inset 3px 3px 6px #d1d9e6, inset -3px -3px 6px #ffffff, 0 0 0 2px var(--accent-primary);
+        }
+
+        /* --- BUTTON STYLES --- */
         .btn {
             position: relative;
             overflow: hidden;
-            background-size: 200% 100%;
-        }
-
-        .btn-lime-sweep {
-            animation: gradient-shift 4s ease-in-out infinite;
-        }
-
-        @keyframes gradient-shift {
-            0%, 100% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
+            transition: all 0.2s ease;
         }
 
         .btn::before {
             content: "";
             position: absolute;
             inset: 0;
-            background: linear-gradient(
-                120deg,
-                transparent 0%,
-                rgba(255, 255, 255, 0.14) 30%,
-                transparent 60%
-            );
-            transform: translate3d(-120%, 0, 0);
-            opacity: 0;
-            pointer-events: none;
+            background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
+            transform: translateX(-100%);
+            transition: transform 0.4s ease;
         }
 
         .btn:hover::before {
-            opacity: 1;
-            transform: translate3d(120%, 0, 0);
-            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease-out;
+            transform: translateX(100%);
         }
 
-        /* --- LOCK ICON GLOW ON BUTTON HOVER --- */
-        .btn:hover .lock-charge-up {
-            filter: drop-shadow(0 0 8px #FCD34D) drop-shadow(0 0 12px rgba(252, 211, 77, 0.6)) drop-shadow(0 0 16px rgba(252, 211, 77, 0.3));
-            transform: scale(1.1);
-            transition: filter 0.3s ease-out, transform 0.3s ease-out;
+        .btn-primary {
+            background: var(--accent-primary);
+            color: white;
+            font-weight: 600;
+            border-radius: 50px;
+            box-shadow: 0 4px 14px rgba(0, 196, 204, 0.35);
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            box-shadow: 0 6px 20px rgba(0, 196, 204, 0.45);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
         }
 
         /* --- CARD HOVER --- */
         .card-hover {
-            transition:
-                transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-                box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-                border-color 0.35s ease-out,
-                background-color 0.35s ease-out;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            background: var(--bg-card);
         }
 
         .card-hover:hover {
             transform: translateY(-4px);
-            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75);
-            border-color: rgba(148, 163, 184, 0.55);
-            background-color: rgba(26, 26, 26, 0.78);
+            box-shadow: 
+                14px 14px 28px var(--shadow-light),
+                -14px -14px 28px var(--shadow-white);
+            background-color: var(--hover-highlight);
         }
 
-        /* --- JACKPOT NUMBER ANIMATION & SCALING --- */
+        /* --- JACKPOT NUMBER --- */
         .jackpot-number {
             display: inline-block;
             transform-origin: center;
-            transition:
-                transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
-                filter 0.22s ease-out;
+            transition: transform 0.2s ease, color 0.2s ease;
         }
 
         .jackpot-number.jackpot-active {
-            animation: jackpot-rise 0.24s cubic-bezier(0.22, 1, 0.36, 1);
-            filter: drop-shadow(0 0 18px rgba(250, 250, 210, 0.35));
+            animation: jackpot-rise 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         @keyframes jackpot-rise {
-            0% {
-                transform: translateY(10px) scale(1.02);
-                opacity: 0.45;
-            }
-            55% {
-                transform: translateY(-4px) scale(1.12);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(0) scale(1.06);
-                opacity: 1;
-            }
+            0% { transform: translateY(8px) scale(1.02); opacity: 0.5; }
+            50% { transform: translateY(-3px) scale(1.08); opacity: 1; }
+            100% { transform: translateY(0) scale(1.04); opacity: 1; }
         }
 
-        /* --- HUSH FIELD FOCUS --- */
-        .hush-hint {
-            transition: opacity 0.15s ease-out;
-        }
-
-        .hush-hint.hidden {
-            opacity: 0;
-        }
-
-        /* --- LOCK ICON CHARGE-UP --- */
-        .lock-charge-up {
-            transition: filter 0.3s ease-out, transform 0.3s ease-out;
-        }
-
-        .lock-charge-up:hover {
-            filter: drop-shadow(0 0 8px #FCD34D) drop-shadow(0 0 12px rgba(252, 211, 77, 0.6));
-            transform: scale(1.05);
-        }
-
-        .btn-lime-sweep::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(
-                120deg,
-                transparent 0%,
-                rgba(167, 239, 0, 0.3) 30%,
-                transparent 60%
-            );
-            transform: translate3d(-120%, 0, 0);
-            opacity: 0;
-            pointer-events: none;
-            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease-out;
-        }
-
-        .btn-lime-sweep:hover::before {
-            opacity: 1;
-            transform: translate3d(120%, 0, 0);
-        }
-
-        /* --- URL COPY CONFIRMATION --- */
-        @keyframes url-flip {
-            0% {
-                transform: rotateY(0deg);
-                background: rgba(0, 0, 0, 0.3);
-            }
-            50% {
-                transform: rotateY(90deg);
-                background: #A7EF00;
-            }
-            100% {
-                transform: rotateY(0deg);
-                background: rgba(0, 0, 0, 0.3);
-            }
-        }
-
-        .url-flip-active {
-            animation: url-flip 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .url-checkmark {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .url-flip-active .url-checkmark {
-            opacity: 1;
-            animation: checkmark-fade 0.6s ease-out;
-        }
-
-        @keyframes checkmark-fade {
-            0%, 100% { opacity: 0; transform: scale(0.5); }
-            50% { opacity: 1; transform: scale(1.2); }
-        }
-
-        /* --- CANDIDATE LIME FLASH (Personal Confirmation) --- */
-        @keyframes candidate-lime-flash {
-            0% {
-                color: #F1F5F9;
-                filter: drop-shadow(0 0 0px rgba(167, 239, 0, 0));
-            }
-            30% {
-                color: #A7EF00;
-                filter: drop-shadow(0 0 12px rgba(167, 239, 0, 0.6)) drop-shadow(0 0 24px rgba(167, 239, 0, 0.3));
-            }
-            70% {
-                color: #A7EF00;
-                filter: drop-shadow(0 0 8px rgba(167, 239, 0, 0.4)) drop-shadow(0 0 16px rgba(167, 239, 0, 0.2));
-            }
-            100% {
-                color: #F1F5F9;
-                filter: drop-shadow(0 0 0px rgba(167, 239, 0, 0));
-            }
+        /* --- CANDIDATE CONFIRMATION --- */
+        @keyframes candidate-confirm-flash {
+            0% { color: var(--text-primary); }
+            30% { color: var(--accent-primary); }
+            100% { color: var(--text-primary); }
         }
 
         .candidate-confirm-flash {
-            animation: candidate-lime-flash 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+            animation: candidate-confirm-flash 0.6s ease-out;
         }
 
-
-        @keyframes pulse-subtle {
-            0%, 100% {
-                opacity: 0.5;
-            }
-            50% {
-                opacity: 0.7;
-            }
-        }
-
-
-        /* --- INTERACTIVE VIGNETTE --- */
-        .vignette-active {
-            animation: vignette-focus 0.4s ease-out forwards;
-        }
-
-        @keyframes vignette-focus {
-            0% {
-                background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.6) 70%);
-            }
-            100% {
-                background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.4) 60%);
-            }
-        }
-
-        /* --- LED FLICKER ANIMATION --- */
-        @keyframes led-flicker {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            10% { opacity: 0.3; transform: scale(0.98); }
-            20% { opacity: 1; transform: scale(1.02); }
-            30% { opacity: 0.5; transform: scale(0.99); }
-            40% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(1.01); }
-            60% { opacity: 1; transform: scale(1); }
-        }
-
+        /* --- LED FLICKER --- */
         .led-flicker {
-            animation: led-flicker 0.15s ease-out;
+            animation: led-flicker 0.12s ease-out;
         }
 
-        /* --- SECURITY SEAL ANIMATION --- */
-        @keyframes security-seal {
-            0% { 
-                background: linear-gradient(to right, #FCD34D, #F59E0B);
-                border-color: transparent;
-            }
-            50% {
-                background: linear-gradient(to right, #FCD34D, #F59E0B);
-                border-color: transparent;
-            }
-            100% {
-                background: linear-gradient(to right, #FCD34D, #F59E0B);
-                border: 2px solid;
-                border-image: linear-gradient(135deg, #FCD34D, #F59E0B, #D97706) 1;
-            }
+        @keyframes led-flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
 
-        .security-seal-active {
-            animation: security-seal 2s ease-out forwards;
+        /* --- CARD SINK --- */
+        .card-sink {
+            animation: card-sink 0.15s ease-out;
         }
 
-        /* --- CARD SINK EFFECT --- */
         @keyframes card-sink {
             0% { transform: translateY(0); }
-            50% { transform: translateY(2px); }
+            50% { transform: translateY(1px); }
             100% { transform: translateY(0); }
         }
 
-        .card-sink {
-            animation: card-sink 0.2s ease-out;
-        }
-
-        /* --- VISUAL METAPHOR BAR (Hero Animation) --- */
-        @keyframes marker-slide-left {
-            0%, 100% { transform: translateX(0); }
-            50% { transform: translateX(15px); }
-        }
-
-        @keyframes marker-slide-right {
-            0%, 100% { transform: translateX(0); }
-            50% { transform: translateX(-15px); }
-        }
-
-        @keyframes overlap-highlight {
-            0%, 100% { opacity: 0.3; }
-            25%, 75% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-
-        .visual-metaphor-bar {
-            height: 8px;
-            background: linear-gradient(to right, #A7EF00 50%, #FCD34D 50%);
-            border-radius: 9999px;
-            position: relative;
-            overflow: visible;
-        }
-
-        .visual-metaphor-marker {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            border: 2px solid;
-        }
-
-        .visual-metaphor-marker.left {
-            left: 20%;
-            background: #A7EF00;
-            border-color: #A7EF00;
-            box-shadow: 0 0 8px rgba(167, 239, 0, 0.5);
-            animation: marker-slide-left 4s ease-in-out infinite;
-        }
-
-        .visual-metaphor-marker.right {
-            right: 20%;
-            background: #FCD34D;
-            border-color: #FCD34D;
-            box-shadow: 0 0 8px rgba(252, 211, 77, 0.5);
-            animation: marker-slide-right 4s ease-in-out infinite;
-        }
-
-        .visual-metaphor-overlap {
-            position: absolute;
-            left: 45%;
-            width: 10%;
-            height: 100%;
-            background: linear-gradient(to right, #A7EF00, #FCD34D);
-            border-radius: 9999px;
-            opacity: 0.3;
-            animation: overlap-highlight 4s ease-in-out infinite;
-        }
-
-        /* --- MECHANISM CALCULATION BAR --- */
-        .calculation-bar-container {
-            position: relative;
-            width: 100%;
-            height: 12px;
-            background: #0F0F0F;
-            border-radius: 6px;
-            overflow: visible;
-        }
-
-        .calculation-bar-range {
-            position: absolute;
-            height: 100%;
-            background: linear-gradient(to right, #A7EF00 0%, #A7EF00 50%, #FCD34D 50%, #FCD34D 100%);
-            border-radius: 6px;
-        }
-
-        .calculation-bar-split-point {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 3px;
-            height: 20px;
-            background: #F1F5F9;
-            box-shadow: 0 0 8px rgba(241, 245, 249, 0.6);
-            z-index: 2;
-        }
-
-        .calculation-bar-label {
-            position: absolute;
-            top: -24px;
-            font-size: 11px;
-            font-weight: 600;
-            color: #CBD5E1;
-            white-space: nowrap;
-        }
-
-        .calculation-bar-label.left {
-            left: 0;
-            color: #A7EF00;
-        }
-
-        .calculation-bar-label.right {
-            right: 0;
-            color: #FCD34D;
-        }
-
-        .calculation-bar-label.center {
-            left: 50%;
-            transform: translateX(-50%);
-            color: #F1F5F9;
-        }
-
-        /* --- COMMITMENT CONFIRMATION ANIMATION --- */
-        @keyframes vault-lock {
-            0% { transform: rotate(0deg) scale(1); }
-            50% { transform: rotate(5deg) scale(1.1); }
-            100% { transform: rotate(0deg) scale(1); }
-        }
-
-        @keyframes scale-balance {
-            0%, 100% { transform: translateX(0) rotate(0deg); }
-            25% { transform: translateX(-10px) rotate(-2deg); }
-            75% { transform: translateX(10px) rotate(2deg); }
-        }
-
-        @keyframes text-flash {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
-        }
-
-        .vault-icon {
-            animation: vault-lock 1s ease-in-out;
-        }
-
-        .scale-icon {
-            animation: scale-balance 2s ease-in-out infinite;
-        }
-
-        .commitment-text {
-            animation: text-flash 1.5s ease-in-out;
-        }
-
-        /* --- SURPLUS GAINED COUNTER --- */
-        @keyframes counter-pop {
-            0% { transform: scale(0.8); opacity: 0; }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .surplus-counter {
-            animation: counter-pop 0.6s ease-out;
-        }
-
-        /* --- OUTCOME BAR VISUALIZATION --- */
+        /* --- OUTCOME BARS --- */
         .outcome-bar-container {
             position: relative;
             width: 100%;
-            height: 16px;
-            background: #0F0F0F;
-            border-radius: 8px;
+            height: 12px;
+            background: #E0E0E0;
+            border-radius: 6px;
             overflow: visible;
-            margin: 24px 0;
+            margin: 20px 0;
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.08);
         }
 
         .outcome-bar-fair-split {
-            background: linear-gradient(to right, #A7EF00 0%, #A7EF00 50%, #FCD34D 50%, #FCD34D 100%);
+            background: linear-gradient(to right, var(--accent-primary) 0%, var(--accent-primary) 50%, var(--success-color) 50%, var(--success-color) 100%);
             height: 100%;
-            border-radius: 8px;
-            position: relative;
+            border-radius: 6px;
         }
 
         .outcome-bar-bridge {
-            background: linear-gradient(to right, #A7EF00 0%, #A7EF00 45%, #FACC15 45%, #FACC15 55%, #FCD34D 55%, #FCD34D 100%);
+            background: linear-gradient(to right, var(--accent-primary) 0%, var(--accent-primary) 45%, var(--warning-color) 45%, var(--warning-color) 55%, #FFD60A 55%, #FFD60A 100%);
             height: 100%;
-            border-radius: 8px;
-            position: relative;
+            border-radius: 6px;
         }
 
         .outcome-bar-no-deal {
-            background: linear-gradient(to right, #A7EF00 0%, #A7EF00 40%, #EF4444 40%, #EF4444 100%);
+            background: linear-gradient(to right, var(--accent-primary) 0%, var(--accent-primary) 40%, var(--error-color) 40%, var(--error-color) 100%);
             height: 100%;
-            border-radius: 8px;
-            position: relative;
+            border-radius: 6px;
         }
 
         .outcome-bar-label {
             position: absolute;
-            top: -20px;
+            top: -18px;
             font-size: 10px;
             font-weight: 600;
-            color: #CBD5E1;
+            color: var(--text-secondary);
             white-space: nowrap;
         }
 
@@ -666,47 +304,62 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(15, 5, 24, 0.9);
-            padding: 4px 8px;
+            background: var(--text-primary);
+            padding: 3px 8px;
             border-radius: 4px;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 700;
-            color: #F1F5F9;
+            color: white;
             white-space: nowrap;
         }
 
-        /* --- TOOLTIP STYLES (Pristine Theme) --- */
+        /* --- CALCULATION BAR --- */
+        .calculation-bar-container {
+            position: relative;
+            width: 100%;
+            height: 10px;
+            background: #E0E0E0;
+            border-radius: 5px;
+            overflow: visible;
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.08);
+        }
+
+        .calculation-bar-range {
+            position: absolute;
+            height: 100%;
+            background: linear-gradient(to right, var(--accent-primary), var(--success-color));
+            border-radius: 5px;
+        }
+
+        .calculation-bar-label {
+            position: absolute;
+            top: -20px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .calculation-bar-label.left { left: 0; color: var(--accent-primary); }
+        .calculation-bar-label.right { right: 0; color: var(--success-color); }
+        .calculation-bar-label.center { left: 50%; transform: translateX(-50%); color: var(--text-primary); }
+
+        /* --- TOOLTIP --- */
         .whisper-tooltip {
             position: absolute;
             bottom: 100%;
             left: 50%;
             transform: translateX(-50%) translateY(-8px);
-            background: rgba(15, 5, 24, 0.95);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(203, 213, 225, 0.3);
+            background: var(--bg-card);
             padding: 10px 14px;
-            border-radius: 12px;
+            border-radius: 10px;
             font-size: 0.75rem;
-            color: #CBD5E1;
+            color: var(--text-secondary);
             white-space: nowrap;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+            transition: opacity 0.2s ease, transform 0.2s ease;
             z-index: 1000;
-            box-shadow: 
-                0 8px 20px rgba(0, 0, 0, 0.6),
-                0 0 0 1px rgba(45, 20, 85, 0.5) inset;
-            clip-path: polygon(0% 0%, 100% 0%, 100% calc(100% - 8px), calc(50% + 6px) calc(100% - 8px), 50% 100%, calc(50% - 6px) calc(100% - 8px), 0% calc(100% - 8px));
-        }
-
-        .whisper-tooltip::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 6px solid transparent;
-            border-top-color: rgba(15, 5, 24, 0.95);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         .tooltip-trigger:hover .whisper-tooltip {
@@ -714,50 +367,42 @@
             transform: translateX(-50%) translateY(-12px);
         }
 
-        /* --- SAFE DIAL KNOB (Metallic Gold) --- */
-        .safe-knob {
-            position: relative;
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, #F5C04A 0%, #E6AC2E 30%, #F5C04A 60%, #D97706 100%);
-            border: 2px solid rgba(245, 192, 74, 0.4);
-            border-radius: 50%;
-            box-shadow: 
-                0 0 16px rgba(245, 192, 74, 0.6),
-                0 0 8px rgba(245, 192, 74, 0.3),
-                0 2px 8px rgba(0, 0, 0, 0.5),
-                inset 0 2px 4px rgba(255, 255, 255, 0.2),
-                inset 0 -2px 4px rgba(0, 0, 0, 0.4);
-            transition: transform 0.1s linear;
+        /* --- MISC ANIMATIONS --- */
+        .vault-icon { animation: vault-lock 0.8s ease-in-out; }
+        .scale-icon { animation: scale-balance 2s ease-in-out infinite; }
+        .commitment-text { animation: text-flash 1.2s ease-in-out; }
+
+        @keyframes vault-lock {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(3deg) scale(1.05); }
+            100% { transform: rotate(0deg) scale(1); }
         }
 
-        .safe-knob.slider-glow {
-            animation: sliderGlow 2.5s ease-in-out infinite;
+        @keyframes scale-balance {
+            0%, 100% { transform: translateX(0) rotate(0deg); }
+            25% { transform: translateX(-6px) rotate(-1deg); }
+            75% { transform: translateX(6px) rotate(1deg); }
         }
 
-        .safe-knob::before {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 4px;
-            height: 4px;
-            background: rgba(252, 211, 77, 0.9);
-            border-radius: 50%;
-            box-shadow: 0 0 8px rgba(252, 211, 77, 0.9);
+        @keyframes text-flash {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
         }
 
-        .safe-knob::after {
-            content: "";
-            position: absolute;
-            top: 6px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 2px;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.4);
-            border-radius: 1px;
+        /* --- URL COPY --- */
+        .url-flip-active { animation: url-flip 0.5s ease; }
+        .url-checkmark { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; }
+        .url-flip-active .url-checkmark { opacity: 1; animation: checkmark-fade 0.5s ease-out; }
+
+        @keyframes url-flip {
+            0% { transform: scale(1); background: var(--bg-input); }
+            50% { transform: scale(0.98); background: var(--hover-highlight); }
+            100% { transform: scale(1); background: var(--bg-input); }
+        }
+
+        @keyframes checkmark-fade {
+            0%, 100% { opacity: 0; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.1); }
         }
     </style>
 </head>
@@ -1040,10 +685,10 @@
 
             return (
                 <div className="relative w-full h-12 flex items-center group" onMouseUp={handleMouseUp} onTouchEnd={handleMouseUp}>
-                    <div className="absolute w-full h-3 bg-gradient-to-r from-[#0F0F0F] via-[#1A1A1A] to-[#2A2A2A] rounded-full overflow-hidden" style={{ boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.4)' }}>
+                    <div className="absolute w-full h-2.5 bg-[#E0E0E0] rounded-full overflow-hidden" style={{ boxShadow: 'inset 2px 2px 4px rgba(0, 0, 0, 0.08)' }}>
                         <div
-                            className="h-full bg-gradient-to-r from-yellow-300 to-amber-400"
-                            style={{ width: `${percent}%` }}
+                            className="h-full"
+                            style={{ width: `${percent}%`, background: '#00C4CC' }}
                         />
                     </div>
                     <input
@@ -1059,10 +704,11 @@
                         className="absolute w-full h-full opacity-0 cursor-pointer z-20"
                     />
                     <div
-                        className="absolute h-6 w-6 bg-yellow-300 border-4 border-yellow-500 shadow-[0_0_15px_rgba(245,192,74,0.7)] rounded-full pointer-events-none transition-all slider-glow"
+                        className="absolute h-6 w-6 rounded-full pointer-events-none transition-all"
                         style={{ 
                             left: `calc(${percent}% - 12px)`,
-                            transform: `rotate(${rotation}deg)`
+                            background: '#00C4CC',
+                            boxShadow: '0 2px 8px rgba(0, 196, 204, 0.4)'
                         }}
                     />
                 </div>
@@ -1073,18 +719,18 @@
             const baseStyle =
                 "btn relative transform transition-all duration-200 " +
                 "flex items-center justify-center gap-3 " +
-                "hover:-translate-y-0.5 active:translate-y-0 active:scale-95 " +
+                "hover:-translate-y-0.5 active:translate-y-0 active:scale-98 " +
                 "disabled:opacity-50 disabled:cursor-not-allowed " +
-                "focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F5C04A]/80 " +
-                "focus-visible:ring-offset-2 focus-visible:ring-offset-[#0F0F0F]";
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00C4CC]/60 " +
+                "focus-visible:ring-offset-2 focus-visible:ring-offset-[#F8F8F8]";
 
             const variants = {
-                primary: "bg-yellow-400 text-black font-semibold py-4 px-6 rounded-xl shadow-[0_0_20px_rgba(245,192,74,0.4)] hover:shadow-[0_0_30px_rgba(245,192,74,0.6)] transition-all",
-                secondary: "bg-white/10 text-[#F1F5F9] border border-white/10 hover:bg-white/20 backdrop-blur-md",
-                outline: "border-2 border-[#CBD5E1] text-[#CBD5E1] hover:border-[#F5C04A] hover:text-[#F5C04A]",
-                gold: "bg-yellow-400 text-black font-semibold py-4 px-6 rounded-xl shadow-[0_0_20px_rgba(245,192,74,0.4)] hover:shadow-[0_0_30px_rgba(245,192,74,0.6)] transition-all",
-                danger: "bg-[#EF4444] text-[#F1F5F9] shadow-lg shadow-[#EF4444]/20 hover:bg-[#DC2626]",
-                ai: "bg-lime-900/40 text-lime-400 border border-lime-700 hover:bg-lime-900/60 shadow-md shadow-lime-900/50",
+                primary: "bg-[#00C4CC] text-white font-semibold py-4 px-6 rounded-full shadow-[0_4px_14px_rgba(0,196,204,0.35)] hover:bg-[#00B0B8] hover:shadow-[0_6px_20px_rgba(0,196,204,0.45)] transition-all",
+                secondary: "bg-white text-[#666666] font-medium py-4 px-6 rounded-full shadow-[10px_10px_20px_#d9d9d9,-10px_-10px_20px_#ffffff] hover:bg-[#E5F2F9] transition-all",
+                outline: "border-2 border-[#1C1C1E] text-[#1C1C1E] font-medium py-4 px-6 rounded-full hover:border-[#00C4CC] hover:text-[#00C4CC] bg-transparent transition-all",
+                gold: "bg-[#00C4CC] text-white font-semibold py-4 px-6 rounded-full shadow-[0_4px_14px_rgba(0,196,204,0.35)] hover:bg-[#00B0B8] hover:shadow-[0_6px_20px_rgba(0,196,204,0.45)] transition-all",
+                danger: "bg-[#FF3B30] text-white font-semibold py-4 px-6 rounded-full shadow-[0_4px_14px_rgba(255,59,48,0.35)] hover:bg-[#E5342B] transition-all",
+                ai: "bg-white text-[#00C4CC] font-medium border border-[#00C4CC] py-4 px-6 rounded-full shadow-[10px_10px_20px_#d9d9d9,-10px_-10px_20px_#ffffff] hover:bg-[#E5F2F9] transition-all",
             };
 
             return (
@@ -1128,7 +774,7 @@
             }, [onInteraction]);
 
             return (
-                <div ref={cardRef} className={`backdrop-blur-xl bg-[rgba(26,26,26,0.55)] border border-[rgba(245,192,74,0.25)] shadow-[0_0_20px_rgba(245,192,74,0.15)] rounded-2xl p-8 card-hover ${className}`}>
+                <div ref={cardRef} className={`bg-white border-none shadow-[10px_10px_20px_#d9d9d9,-10px_-10px_20px_#ffffff] rounded-[20px] p-8 card-hover ${className}`}>
                     {children}
                 </div>
             );
@@ -1136,47 +782,47 @@
 
         // --- REUSABLE HOW IT WORKS FAQ ---
         const HowItWorksSection = ({ isCandidate = false }) => (
-            <GlassCard className="border-[#F5C04A]/25">
-                <h3 className="text-base font-bold text-yellow-400 tracking-wide mb-4">
+            <GlassCard className="border-l-4 border-[#00C4CC]">
+                <h3 className="text-base font-bold text-[#1C1C1E] tracking-wide mb-4">
                     How it works
                 </h3>
 
-                <ul className="space-y-3 text-sm text-gray-200 mb-6">
+                <ul className="space-y-3 text-sm text-[#666666] mb-6">
                     <li className="flex items-start gap-2">
-                        <span className="text-yellow-400 mt-1">•</span>
+                        <span className="text-[#00C4CC] mt-1">•</span>
                         <div>
-                            <span className="font-semibold">No negotiation.</span> Both sides commit {isCandidate ? 'their numbers once' : 'up front'}.
+                            <span className="font-semibold text-[#1C1C1E]">Single-shot decision.</span> Both sides submit {isCandidate ? 'their numbers once' : 'up front'}.
                         </div>
                     </li>
                     <li className="flex items-start gap-2">
-                        <span className="text-yellow-400 mt-1">•</span>
+                        <span className="text-[#00C4CC] mt-1">•</span>
                         <div>
-                            <span className="font-semibold">Fair split.</span> If {isCandidate ? 'your minimum and their maximum' : 'ranges'} overlap, {isCandidate ? 'we split the surplus' : 'surplus splits'} 50/50.
+                            <span className="font-semibold text-[#1C1C1E]">Fair split.</span> If {isCandidate ? 'your minimum and their maximum' : 'ranges'} overlap, {isCandidate ? 'the surplus is split' : 'surplus splits'} 50/50.
                         </div>
                     </li>
                     <li className="flex items-start gap-2">
-                        <span className="text-yellow-400 mt-1">•</span>
+                        <span className="text-[#00C4CC] mt-1">•</span>
                         <div>
-                            <span className="font-semibold">Private.</span> Neither side {isCandidate ? 'ever ' : ''}sees the other's number.
+                            <span className="font-semibold text-[#1C1C1E]">Outcome-only display.</span> The app only displays the final outcome and number, not the original inputs.
                         </div>
                     </li>
                     {isCandidate && (
                         <li className="flex items-start gap-2">
-                            <span className="text-yellow-400 mt-1">•</span>
+                            <span className="text-[#00C4CC] mt-1">•</span>
                             <div>
-                                <span className="font-semibold">Clear outcome.</span> You immediately see whether there's a deal, a close gap, or no deal.
+                                <span className="font-semibold text-[#1C1C1E]">Clear outcome.</span> You immediately see whether there's a deal, a close gap, or no deal.
                             </div>
                         </li>
                     )}
                 </ul>
 
-                <div className="border-t border-gray-700 pt-4 space-y-3 text-sm">
+                <div className="border-t border-gray-200 pt-4 space-y-3 text-sm">
                     <details className="group">
-                        <summary className="cursor-pointer font-medium text-gray-200 hover:text-yellow-400 transition-colors list-none flex items-center gap-2">
-                            <span className="text-yellow-400 group-open:rotate-90 transition-transform">▶</span>
+                        <summary className="cursor-pointer font-medium text-[#1C1C1E] hover:text-[#00C4CC] transition-colors list-none flex items-center gap-2">
+                            <span className="text-[#00C4CC] group-open:rotate-90 transition-transform">▶</span>
                             How is the final salary calculated?
                         </summary>
-                        <div className="mt-2 text-sm text-gray-300 pl-5">
+                        <div className="mt-2 text-sm text-[#666666] pl-5">
                             {isCandidate ? (
                                 <>
                                     <p className="mb-2">If your minimum (CMin) is less than or equal to the company's maximum (CMax), we:</p>
@@ -1194,17 +840,17 @@
                     </details>
 
                     <details className="group">
-                        <summary className="cursor-pointer font-medium text-gray-200 hover:text-yellow-400 transition-colors list-none flex items-center gap-2">
-                            <span className="text-yellow-400 group-open:rotate-90 transition-transform">▶</span>
+                        <summary className="cursor-pointer font-medium text-[#1C1C1E] hover:text-[#00C4CC] transition-colors list-none flex items-center gap-2">
+                            <span className="text-[#00C4CC] group-open:rotate-90 transition-transform">▶</span>
                             What if {isCandidate ? 'our ' : ''}numbers don't overlap?
                         </summary>
-                        <div className="mt-2 text-sm text-gray-300 pl-5">
+                        <div className="mt-2 text-sm text-[#666666] pl-5">
                             {isCandidate ? (
                                 <>
                                     <p className="mb-2">If your minimum is above the company's maximum, there are two cases:</p>
                                     <ul className="space-y-1 mb-2">
-                                        <li>• <strong>Bridge zone (close):</strong> If the gap is small (within 10% of their maximum), we flag that a human conversation might bridge it.</li>
-                                        <li>• <strong>No deal:</strong> If the gap is larger than 10%, we show that the ranges are too far apart for this mechanism to close a deal.</li>
+                                        <li>• <strong className="text-[#1C1C1E]">Bridge zone (close):</strong> If the gap is small (within 10% of their maximum), we flag that a human conversation might bridge it.</li>
+                                        <li>• <strong className="text-[#1C1C1E]">No deal:</strong> If the gap is larger than 10%, we show that the ranges are too far apart for this mechanism to close a deal.</li>
                                     </ul>
                                     <p>In both cases, your number stays private. The company never sees what you entered.</p>
                                 </>
@@ -1216,26 +862,27 @@
 
                     {isCandidate ? (
                         <details className="group">
-                            <summary className="cursor-pointer font-medium text-gray-200 hover:text-yellow-400 transition-colors list-none flex items-center gap-2">
-                                <span className="text-yellow-400 group-open:rotate-90 transition-transform">▶</span>
+                            <summary className="cursor-pointer font-medium text-[#1C1C1E] hover:text-[#00C4CC] transition-colors list-none flex items-center gap-2">
+                                <span className="text-[#00C4CC] group-open:rotate-90 transition-transform">▶</span>
                                 Who can see my number?
                             </summary>
-                            <div className="mt-2 text-sm text-gray-300 pl-5">
-                                <p className="mb-2">Only the mechanism. Neither the company nor any individual sees your exact CMin.</p>
+                            <div className="mt-2 text-sm text-[#666666] pl-5">
+                                <p className="mb-2">The app only displays the final outcome and number.</p>
                                 <ul className="space-y-1">
-                                    <li>• The company sees only the final salary (if there's a deal) or that no deal was possible.</li>
+                                    <li>• The company sees the final salary (if there's a deal) or the outcome status (close gap/no deal).</li>
                                     <li>• You see the same: the computed offer, a 'close gap' signal, or a 'no deal' result.</li>
-                                    <li>• All inputs are stored temporarily and auto-deleted after a short window as described in the project documentation.</li>
+                                    <li>• Neither party's original input is shown to the other side in the interface.</li>
+                                    <li>• All data is stored temporarily and auto-deleted after a short window as described in the project documentation.</li>
                                 </ul>
                             </div>
                         </details>
                     ) : (
                         <details className="group">
-                            <summary className="cursor-pointer font-medium text-gray-200 hover:text-yellow-400 transition-colors list-none flex items-center gap-2">
-                                <span className="text-yellow-400 group-open:rotate-90 transition-transform">▶</span>
+                            <summary className="cursor-pointer font-medium text-[#1C1C1E] hover:text-[#00C4CC] transition-colors list-none flex items-center gap-2">
+                                <span className="text-[#00C4CC] group-open:rotate-90 transition-transform">▶</span>
                                 What happens to our data?
                             </summary>
-                            <p className="mt-2 text-sm text-gray-300 pl-5">
+                            <p className="mt-2 text-sm text-[#666666] pl-5">
                                 Auto-deleted after 7 days.
                             </p>
                         </details>
@@ -1247,26 +894,34 @@
         // --- COMPANY VIEW ---
 
         const CompanyView = () => {
-            const [budget, setBudget] = useState(140000);
+            const [baseMax, setBaseMax] = useState(100000);
+            const [equityMax, setEquityMax] = useState(40000);
+            const [equityEnabled, setEquityEnabled] = useState(false);
             const [email, setEmail] = useState('');
             const [link, setLink] = useState(null);
             const [loading, setLoading] = useState(false);
             const [error, setError] = useState(null);
-            const [budgetAnimating, setBudgetAnimating] = useState(false);
+            const [baseAnimating, setBaseAnimating] = useState(false);
+            const [equityAnimating, setEquityAnimating] = useState(false);
             const [ledFlicker, setLedFlicker] = useState(false);
             const [cardSink, setCardSink] = useState(false);
             const [securitySeal, setSecuritySeal] = useState(false);
             const cardRef = useRef(null);
 
-            const COMPANY_MIN = 50000;
-            const COMPANY_MAX = 300000;
+            const BASE_MIN = 50000;
+            const BASE_MAX = 300000;
+            const EQUITY_MIN = 0;
+            const EQUITY_MAX = 200000;
 
-            const budgetScale = (() => {
+            const totalComp = baseMax + (equityEnabled ? equityMax : 0);
+
+            const totalScale = (() => {
+                const maxPossible = BASE_MAX + EQUITY_MAX;
                 const norm = Math.min(
                     1,
-                    Math.max(0, (budget - COMPANY_MIN) / (COMPANY_MAX - COMPANY_MIN))
+                    Math.max(0, totalComp / maxPossible)
                 );
-                return 0.98 + norm * 0.18; // grows up to ~1.16 near the top
+                return 0.98 + norm * 0.18;
             })();
 
             const generateLink = async () => {
@@ -1276,7 +931,12 @@
                     const response = await fetch(`${API_BASE}/api/offers`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ max: budget, email }),
+                        body: JSON.stringify({ 
+                            equityEnabled,
+                            companyBaseMax: baseMax,
+                            companyEquityMax: equityEnabled ? equityMax : 0,
+                            email 
+                        }),
                     });
 
                     if (!response.ok) {
@@ -1300,7 +960,10 @@
                     setLink(newLink);
 
                     logEvent('offer_created', {
-                        max: budget,
+                        baseMax,
+                        equityMax: equityEnabled ? equityMax : 0,
+                        totalComp,
+                        equityEnabled,
                         email,
                         offerId,
                     });
@@ -1342,16 +1005,33 @@
                 document.body.removeChild(textarea);
             };
 
-            const handleBudgetChange = (e) => {
+            const handleBaseChange = (e) => {
                 const value = parseInt(e.target.value, 10);
                 if (isNaN(value)) return;
 
-                setBudget(prev => {
+                setBaseMax(prev => {
                     if (value !== prev) {
-                        setBudgetAnimating(true);
+                        setBaseAnimating(true);
                         setLedFlicker(true);
                         setTimeout(() => {
-                            setBudgetAnimating(false);
+                            setBaseAnimating(false);
+                            setLedFlicker(false);
+                        }, 200);
+                    }
+                    return value;
+                });
+            };
+
+            const handleEquityChange = (e) => {
+                const value = parseInt(e.target.value, 10);
+                if (isNaN(value)) return;
+
+                setEquityMax(prev => {
+                    if (value !== prev) {
+                        setEquityAnimating(true);
+                        setLedFlicker(true);
+                        setTimeout(() => {
+                            setEquityAnimating(false);
                             setLedFlicker(false);
                         }, 200);
                     }
@@ -1366,7 +1046,6 @@
                 
                 await generateLink();
                 
-                // Check if link was successfully created
                 setTimeout(() => {
                     if (link) {
                         setSecuritySeal(true);
@@ -1378,32 +1057,59 @@
             if (link) {
                 return (
                     <div className="max-w-2xl mx-auto animate-enter text-center">
-                        <div className="mb-8 inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-[#FCD34D] to-[#F59E0B] shadow-2xl shadow-[#FCD34D]/30 mx-auto">
-                            <Icons.Lock className="w-10 h-10 text-black" />
+                        <div className="mb-8 inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#00C4CC] shadow-[0_4px_20px_rgba(0,196,204,0.4)] mx-auto">
+                            <Icons.Lock className="w-10 h-10 text-white" />
                         </div>
-                        <h1 className="text-4xl md:text-6xl font-bold mb-6 text-[#F1F5F9]">
-                            Terms Locked
+                        <h1 className="text-4xl md:text-5xl font-extrabold mb-6 text-[#1C1C1E]">
+                            Offer Link Created
                         </h1>
-                        <p className="text-xl text-[#CBD5E1] mb-10 leading-relaxed">
+                        <p className="text-lg text-[#666666] mb-10 leading-relaxed">
                             Your maximum is locked and ready for the candidate.
                         </p>
 
+                        {/* 3-Step Instructions */}
+                        <GlassCard className="mb-6 border-l-4 border-[#00C4CC]">
+                            <h2 className="text-sm font-bold text-[#00C4CC] tracking-wide uppercase mb-4">
+                                What Happens Next
+                            </h2>
+                            <ol className="space-y-3 text-left">
+                                <li className="flex items-start gap-3">
+                                    <span className="flex-shrink-0 w-6 h-6 bg-[#00C4CC] text-white rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                                    <div className="text-sm text-[#666666]">
+                                        <span className="font-semibold text-[#1C1C1E]">Send this link to the candidate.</span> They'll be prompted to enter their minimum total compensation.
+                                    </div>
+                                </li>
+                                <li className="flex items-start gap-3">
+                                    <span className="flex-shrink-0 w-6 h-6 bg-[#00C4CC] text-white rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                                    <div className="text-sm text-[#666666]">
+                                        <span className="font-semibold text-[#1C1C1E]">They enter their minimum.</span> Once submitted, the mechanism runs automatically.
+                                    </div>
+                                </li>
+                                <li className="flex items-start gap-3">
+                                    <span className="flex-shrink-0 w-6 h-6 bg-[#00C4CC] text-white rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                                    <div className="text-sm text-[#666666]">
+                                        <span className="font-semibold text-[#1C1C1E]">The mechanism checks for a fair middle ground.</span> It returns one of three outcomes: Deal Closed, Close Gap, or No Deal.
+                                    </div>
+                                </li>
+                            </ol>
+                        </GlassCard>
+
                         <GlassCard className="mb-8">
-                            <div className="bg-black/30 p-4 rounded-xl border border-white/10 flex items-center justify-between gap-4 mb-6 relative" id="url-container">
-                                <code className="text-[#A7EF00] truncate flex-1 text-left font-mono text-sm">
+                            <div className="bg-[#EFF3F6] p-4 rounded-xl shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] flex items-center justify-between gap-4 mb-6 relative" id="url-container">
+                                <code className="text-[#00C4CC] truncate flex-1 text-left font-mono text-sm">
                                     {link}
                                 </code>
                                 <div className="url-checkmark">
-                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0F0F0F" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#00C4CC" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                                         <polyline points="20 6 9 17 4 12"></polyline>
                                     </svg>
                                 </div>
                                 <button
                                     onClick={copyLink}
                                     aria-label="Copy link to clipboard"
-                                    className="p-2 hover:bg-white/10 rounded-lg transition"
+                                    className="p-2 hover:bg-[#E5F2F9] rounded-lg transition"
                                 >
-                                    <Icons.Copy className="w-5 h-5 text-[#CBD5E1]" />
+                                    <Icons.Copy className="w-5 h-5 text-[#666666]" />
                                 </button>
                             </div>
                             <div className="grid gap-4">
@@ -1415,7 +1121,7 @@
                                         setTimeout(() => container.classList.remove('url-flip-active'), 600);
                                     }
                                 }} variant="gold">
-                                    Copy Link & Close
+                                    Copy Link for Candidate
                                 </Button>
                                 <Button
                                     variant="secondary"
@@ -1425,7 +1131,7 @@
                                     }}
                                 >
                                     <Icons.ArrowRight className="w-5 h-5" />
-                                    Preview Candidate View
+                                    Preview Candidate Screen
                                 </Button>
                             </div>
                         </GlassCard>
@@ -1437,74 +1143,135 @@
                 <div className="max-w-2xl mx-auto animate-enter">
                     {/* Hero / Intro zone */}
                     <div className="text-center mb-10">
-                        <div className="relative inline-block mb-4">
-                            <div className="absolute inset-0 blur-3xl opacity-20 bg-yellow-300 rounded-full"></div>
-                            <h1 className="relative text-6xl font-extrabold text-yellow-400 tracking-tight drop-shadow-[0_0_10px_rgba(245,192,74,0.4)]">
-                                The Closing Table
-                            </h1>
-                        </div>
-                        <p className="text-xl text-gray-200/80 mt-4 leading-relaxed mb-4">
-                            Close salary negotiations fairly. No back-and-forth, no anchoring.
+                        <h1 className="text-5xl md:text-6xl font-extrabold text-[#1C1C1E] tracking-tight mb-4">
+                            The Closing Table
+                        </h1>
+                        <p className="text-lg text-[#666666] mt-4 leading-relaxed mb-4">
+                            Close salary negotiations fairly. No back-and-forth.
                         </p>
-                        <p className="text-base text-gray-300 leading-relaxed max-w-2xl mx-auto">
-                            Set your maximum. The candidate sets their minimum. If they overlap, we split the difference. Neither side sees the other's number.
+                        <p className="text-base text-[#666666] leading-relaxed max-w-2xl mx-auto">
+                            Set your maximum compensation (base {equityEnabled ? '+ equity' : 'only'}). The candidate sets their minimum. If they overlap, the app splits the difference 50/50.
                         </p>
                     </div>
 
                     {/* Action zone - Main Feature Card */}
                     <GlassCard 
-                        className={`${cardSink ? 'card-sink' : ''} border-l-4 border-yellow-400/40 mb-8`}
-                        onInteraction={(active) => {
-                            const body = document.body;
-                            if (active) {
-                                body.classList.add('vignette-active');
-                            } else {
-                                body.classList.remove('vignette-active');
-                            }
-                        }}
+                        className={`${cardSink ? 'card-sink' : ''} border-l-4 border-[#00C4CC] mb-8`}
+                        onInteraction={(active) => {}}
                     >
                         <div className="mb-6">
-                            <h2 className="text-base font-bold text-yellow-400 tracking-wide mb-2">
-                                Your Maximum (CMax)
+                            <h2 className="text-sm font-bold text-[#00C4CC] tracking-wide uppercase mb-2">
+                                Configure Your Side of the Offer
                             </h2>
-                            <p className="text-sm text-gray-300">
-                                Your ceiling. The candidate never sees this.
+                            <p className="text-sm text-[#666666] mb-2">
+                                Set your private maximum compensation (base salary and equity if applicable).
+                            </p>
+                            <p className="text-xs text-[#666666] italic">
+                                These numbers set your ceiling. The app only displays the final outcome to the candidate, not your original inputs.
                             </p>
                         </div>
 
-                        <div className="flex items-baseline justify-start mb-4">
-                            <span className="text-gray-300 text-4xl font-bold mr-2">$</span>
+                        {/* Equity Toggle */}
+                        <div className="mb-8 p-4 bg-[#EFF3F6] rounded-xl shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff]">
+                            <label className="flex items-center justify-between cursor-pointer">
+                                <div>
+                                    <p className="text-sm font-semibold text-[#1C1C1E]">Include equity in this offer</p>
+                                    <p className="text-xs text-[#666666]">Toggle to add equity component to compensation</p>
+                                </div>
+                                <div className="relative">
+                                    <input
+                                        type="checkbox"
+                                        checked={equityEnabled}
+                                        onChange={(e) => setEquityEnabled(e.target.checked)}
+                                        className="sr-only"
+                                    />
+                                    <div
+                                        className={`w-14 h-8 rounded-full transition-colors duration-200 ${
+                                            equityEnabled ? 'bg-[#00C4CC]' : 'bg-[#E0E0E0]'
+                                        }`}
+                                        onClick={() => setEquityEnabled(!equityEnabled)}
+                                    >
+                                        <div
+                                            className={`w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-200 mt-1 ${
+                                                equityEnabled ? 'translate-x-7' : 'translate-x-1'
+                                            }`}
+                                        ></div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+
+
+                        {/* Total Display */}
+                        <div className="flex items-baseline justify-center mb-8">
+                            <span className="text-[#666666] text-2xl font-bold mr-2">Total:</span>
+                            <span className="text-[#666666] text-3xl font-bold mr-2">$</span>
                             <span
                                 className={
-                                    "text-7xl font-bold text-white tracking-tighter jackpot-number financial-number " +
-                                    (budgetAnimating ? "jackpot-active" : "") +
+                                    "text-5xl font-bold text-[#1C1C1E] tracking-tight jackpot-number financial-number " +
+                                    ((baseAnimating || equityAnimating) ? "jackpot-active" : "") +
                                     (ledFlicker ? " led-flicker" : "")
                                 }
-                                style={{ transform: `scale(${budgetScale})` }}
+                                style={{ transform: `scale(${totalScale})` }}
                             >
-                                {budget.toLocaleString()}
+                                {totalComp.toLocaleString()}
                             </span>
                         </div>
 
-                        <div className="mb-10 px-4 mt-8">
+                        {/* Base Salary Slider */}
+                        <div className="mb-8">
+                            <label className="block text-xs font-semibold text-[#1C1C1E] mb-3 uppercase tracking-wide">
+                                Base Salary Maximum
+                            </label>
+                            <div className="mb-2 text-right">
+                                <span className="text-lg font-bold text-[#00C4CC] financial-number">
+                                    ${baseMax.toLocaleString()}
+                                </span>
+                            </div>
                             <Slider
-                                min={50000}
-                                max={300000}
+                                min={BASE_MIN}
+                                max={BASE_MAX}
                                 step={5000}
-                                value={budget}
-                                onChange={handleBudgetChange}
+                                value={baseMax}
+                                onChange={handleBaseChange}
                                 onDragStart={() => {}}
                                 onDragEnd={() => {}}
                             />
                         </div>
 
+                        {/* Equity Slider (conditional) */}
+                        {equityEnabled && (
+                            <div className="mb-8">
+                                <label className="block text-xs font-semibold text-[#1C1C1E] mb-3 uppercase tracking-wide">
+                                    Equity Value Maximum
+                                </label>
+                                <div className="mb-2 text-right">
+                                    <span className="text-lg font-bold text-[#34C759] financial-number">
+                                        ${equityMax.toLocaleString()}
+                                    </span>
+                                </div>
+                                <Slider
+                                    min={EQUITY_MIN}
+                                    max={EQUITY_MAX}
+                                    step={5000}
+                                    value={equityMax}
+                                    onChange={handleEquityChange}
+                                    onDragStart={() => {}}
+                                    onDragEnd={() => {}}
+                                />
+                                <p className="mt-2 text-xs text-[#666666]">
+                                    Dollar value of equity component (RSUs, stock options, etc.)
+                                </p>
+                            </div>
+                        )}
+
                         <div className="space-y-6">
                             <div>
-                                <label className="block text-xs font-medium text-gray-300 mb-3">
+                                <label className="block text-xs font-semibold text-[#1C1C1E] mb-3 uppercase tracking-wide">
                                     Your email
                                 </label>
                                 <div className="relative">
-                                    <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                    <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#666666]" />
                                     <input
                                         type="email"
                                         value={email}
@@ -1512,31 +1279,31 @@
                                         placeholder="you@company.com"
                                         aria-label="Company email address"
                                         autoComplete="email"
-                                        className="w-full frosted-input border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder-gray-400 focus:outline-none focus:border-[#F5C04A] focus:ring-2 focus:ring-[#F5C04A]/30 hover:border-[#F5C04A]/50 transition-all duration-200"
+                                        className="w-full bg-[#EFF3F6] border-none rounded-xl py-4 pl-12 pr-4 text-[#1C1C1E] placeholder-[#999999] focus:outline-none focus:ring-2 focus:ring-[#00C4CC]/50 shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] transition-all duration-200"
                                     />
                                 </div>
-                                <p className="mt-2 text-xs text-gray-400">
+                                <p className="mt-2 text-xs text-[#666666]">
                                     We'll email you the result. No spam. Data auto-deletes after 7 days.
                                 </p>
                             </div>
 
                             {error && (
-                                <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-xl">
-                                    <p className="text-red-200 text-sm">{error}</p>
+                                <div className="bg-[#FFEBEB] border border-[#FF3B30]/30 p-4 rounded-xl">
+                                    <p className="text-[#FF3B30] text-sm">{error}</p>
                                 </div>
                             )}
 
                             <button 
                                 onClick={handleGenerateLink} 
                                 disabled={!email || loading}
-                                className="w-full bg-gradient-to-r from-yellow-300 to-amber-400 text-black font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(245,192,74,0.5)] hover:shadow-[0_0_30px_rgba(245,192,74,0.7)] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full bg-[#00C4CC] text-white font-bold py-4 rounded-full shadow-[0_4px_14px_rgba(0,196,204,0.35)] hover:bg-[#00B0B8] hover:shadow-[0_6px_20px_rgba(0,196,204,0.45)] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                <span className="text-xl">🔒</span>
-                                {loading ? 'Creating Link...' : 'Commit Maximum & Generate Link'}
+                                <Icons.Lock className="w-5 h-5" />
+                                {loading ? 'Creating Link...' : 'Lock Budget & Create Link'}
                             </button>
 
-                            <p className="text-center text-xs text-gray-300 opacity-80">
-                                The candidate never sees your CMax. This protects your budget.
+                            <p className="text-center text-xs text-[#666666]">
+                                The app only displays the final outcome and number to the candidate, not your original input.
                             </p>
                         </div>
                     </GlassCard>
@@ -1551,25 +1318,31 @@
         // --- CANDIDATE VIEW ---
 
         const CandidateView = ({ offerId }) => {
-            const [ask, setAsk] = useState(120000);
+            const [baseMin, setBaseMin] = useState(100000);
+            const [equityMin, setEquityMin] = useState(20000);
+            const [equityEnabled, setEquityEnabled] = useState(false);
             const [email, setEmail] = useState('');
             const [step, setStep] = useState('loading');
             const [result, setResult] = useState(null);
             const [offerStatus, setOfferStatus] = useState(null);
             const [error, setError] = useState(null);
-            const [askAnimating, setAskAnimating] = useState(false);
+            const [validationError, setValidationError] = useState('');
+            const [baseAnimating, setBaseAnimating] = useState(false);
+            const [equityAnimating, setEquityAnimating] = useState(false);
             const [ledFlicker, setLedFlicker] = useState(false);
             const [greenFlash, setGreenFlash] = useState(false);
-            const [surplusCounter, setSurplusCounter] = useState(0);
+            const emailInputRef = useRef(null);
 
-            const ASK_MIN = 80000;
-            const ASK_MAX = 250000;
+            const BASE_MIN = 80000;
+            const BASE_MAX = 250000;
+            const EQUITY_MIN = 0;
+            const EQUITY_MAX = 150000;
 
-            const askScale = (() => {
-                const norm = Math.min(
-                    1,
-                    Math.max(0, (ask - ASK_MIN) / (ASK_MAX - ASK_MIN))
-                );
+            const totalMin = baseMin + (equityEnabled ? equityMin : 0);
+
+            const totalScale = (() => {
+                const maxPossible = BASE_MAX + EQUITY_MAX;
+                const norm = Math.min(1, Math.max(0, totalMin / maxPossible));
                 return 0.98 + norm * 0.18;
             })();
 
@@ -1609,8 +1382,9 @@
                             logEvent('offer_check_used', { offerId });
                         } else {
                             setOfferStatus('ok');
-                            setStep('intro');
-                            logEvent('offer_viewed', { offerId, status: 'ok' });
+                            setEquityEnabled(data.equityEnabled || false);
+                            setStep('input');
+                            logEvent('offer_viewed', { offerId, status: 'ok', equityEnabled: data.equityEnabled });
                         }
                     } catch (err) {
                         setError('Failed to load offer. Check your connection.');
@@ -1624,16 +1398,33 @@
                 }
             }, [offerId]);
 
-            const handleAskChange = (e) => {
+            const handleBaseChange = (e) => {
                 const value = parseInt(e.target.value, 10);
                 if (isNaN(value)) return;
 
-                setAsk(prev => {
+                setBaseMin(prev => {
                     if (value !== prev) {
-                        setAskAnimating(true);
+                        setBaseAnimating(true);
                         setLedFlicker(true);
                         setTimeout(() => {
-                            setAskAnimating(false);
+                            setBaseAnimating(false);
+                            setLedFlicker(false);
+                        }, 200);
+                    }
+                    return value;
+                });
+            };
+
+            const handleEquityChange = (e) => {
+                const value = parseInt(e.target.value, 10);
+                if (isNaN(value)) return;
+
+                setEquityMin(prev => {
+                    if (value !== prev) {
+                        setEquityAnimating(true);
+                        setLedFlicker(true);
+                        setTimeout(() => {
+                            setEquityAnimating(false);
                             setLedFlicker(false);
                         }, 200);
                     }
@@ -1649,7 +1440,61 @@
                 }, 800);
             };
 
+            // Auto-focus email input when step changes to 'input'
+            useEffect(() => {
+                if (step === 'input' && emailInputRef.current && !email) {
+                    emailInputRef.current.focus();
+                }
+            }, [step, email]);
+
+            // Client-side validation function
+            const validateForm = () => {
+                setValidationError('');
+                
+                // Email validation
+                if (!email || email.trim() === '') {
+                    setValidationError('Please enter your email address.');
+                    return false;
+                }
+                
+                // Simple email regex - just check for basic format
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    setValidationError('Please enter a valid email address.');
+                    return false;
+                }
+                
+                // Validate ranges (should already be enforced by sliders, but check programmatically)
+                if (baseMin < BASE_MIN || baseMin > BASE_MAX) {
+                    setValidationError(`Base salary must be between $${BASE_MIN.toLocaleString()} and $${BASE_MAX.toLocaleString()}.`);
+                    return false;
+                }
+                
+                if (equityEnabled && (equityMin < EQUITY_MIN || equityMin > EQUITY_MAX)) {
+                    setValidationError(`Equity value must be between $${EQUITY_MIN.toLocaleString()} and $${EQUITY_MAX.toLocaleString()}.`);
+                    return false;
+                }
+                
+                return true;
+            };
+
+            // Handle Enter key in email field
+            const handleEmailKeyDown = (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (validateForm()) {
+                        playMagneticLatchSound();
+                        submit();
+                    }
+                }
+            };
+
             const submit = async () => {
+                // Client-side validation
+                if (!validateForm()) {
+                    return;
+                }
+
                 // Validate offerId before submitting
                 if (!offerId || typeof offerId !== 'string' || offerId.trim() === '') {
                     setError('Invalid offer link.');
@@ -1657,12 +1502,20 @@
                     return;
                 }
 
+                // Clear validation error and backend error on submit
+                setValidationError('');
+                setError(null);
+
                 setStep('submitting');
                 try {
                     const response = await fetch(`${API_BASE}/api/offers/${offerId}/submit`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ min: ask, email }),
+                        body: JSON.stringify({ 
+                            candidateBaseMin: baseMin,
+                            candidateEquityMin: equityEnabled ? equityMin : 0,
+                            email 
+                        }),
                     });
 
                     if (!response.ok) {
@@ -1677,18 +1530,18 @@
                     }
 
                     if (data.status === 'invalid') {
-                        setError('Invalid offer link.');
-                        setStep('error');
+                        setError('This offer link is invalid. Please check the link and try again.');
+                        setStep('input');
                         logEvent('submit_rejected', { offerId, status: data.status });
                         return;
                     } else if (data.status === 'expired') {
-                        setError('Offer expired. Ask for a new link.');
-                        setStep('error');
+                        setError('This offer has expired. Please request a new link from the company.');
+                        setStep('input');
                         logEvent('submit_rejected', { offerId, status: data.status });
                         return;
                     } else if (data.status === 'used') {
-                        setError('Link already used. The mechanism runs once per offer.');
-                        setStep('error');
+                        setError('This link has already been used. The mechanism runs once per offer.');
+                        setStep('input');
                         logEvent('submit_rejected', { offerId, status: data.status });
                         return;
                     }
@@ -1696,36 +1549,15 @@
                     setResult(data);
                     setStep('result');
 
-                    // Animate surplus counter if success
-                    if (data.status === 'success') {
-                        const benefit = data.final - ask;
-                        const duration = 2000; // 2 seconds
-                        const steps = 60;
-                        const increment = benefit / steps;
-                        const stepTime = duration / steps;
-                        let current = 0;
-                        const timer = setInterval(() => {
-                            current += increment;
-                            if (current >= benefit) {
-                                setSurplusCounter(benefit);
-                                clearInterval(timer);
-                            } else {
-                                setSurplusCounter(Math.floor(current));
-                            }
-                        }, stepTime);
-                    }
-
                     logEvent('candidate_submitted', {
                         offerId,
-                        min: ask,
+                        totalMin,
                         status: data.status,
-                        surplus: data.surplus,
-                        gap: data.gap,
                         emailProvided: !!email,
                     });
                 } catch (err) {
-                    setError('Failed to submit. Try again.');
-                    setStep('error');
+                    setError('Failed to submit your response. Please check your connection and try again.');
+                    setStep('input');
                     logEvent('submit_error', { offerId, error: err.message });
                 }
             };
@@ -1733,7 +1565,7 @@
             if (step === 'loading') {
                 return (
                     <div className="max-w-xl mx-auto animate-enter text-center">
-                        <div className="text-[#CBD5E1]">Loading offer...</div>
+                        <div className="text-[#666666]">Loading offer...</div>
                     </div>
                 );
             }
@@ -1741,12 +1573,12 @@
             if (step === 'error') {
                 return (
                     <div className="max-w-xl mx-auto animate-enter text-center">
-                        <GlassCard className="border-red-500/30">
-                            <div className="w-24 h-24 mx-auto rounded-full bg-red-500/20 flex items-center justify-center mb-8">
-                                <Icons.Lock className="w-12 h-12 text-red-400" />
+                        <GlassCard className="border-l-4 border-[#FF3B30]">
+                            <div className="w-24 h-24 mx-auto rounded-full bg-[#FFEBEB] shadow-[10px_10px_20px_#d9d9d9,-10px_-10px_20px_#ffffff] flex items-center justify-center mb-8">
+                                <Icons.Lock className="w-12 h-12 text-[#FF3B30]" />
                             </div>
-                            <h2 className="text-3xl font-bold text-[#F1F5F9] mb-4">Unable to Load</h2>
-                            <p className="text-[#CBD5E1] mb-6">{error}</p>
+                            <h2 className="text-3xl font-bold text-[#1C1C1E] mb-4">Unable to Load</h2>
+                            <p className="text-[#666666] mb-6">{error}</p>
                             <Button variant="outline" onClick={() => {
                                 window.location.hash = '';
                                 window.location.reload();
@@ -1762,103 +1594,15 @@
                 return (
                     <div className="max-w-xl mx-auto animate-enter text-center">
                         <div className="mb-8">
-                            <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-[#A7EF00] to-[#C8FF4D] mb-6 vault-icon">
-                                <Icons.Lock className="w-12 h-12 text-black" />
-                            </div>
-                            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-[#FCD34D] to-[#F59E0B] scale-icon">
-                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <line x1="12" y1="2" x2="12" y2="22" />
-                                    <line x1="2" y1="12" x2="22" y2="12" />
-                                    <circle cx="8" cy="8" r="2" />
-                                    <circle cx="16" cy="16" r="2" />
-                                </svg>
+                            <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-[#00C4CC] shadow-[0_4px_20px_rgba(0,196,204,0.4)] mb-6 vault-icon">
+                                <Icons.Lock className="w-12 h-12 text-white" />
                             </div>
                         </div>
-                        <div className="space-y-3 text-lg text-[#CBD5E1]">
-                            <p className="commitment-text font-bold text-yellow-400">Number locked.</p>
+                        <div className="space-y-3 text-lg text-[#666666]">
+                            <p className="commitment-text font-bold text-[#00C4CC]">Number locked.</p>
                             <p className="commitment-text">Calculating...</p>
-                            <p className="commitment-text font-bold text-[#FCD34D]">Almost there...</p>
+                            <p className="commitment-text font-bold text-[#1C1C1E]">Almost there...</p>
                         </div>
-                    </div>
-                );
-            }
-
-            if (step === 'intro') {
-                return (
-                    <div className="max-w-4xl mx-auto animate-enter px-4 py-16">
-                        {/* Hero / Intro zone */}
-                        <div className="text-center mb-10">
-                            <div className="relative inline-block mb-4">
-                                <div className="absolute inset-0 blur-3xl opacity-20 bg-yellow-300 rounded-full"></div>
-                                <h1 className="relative text-6xl font-extrabold text-yellow-400 tracking-tight drop-shadow-[0_0_10px_rgba(245,192,74,0.4)]">
-                                    The Closing Table
-                                </h1>
-                            </div>
-                            <p className="text-xl text-gray-200/80 mt-4 leading-relaxed mb-4">
-                                Set your true minimum salary. No haggling, no anchoring, no games.
-                            </p>
-                            <p className="text-sm text-gray-300 opacity-60 tracking-wide">
-                                Fair · Fast · Private
-                            </p>
-                        </div>
-
-                        {/* Action zone - Main Feature Card */}
-                        <GlassCard className="border-l-4 border-yellow-400/40 mb-8">
-                            <div className="mb-6">
-                                <h2 className="text-base font-bold text-yellow-400 tracking-wide mb-2">
-                                    Your Minimum (CMin)
-                                </h2>
-                                <p className="text-sm text-gray-300">
-                                    Your walk-away base salary. The company never sees this number.
-                                </p>
-                            </div>
-
-                            <div className="flex items-baseline justify-start mb-4">
-                                <span className="text-gray-300 text-4xl font-bold mr-2">$</span>
-                                <span
-                                    className={
-                                        "text-7xl font-bold text-white tracking-tighter jackpot-number financial-number " +
-                                        (askAnimating ? "jackpot-active" : "") +
-                                        (ledFlicker ? " led-flicker" : "") +
-                                        (greenFlash ? " candidate-confirm-flash" : "")
-                                    }
-                                    style={{ transform: `scale(${askScale})` }}
-                                >
-                                    {ask.toLocaleString()}
-                                </span>
-                            </div>
-
-                            <div className="mb-10 px-4 mt-8">
-                                <Slider
-                                    min={80000}
-                                    max={250000}
-                                    step={1000}
-                                    value={ask}
-                                    onChange={handleAskChange}
-                                    onDragStart={() => {}}
-                                    onDragEnd={handleSliderRelease}
-                                />
-                            </div>
-
-                            <p className="text-sm text-gray-300 mb-6 text-center">
-                                Choose the minimum salary you'd be genuinely happy to accept for this role.
-                            </p>
-
-                            <div className="text-center">
-                                <Button onClick={() => setStep('input')} className="w-full text-lg font-bold">
-                                    Continue to Email{' '}
-                                    <Icons.ArrowRight className="w-5 h-5" />
-                                </Button>
-                            </div>
-
-                            <p className="text-center text-xs text-gray-300 opacity-80 mt-6">
-                                Your number is encrypted and never shared. The company only sees whether a deal is possible and the final salary we compute.
-                            </p>
-                        </GlassCard>
-
-                        {/* Assurance / Details zone */}
-                        <HowItWorksSection isCandidate={true} />
-
                     </div>
                 );
             }
@@ -1868,106 +1612,190 @@
                     <div className="max-w-2xl mx-auto animate-enter">
                         {/* Hero / Intro zone */}
                         <div className="text-center mb-10">
-                            <div className="relative inline-block mb-4">
-                                <div className="absolute inset-0 blur-3xl opacity-20 bg-yellow-300 rounded-full"></div>
-                                <h1 className="relative text-6xl font-extrabold text-yellow-400 tracking-tight drop-shadow-[0_0_10px_rgba(245,192,74,0.4)]">
-                                    The Closing Table
-                                </h1>
-                            </div>
-                            <p className="text-xl text-gray-200/80 mt-4 leading-relaxed mb-4">
-                                Set your true minimum salary. No haggling, no anchoring, no games.
+                            <h1 className="text-5xl md:text-6xl font-extrabold text-[#1C1C1E] tracking-tight mb-4">
+                                The Closing Table
+                            </h1>
+                            <p className="text-lg text-[#666666] mt-4 leading-relaxed mb-4">
+                                Set your minimum salary. The tool will check for a fair middle ground.
                             </p>
                         </div>
 
+                        {/* Backend error banner at top */}
+                        {error && (
+                            <div className="bg-[#FFEBEB] border-l-4 border-[#FF3B30] p-5 rounded-xl mb-6 shadow-sm animate-enter">
+                                <div className="flex items-start gap-3">
+                                    <Icons.AlertTriangle className="w-5 h-5 text-[#FF3B30] flex-shrink-0 mt-0.5" />
+                                    <div>
+                                        <p className="text-[#FF3B30] font-semibold mb-1">Unable to Submit</p>
+                                        <p className="text-[#FF3B30] text-sm">{error}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Action zone - Main Feature Card */}
-                        <GlassCard className="border-l-4 border-yellow-400/40 mb-8">
-                            <div className="mb-6">
-                                <h2 className="text-base font-bold text-yellow-400 tracking-wide mb-2">
-                                    Your Minimum (CMin)
-                                </h2>
-                                <p className="text-sm text-gray-300">
-                                    Your walk-away base salary. The company never sees this number.
+                        <GlassCard className="border-l-4 border-[#00C4CC] mb-8">
+                            {/* Instructional copy at top */}
+                            <div className="mb-8">
+                                <p className="text-base text-[#666666] leading-relaxed">
+                                    Set the minimum total compensation you would actually accept for this role.
                                 </p>
                             </div>
 
-                            <div className="flex items-baseline justify-start mb-4">
-                                <span className="text-gray-300 text-4xl font-bold mr-2">$</span>
-                                <span
-                                    className={
-                                        "text-7xl font-bold text-white tracking-tighter jackpot-number financial-number " +
-                                        (askAnimating ? "jackpot-active" : "") +
-                                        (ledFlicker ? " led-flicker" : "") +
-                                        (greenFlash ? " candidate-confirm-flash" : "")
-                                    }
-                                    style={{ transform: `scale(${askScale})` }}
-                                >
-                                    {ask.toLocaleString()}
-                                </span>
+                            {/* Base Salary Slider */}
+                            <div className="mb-8">
+                                <h3 className="text-sm font-bold text-[#00C4CC] tracking-wide uppercase mb-4">
+                                    Base Salary Minimum
+                                </h3>
+                                <div className="flex items-baseline justify-start mb-4">
+                                    <span className="text-[#666666] text-2xl font-bold mr-2">$</span>
+                                    <span
+                                        className={
+                                            "text-4xl font-bold text-[#1C1C1E] tracking-tight jackpot-number financial-number " +
+                                            (baseAnimating ? "jackpot-active" : "") +
+                                            (ledFlicker ? " led-flicker" : "")
+                                        }
+                                    >
+                                        {baseMin.toLocaleString()}
+                                    </span>
+                                </div>
+                                <div className="px-4 mt-6">
+                                    <Slider
+                                        min={BASE_MIN}
+                                        max={BASE_MAX}
+                                        step={1000}
+                                        value={baseMin}
+                                        onChange={handleBaseChange}
+                                        onDragStart={() => {}}
+                                        onDragEnd={handleSliderRelease}
+                                    />
+                                </div>
                             </div>
 
-                            <div className="mb-10 px-4 mt-8">
-                                <Slider
-                                    min={80000}
-                                    max={250000}
-                                    step={1000}
-                                    value={ask}
-                                    onChange={handleAskChange}
-                                    onDragStart={() => {}}
-                                    onDragEnd={handleSliderRelease}
-                                />
+                            {/* Equity Slider (conditional) */}
+                            {equityEnabled && (
+                                <div className="mb-8 pt-6 border-t border-[#E0E0E0]">
+                                    <h3 className="text-sm font-bold text-[#00C4CC] tracking-wide uppercase mb-4">
+                                        Equity Value Minimum
+                                    </h3>
+                                    <div className="flex items-baseline justify-start mb-4">
+                                        <span className="text-[#666666] text-2xl font-bold mr-2">$</span>
+                                        <span
+                                            className={
+                                                "text-4xl font-bold text-[#1C1C1E] tracking-tight jackpot-number financial-number " +
+                                                (equityAnimating ? "jackpot-active" : "") +
+                                                (ledFlicker ? " led-flicker" : "")
+                                            }
+                                        >
+                                            {equityMin.toLocaleString()}
+                                        </span>
+                                    </div>
+                                    <div className="px-4 mt-6">
+                                        <Slider
+                                            min={EQUITY_MIN}
+                                            max={EQUITY_MAX}
+                                            step={1000}
+                                            value={equityMin}
+                                            onChange={handleEquityChange}
+                                            onDragStart={() => {}}
+                                            onDragEnd={handleSliderRelease}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Total Compensation Display */}
+                            <div className="mb-8 pt-6 border-t border-[#E0E0E0]">
+                                <div className="bg-[#E5F9F0] rounded-xl p-6 shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff]">
+                                    <h3 className="text-sm font-bold text-[#00C4CC] tracking-wide uppercase mb-3">
+                                        Your Total Minimum (CMin)
+                                    </h3>
+                                    <div className="flex items-baseline justify-start">
+                                        <span className="text-[#666666] text-3xl font-bold mr-2">$</span>
+                                        <span
+                                            className={
+                                                "text-6xl font-bold text-[#1C1C1E] tracking-tight jackpot-number financial-number " +
+                                                ((baseAnimating || equityAnimating) ? "jackpot-active" : "") +
+                                                (ledFlicker ? " led-flicker" : "") +
+                                                (greenFlash ? " candidate-confirm-flash" : "")
+                                            }
+                                            style={{ transform: `scale(${totalScale})` }}
+                                        >
+                                            {totalMin.toLocaleString()}
+                                        </span>
+                                    </div>
+                                    {equityEnabled && (
+                                        <div className="mt-4 pt-4 border-t border-[#00C4CC]/20 text-sm text-[#666666] space-y-1">
+                                            <div className="flex justify-between">
+                                                <span>Base:</span>
+                                                <span className="font-semibold">${baseMin.toLocaleString()}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span>Equity:</span>
+                                                <span className="font-semibold">${equityMin.toLocaleString()}</span>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
 
-                            <p className="text-sm text-gray-300 mb-6 text-center">
-                                Choose the minimum salary you'd be genuinely happy to accept for this role.
-                            </p>
-
-                            <div className="space-y-6">
+                            {/* Email Input */}
+                            <div className="space-y-6 pt-6 border-t border-[#E0E0E0]">
                                 <div>
-                                    <label className="block text-xs font-medium text-gray-300 mb-3">
+                                    <p className="text-sm text-[#666666] mb-4">
+                                        We use your email to associate this result with this offer only.
+                                    </p>
+                                    <label className="block text-xs font-semibold text-[#1C1C1E] mb-3 uppercase tracking-wide">
                                         Your email
                                     </label>
                                     <div className="relative">
-                                        <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                        <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#666666]" />
                                         <input
+                                            ref={emailInputRef}
                                             type="email"
                                             value={email}
-                                            onChange={(e) => setEmail(e.target.value)}
+                                            onChange={(e) => {
+                                                setEmail(e.target.value);
+                                                if (validationError) setValidationError('');
+                                            }}
+                                            onKeyDown={handleEmailKeyDown}
                                             placeholder="you@email.com"
                                             aria-label="Candidate email address"
                                             autoComplete="email"
-                                            className="w-full frosted-input border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder-gray-400 focus:outline-none focus:border-[#F5C04A] focus:ring-2 focus:ring-[#F5C04A]/30 hover:border-[#F5C04A]/50 transition-all duration-200"
+                                            className="w-full bg-[#EFF3F6] border-none rounded-xl py-4 pl-12 pr-4 text-[#1C1C1E] placeholder-[#999999] focus:outline-none focus:ring-2 focus:ring-[#00C4CC]/50 shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] transition-all duration-200"
                                         />
                                     </div>
-                                    <p className="mt-2 text-xs text-gray-400">
+                                    {validationError && (
+                                        <div className="mt-2 flex items-start gap-2">
+                                            <Icons.AlertTriangle className="w-4 h-4 text-[#FF3B30] flex-shrink-0 mt-0.5" />
+                                            <p className="text-[#FF3B30] text-sm">{validationError}</p>
+                                        </div>
+                                    )}
+                                    <p className="mt-2 text-xs text-[#666666]">
                                         We'll email you the result. No spam. Data auto-deletes after 7 days.
                                     </p>
                                 </div>
 
-                                {error && (
-                                    <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-xl">
-                                        <p className="text-red-200 text-sm">{error}</p>
-                                    </div>
-                                )}
-
                                 <button 
                                     onClick={() => {
-                                        playMagneticLatchSound();
-                                        submit();
+                                        if (validateForm()) {
+                                            playMagneticLatchSound();
+                                            submit();
+                                        }
                                     }} 
-                                    disabled={!email}
-                                    className="w-full bg-gradient-to-r from-yellow-300 to-amber-400 text-black font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(245,192,74,0.5)] hover:shadow-[0_0_30px_rgba(245,192,74,0.7)] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="w-full bg-[#00C4CC] text-white font-bold py-4 rounded-full shadow-[0_4px_14px_rgba(0,196,204,0.35)] hover:bg-[#00B0B8] hover:shadow-[0_6px_20px_rgba(0,196,204,0.45)] transition-all flex items-center justify-center gap-3"
                                 >
-                                    <span className="text-xl">🔒</span>
+                                    <Icons.Lock className="w-5 h-5" />
                                     Commit Minimum & See Result
                                 </button>
 
-                                <p className="text-center text-xs text-gray-300 opacity-80">
+                                <p className="text-center text-xs text-[#666666]">
                                     Your number is encrypted and never shared. The company only sees whether a deal is possible and the final salary we compute.
                                 </p>
                             </div>
                         </GlassCard>
 
-                        {/* Assurance / Details zone */}
+                        {/* Assurance / Details zone - moved to bottom */}
                         <HowItWorksSection isCandidate={true} />
 
                     </div>
@@ -1983,25 +1811,24 @@
                 return (
                     <div className="max-w-xl mx-auto animate-enter text-center">
                         <div
-                            className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-8 shadow-2xl ${
+                            className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-8 ${
                                 isSuccess
-                                    ? 'bg-[#A7EF00] shadow-[#A7EF00]/50'
+                                    ? 'bg-[#34C759] shadow-[0_4px_20px_rgba(52,199,89,0.4)]'
                                     : result.status === 'close'
-                                    ? 'bg-[#FACC15] shadow-[#FACC15]/50'
-                                    : 'bg-[#EF4444] shadow-[#EF4444]/50'
+                                    ? 'bg-[#FF9500] shadow-[0_4px_20px_rgba(255,149,0,0.4)]'
+                                    : 'bg-[#FF3B30] shadow-[0_4px_20px_rgba(255,59,48,0.4)]'
                             }`}
-                            style={isSuccess ? { boxShadow: '0 0 40px rgba(167, 239, 0, 0.5), 0 0 80px rgba(167, 239, 0, 0.3)' } : {}}
                         >
                             {isSuccess ? (
-                                <Icons.Handshake className="w-12 h-12 text-black" />
+                                <Icons.Handshake className="w-12 h-12 text-white" />
                             ) : result.status === 'close' ? (
-                                <Icons.Phone className="w-12 h-12 text-black" />
+                                <Icons.Phone className="w-12 h-12 text-white" />
                             ) : (
-                                <Icons.Lock className="w-12 h-12 text-[#F1F5F9]" />
+                                <Icons.Lock className="w-12 h-12 text-white" />
                             )}
                         </div>
 
-                        <h2 className="text-5xl font-bold text-[#F1F5F9] mb-6">
+                        <h2 className="text-4xl font-extrabold text-[#1C1C1E] mb-6">
                             {isSuccess
                                 ? 'Deal Closed'
                                 : result.status === 'close'
@@ -2010,139 +1837,129 @@
                         </h2>
 
                         {isSuccess ? (() => {
-                            const cMin = ask;
-                            const cMax = ask + result.surplus;
-                            const benefitAboveMin = result.final - ask;
-                            const splitAmount = result.surplus / 2;
+                            const benefitAboveMin = result.final - totalMin;
                             
                             return (
-                                <div className="space-y-8">
-                                    {/* The Outcome Bar - FAIR SPLIT (Green) */}
-                                    <GlassCard className="border-[#A7EF00]/30">
-                                        <div className="mb-6">
-                                            <div className="flex justify-between items-center mb-4">
-                                                <div>
-                                                    <p className="text-xs text-[#CBD5E1] mb-1">Your Minimum</p>
-                                                    <p className="text-xl font-bold text-[#A7EF00]">${cMin.toLocaleString()}</p>
-                                                </div>
-                                                <div className="text-right">
-                                                    <p className="text-xs text-[#CBD5E1] mb-1">Company Maximum</p>
-                                                    <p className="text-xl font-bold text-[#FCD34D]">${cMax.toLocaleString()}</p>
-                                                </div>
-                                            </div>
-                                            
-                                            <div className="outcome-bar-container">
-                                                <div className="outcome-bar-fair-split">
-                                                    <div className="outcome-bar-split-label">50/50 Split</div>
-                                                </div>
-                                                <div className="outcome-bar-label" style={{ left: '0%' }}>${cMin.toLocaleString()}</div>
-                                                <div className="outcome-bar-label" style={{ left: '50%', transform: 'translateX(-50%)' }}>${result.final.toLocaleString()}</div>
-                                                <div className="outcome-bar-label" style={{ right: '0%' }}>${cMax.toLocaleString()}</div>
-                                            </div>
-                                        </div>
-                                    </GlassCard>
-
-                                    {/* Final Offer with Surplus Counter */}
-                                    <GlassCard className="border-[#F5C04A]/30">
-                                        <p className="text-2xl font-extrabold text-yellow-400 mb-2">Final Salary</p>
-                                        <p className="text-6xl font-bold text-white gold-pulse mb-6 tracking-tighter">
+                                <div className="space-y-6">
+                                    {/* Final Offer */}
+                                    <GlassCard className="border-l-4 border-[#34C759]">
+                                        <p className="text-lg font-bold text-[#1C1C1E] mb-2">Final Total Compensation</p>
+                                        <p className="text-5xl font-bold text-[#1C1C1E] mb-6 tracking-tight financial-number">
                                             ${result.final.toLocaleString()}
                                         </p>
                                         
-                                        <div className="bg-[#A7EF00]/10 rounded-lg p-6 text-left">
-                                            <p className="text-sm text-[#CBD5E1] mb-2">
-                                                Above your minimum:
+                                        <div className="bg-[#E5F9F0] rounded-xl p-5 text-left shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff]">
+                                            <p className="text-sm text-[#666666] mb-2">
+                                                <strong className="text-[#34C759]">✓ Deal reached</strong>
                                             </p>
-                                            <p className={`text-3xl font-bold text-[#A7EF00] surplus-counter`}>
-                                                ${surplusCounter.toLocaleString()}
+                                            <p className="text-xs text-[#666666]">
+                                                The mechanism split the difference between your minimum and the company's number to land on this figure.
                                             </p>
-                                            <p className="text-xs text-[#CBD5E1] mt-2 opacity-70">
-                                                Surplus split 50/50: ${(result.surplus / 2).toLocaleString()} to each side
-                                            </p>
+                                        </div>
+                                    </GlassCard>
+
+                                    {/* How it worked */}
+                                    <GlassCard className="border-l-4 border-[#34C759]">
+                                        <div className="text-left py-2">
+                                            <h3 className="text-sm font-bold text-[#34C759] mb-3 uppercase tracking-wide">How it worked</h3>
+                                            <ul className="space-y-2 text-sm text-[#666666]">
+                                                <li className="flex items-start gap-2">
+                                                    <Icons.Shield className="w-4 h-4 text-[#34C759] mt-0.5 flex-shrink-0" />
+                                                    <span>Your minimum was below the company's maximum</span>
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <Icons.Check className="w-4 h-4 text-[#34C759] mt-0.5 flex-shrink-0" />
+                                                    <span>The mechanism split the difference 50/50</span>
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <Icons.Lock className="w-4 h-4 text-[#34C759] mt-0.5 flex-shrink-0" />
+                                                    <span>Neither side ever saw the other's original number</span>
+                                                </li>
+                                            </ul>
                                         </div>
                                     </GlassCard>
 
                                     {/* Closing Table Signature */}
-                                    <GlassCard className="border-[#A7EF00]/30 bg-gradient-to-br from-[#A7EF00]/10 to-transparent">
-                                        <div className="text-center py-6">
-                                            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#A7EF00] mb-4">
-                                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0F0F0F" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                    <GlassCard className="border-l-4 border-[#00C4CC]">
+                                        <div className="text-center py-4">
+                                            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#34C759] shadow-[0_4px_14px_rgba(52,199,89,0.35)] mb-4">
+                                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                                                     <polyline points="20 6 9 17 4 12"></polyline>
                                                 </svg>
                                             </div>
-                                            <p className="text-xl font-bold text-[#A7EF00] mb-2">
+                                            <p className="text-lg font-bold text-[#34C759] mb-2">
                                                 Deal Closed: ${result.final.toLocaleString()}
                                             </p>
-                                            <p className="text-xs text-[#CBD5E1] mb-4">
+                                            <p className="text-xs text-[#666666] mb-4">
                                                 The Closing Table
                                             </p>
                                             {revealLink && (
-                                                <Button
-                                                    variant="outline"
-                                                    className="text-xs"
-                                                    onClick={async () => {
-                                                        try {
-                                                            await navigator.clipboard.writeText(revealLink);
-                                                            alert('Link copied');
-                                                        } catch {
-                                                            alert('Copy failed');
-                                                        }
-                                                    }}
-                                                >
-                                                    Copy Result Link
-                                                </Button>
+                                                <>
+                                                    <Button
+                                                        variant="outline"
+                                                        className="text-xs mb-3"
+                                                        onClick={async () => {
+                                                            try {
+                                                                await navigator.clipboard.writeText(revealLink);
+                                                                alert('Link copied');
+                                                            } catch {
+                                                                alert('Copy failed');
+                                                            }
+                                                        }}
+                                                    >
+                                                        Copy Result Link
+                                                    </Button>
+                                                    <p className="text-xs text-[#666666]">
+                                                        This link only shows the final outcome of the mechanism (deal/no deal/close) and the final compensation — not anyone's original inputs.
+                                                    </p>
+                                                </>
                                             )}
                                         </div>
                                     </GlassCard>
                                 </div>
                             );
                         })() : (() => {
-                            const cMin = ask;
-                            const cMax = ask - result.gap; // Company max is below candidate min
-                            const bridgeSplit = cMin + (result.gap / 2); // What the fair split would be
                             
                             return (
                                 <GlassCard
                                     className={
                                         result.status === 'close'
-                                            ? 'border-[#FACC15]/30'
-                                            : 'border-red-500/30'
+                                            ? 'border-l-4 border-[#FF9500]'
+                                            : 'border-l-4 border-[#FF3B30]'
                                     }
                                 >
-                                    <div className="mb-6">
-                                        <div className="flex justify-between items-center mb-4">
-                                            <div>
-                                                <p className="text-xs text-[#CBD5E1] mb-1">Your Minimum</p>
-                                                <p className="text-xl font-bold text-[#A7EF00]">${cMin.toLocaleString()}</p>
-                                            </div>
-                                            <div className="text-right">
-                                                <p className="text-xs text-[#CBD5E1] mb-1">Company Maximum</p>
-                                                <p className="text-xl font-bold text-[#FCD34D]">${cMax.toLocaleString()}</p>
-                                            </div>
+                                    {/* Show final total for "close" status */}
+                                    {result.status === 'close' && result.final && (
+                                        <div className="mb-6">
+                                            <p className="text-sm text-[#666666] mb-2 uppercase tracking-wide font-semibold">Proposed Starting Point</p>
+                                            <p className="text-5xl font-bold text-[#FF9500] mb-4 tracking-tight financial-number">
+                                                ${result.final.toLocaleString()}
+                                            </p>
                                         </div>
-                                        
-                                        <div className="outcome-bar-container">
-                                            {result.status === 'close' ? (
-                                                <div className="outcome-bar-bridge">
-                                                    <div className="outcome-bar-split-label">Within 10%</div>
-                                                </div>
-                                            ) : (
-                                                <div className="outcome-bar-no-deal">
-                                                    <div className="outcome-bar-label" style={{ left: '0%' }}>${cMin.toLocaleString()}</div>
-                                                    <div className="outcome-bar-label" style={{ right: '0%' }}>${cMax.toLocaleString()}</div>
-                                                </div>
-                                            )}
+                                    )}
+
+                                    <div className="mb-6">
+                                        <div className="text-center mb-4">
+                                            <p className="text-lg font-bold text-[#1C1C1E] mb-2">
+                                                {result.status === 'close' ? 'Close enough to talk' : 'Too far apart'}
+                                            </p>
+                                            <p className="text-sm text-[#666666]">
+                                                {result.status === 'close' 
+                                                    ? 'The mechanism found you\'re within a reasonable range but not enough for an automatic match; this is a good starting number for a conversation.'
+                                                    : 'The mechanism determined you\'re too far apart for a fair middle ground.'}
+                                            </p>
                                         </div>
                                     </div>
 
                                     {result.status === 'close' && (
-                                        <div className="bg-yellow-500/10 border border-[#FACC15]/30 p-6 rounded-xl mb-6 text-left">
-                                            <p className="text-yellow-200 font-bold text-lg mb-2">
-                                                Within 10% of a deal.
+                                        <div className="bg-[#FFF5E6] border border-[#FF9500]/30 p-5 rounded-xl mb-6 text-left shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff]">
+                                            <p className="text-[#1C1C1E] font-bold text-sm mb-2">
+                                                ⚠ Next Step
                                             </p>
-                                            <p className="text-yellow-100/70 text-sm mb-4">
-                                                A fair split would be <strong className="text-[#FACC15]">${Math.round(bridgeSplit / 1000) * 1000}</strong>. 
-                                                Consider a conversation to close the gap.
+                                            <p className="text-[#666666] text-sm mb-4">
+                                                {result.final 
+                                                    ? `Use $${result.final.toLocaleString()} as the starting point for your conversation to close the gap.`
+                                                    : 'The mechanism detected you\'re close. Consider a conversation to bridge the gap.'}
                                             </p>
                                             <Button
                                                 variant="gold"
@@ -2152,7 +1969,7 @@
                                                         'In a full system, this would trigger a follow-up or scheduling flow.'
                                                     );
                                                     logEvent('resolution_call_requested', {
-                                                        gap: result.gap,
+                                                        status: result.status,
                                                     });
                                                 }}
                                             >
@@ -2162,16 +1979,57 @@
                                         </div>
                                     )}
                                     {result.status === 'fail' && (
-                                        <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-xl mb-6">
-                                            <p className="text-red-200 font-bold">
-                                                Gap too large.
+                                        <div className="bg-red-100 border border-red-300 p-4 rounded-xl mb-6 shadow-[inset_2px_2px_4px_rgba(163,163,163,0.3),inset_-2px_-2px_4px_rgba(255,255,255,0.8)]">
+                                            <p className="text-red-700 font-bold">
+                                                No deal possible
                                             </p>
-                                            <p className="text-red-100/70 text-sm mt-1">
-                                                Your minimum is more than 10% above their maximum.
+                                            <p className="text-red-600 text-sm mt-1">
+                                                The ranges are too far apart for the mechanism to propose a fair middle ground.
                                             </p>
                                         </div>
                                     )}
-                                    <Button variant="outline" onClick={() => window.location.reload()}>
+                                    
+                                    <div className="mt-6 p-4 bg-[#E5F2F9] rounded-xl text-left">
+                                        <h3 className="text-sm font-bold text-[#1C1C1E] mb-2 uppercase tracking-wide">Outcome-Only Display</h3>
+                                        <ul className="space-y-2 text-xs text-[#666666]">
+                                            <li className="flex items-start gap-2">
+                                                <Icons.Lock className="w-4 h-4 text-[#00C4CC] mt-0.5 flex-shrink-0" />
+                                                <span>The app only displayed the final outcome to the company</span>
+                                            </li>
+                                            <li className="flex items-start gap-2">
+                                                <Icons.Shield className="w-4 h-4 text-[#00C4CC] mt-0.5 flex-shrink-0" />
+                                                <span>Your original input was not shown in their interface</span>
+                                            </li>
+                                            <li className="flex items-start gap-2">
+                                                <Icons.Check className="w-4 h-4 text-[#00C4CC] mt-0.5 flex-shrink-0" />
+                                                <span>Similarly, their maximum was not shown to you</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    
+                                    {revealLink && (
+                                        <div className="mt-6 p-4 bg-[#EFF3F6] rounded-xl text-center">
+                                            <Button
+                                                variant="outline"
+                                                className="text-xs mb-3 w-full"
+                                                onClick={async () => {
+                                                    try {
+                                                        await navigator.clipboard.writeText(revealLink);
+                                                        alert('Link copied');
+                                                    } catch {
+                                                        alert('Copy failed');
+                                                    }
+                                                }}
+                                            >
+                                                Copy Result Link
+                                            </Button>
+                                            <p className="text-xs text-[#666666]">
+                                                This link only shows the final outcome of the mechanism (deal/no deal/close) and the final compensation — not anyone's original inputs.
+                                            </p>
+                                        </div>
+                                    )}
+                                    
+                                    <Button variant="outline" onClick={() => window.location.reload()} className="mt-6 w-full">
                                         Start Over
                                     </Button>
                                 </GlassCard>
@@ -2202,9 +2060,6 @@
                         } else if (json.status === 'expired') {
                             setError('Result expired. Ask for a new Closing Table.');
                             setStep('error');
-                        } else if (json.status !== 'success') {
-                            setError('Result not available.');
-                            setStep('error');
                         } else {
                             setData(json);
                             setStep('ready');
@@ -2221,7 +2076,7 @@
             if (step === 'loading') {
                 return (
                     <div className="max-w-xl mx-auto animate-enter text-center">
-                        <div className="text-[#CBD5E1]">Loading result…</div>
+                        <div className="text-[#666666]">Loading result…</div>
                     </div>
                 );
             }
@@ -2229,12 +2084,12 @@
             if (step === 'error') {
                 return (
                     <div className="max-w-xl mx-auto animate-enter text-center">
-                        <GlassCard className="border-red-500/30">
-                            <div className="w-24 h-24 mx-auto rounded-full bg-red-500/20 flex items-center justify-center mb-8">
-                                <Icons.Lock className="w-12 h-12 text-red-400" />
+                        <GlassCard className="border-l-4 border-[#FF3B30]">
+                            <div className="w-24 h-24 mx-auto rounded-full bg-[#FFEBEB] shadow-[10px_10px_20px_#d9d9d9,-10px_-10px_20px_#ffffff] flex items-center justify-center mb-8">
+                                <Icons.Lock className="w-12 h-12 text-[#FF3B30]" />
                             </div>
-                            <h2 className="text-3xl font-bold text-[#F1F5F9] mb-4">Not Available</h2>
-                            <p className="text-[#CBD5E1] mb-6">{error}</p>
+                            <h2 className="text-3xl font-bold text-[#1C1C1E] mb-4">Not Available</h2>
+                            <p className="text-[#666666] mb-6">{error}</p>
                             <Button
                                 variant="outline"
                                 onClick={() => {
@@ -2249,76 +2104,172 @@
                 );
             }
 
-            const revealUrl = `${window.location.origin}${window.location.pathname}#result=${encodeURIComponent(resultId)}`;
+            // Simplified view: Only show status, final, and celebration emojis
+            if (data.status === 'success') {
+                return (
+                    <div className="max-w-xl mx-auto animate-enter text-center">
+                        {/* Party celebration for successful deal */}
+                        <div className="text-7xl mb-6 animate-enter" style={{ animation: 'fade-in-up 0.6s ease-out' }}>
+                            🎉
+                        </div>
+                        
+                        <div className="w-24 h-24 mx-auto rounded-full bg-[#34C759] shadow-[0_4px_20px_rgba(52,199,89,0.4)] flex items-center justify-center mb-8">
+                            <Icons.Handshake className="w-12 h-12 text-white" />
+                        </div>
 
-            return (
-                <div className="max-w-xl mx-auto animate-enter text-center">
-                    <div className="w-24 h-24 mx-auto rounded-full bg-[#A7EF00] shadow-2xl shadow-[#A7EF00]/50 flex items-center justify-center mb-8" style={{ boxShadow: '0 0 40px rgba(167, 239, 0, 0.5), 0 0 80px rgba(167, 239, 0, 0.3)' }}>
-                        <Icons.Handshake className="w-12 h-12 text-black" />
-                    </div>
+                        <h2 className="text-4xl md:text-5xl font-extrabold text-[#1C1C1E] mb-6">
+                            Deal Closed! 🎊
+                        </h2>
+                        <p className="text-lg text-[#666666] mb-10 leading-relaxed">
+                            The mechanism found a fair agreement.
+                        </p>
 
-                    <h2 className="hero-heading text-5xl font-bold text-[#F1F5F9] mb-4">
-                        Final Result
-                    </h2>
-                    <p className="hero-subtitle mb-8">
-                        The Closing Table result.
-                    </p>
-
-                    <div className="space-y-8">
-                        {/* II. The Mechanism Run */}
-                        <GlassCard className="border-[#A7EF00]/30">
-                            <div className="mb-6">
-                                <div className="flex justify-between items-center mb-4">
-                                    <div>
-                                        <p className="text-xs text-[#CBD5E1] mb-1">Candidate Minimum</p>
-                                        <p className="text-xl font-bold text-[#A7EF00]">${data.min.toLocaleString()}</p>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="text-xs text-[#CBD5E1] mb-1">Company Maximum</p>
-                                        <p className="text-xl font-bold text-[#FCD34D]">${data.max.toLocaleString()}</p>
-                                    </div>
-                                </div>
-                                
-                                <div className="outcome-bar-container">
-                                    <div className="outcome-bar-fair-split">
-                                        <div className="outcome-bar-split-label">50/50 Split</div>
-                                    </div>
-                                    <div className="outcome-bar-label" style={{ left: '0%' }}>${data.min.toLocaleString()}</div>
-                                    <div className="outcome-bar-label" style={{ left: '50%', transform: 'translateX(-50%)' }}>${data.final.toLocaleString()}</div>
-                                    <div className="outcome-bar-label" style={{ right: '0%' }}>${data.max.toLocaleString()}</div>
-                                </div>
-                            </div>
-                        </GlassCard>
-
-                        <GlassCard className="border-[#F5C04A]/30">
-                            <h3 className="text-lg font-extrabold text-yellow-400 mb-4 text-left">Final Salary</h3>
-                            <p className="text-6xl font-bold text-white gold-pulse mb-4 tracking-tighter financial-number">
+                        <GlassCard className="border-l-4 border-[#34C759] mb-6">
+                            <p className="text-sm text-[#666666] mb-4">Final Annual Compensation</p>
+                            <p className="text-6xl font-bold text-[#1C1C1E] mb-6 tracking-tight financial-number">
                                 ${data.final.toLocaleString()}
                             </p>
-                            <div className="bg-[#A7EF00]/10 rounded-lg p-4 text-left">
-                                <p className="text-xs text-[#CBD5E1]">
-                                    Surplus split 50/50: ${(data.surplus / 2).toLocaleString()} to each side
+                            <div className="bg-[#E5F9F0] rounded-xl p-5 text-center">
+                                <p className="text-sm text-[#666666]">
+                                    This is the fair split computed by the mechanism. Both sides' ranges overlapped, and the difference was split 50/50.
                                 </p>
                             </div>
                         </GlassCard>
 
-                        {/* IV. Case Results */}
-                        <div className="text-center">
-                            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#A7EF00]/20 border-2 border-[#A7EF00]">
+                        <div className="text-center mb-6">
+                            <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-[#E5F9F0] border-2 border-[#34C759] shadow-[10px_10px_20px_#d9d9d9,-10px_-10px_20px_#ffffff]">
                                 <span className="text-2xl">✅</span>
-                                <span className="text-lg font-bold text-[#A7EF00] uppercase tracking-wider">FAIR SPLIT</span>
+                                <span className="text-lg font-bold text-[#34C759] uppercase tracking-wider">Success</span>
+                                <span className="text-2xl">🎯</span>
                             </div>
                         </div>
 
-                        <div className="mt-8 p-4 bg-black/30 rounded-xl border border-white/10 text-left text-xs text-[#CBD5E1] space-y-1">
-                            <p className="font-semibold text-[#CBD5E1]">Shareable link</p>
-                            <p className="text-[11px] text-[#A7EF00] break-all">{revealUrl}</p>
-                        </div>
+                        <GlassCard className="bg-[#EFF3F6]">
+                            <h3 className="text-xs text-[#1C1C1E] mb-2 font-bold uppercase tracking-wide">
+                                🔒 Privacy Protected
+                            </h3>
+                            <p className="text-xs text-[#666666]">
+                                This link shows only the final outcome (success/close/fail) and the final compensation—not anyone's original inputs. The mechanism kept both parties' numbers private.
+                            </p>
+                        </GlassCard>
 
-                        <p className="text-[#CBD5E1] text-xs text-center opacity-70">
-                            This result is stored. The mechanism runs once.
+                        <p className="text-[#666666] text-xs text-center mt-6">
+                            Created {new Date(data.createdAt).toLocaleDateString()}
                         </p>
                     </div>
+                );
+            }
+
+            if (data.status === 'close') {
+                return (
+                    <div className="max-w-xl mx-auto animate-enter text-center">
+                        {/* Conversation emoji for close cases */}
+                        <div className="text-7xl mb-6 animate-enter" style={{ animation: 'fade-in-up 0.6s ease-out' }}>
+                            💬
+                        </div>
+                        
+                        <div className="w-24 h-24 mx-auto rounded-full bg-[#FF9500] shadow-[0_4px_20px_rgba(255,149,0,0.4)] flex items-center justify-center mb-8">
+                            <Icons.Phone className="w-12 h-12 text-white" />
+                        </div>
+
+                        <h2 className="text-4xl md:text-5xl font-extrabold text-[#1C1C1E] mb-6">
+                            Close — Let's Talk 🤝
+                        </h2>
+                        <p className="text-lg text-[#666666] mb-10 leading-relaxed">
+                            The ranges were within 10% — worth a conversation!
+                        </p>
+
+                        <GlassCard className="border-l-4 border-[#FF9500] mb-6">
+                            <div className="bg-[#FFF5E6] border border-[#FF9500]/30 p-5 rounded-xl text-center">
+                                <p className="text-[#1C1C1E] font-bold text-lg mb-2">
+                                    🎯 Within the bridge zone
+                                </p>
+                                <p className="text-[#666666] text-sm mb-3">
+                                    The mechanism found the two sides close enough (within 10%) that a short conversation could bridge the gap.
+                                </p>
+                                <p className="text-[#FF9500] font-semibold text-sm">
+                                    💡 A brief follow-up chat might close this deal!
+                                </p>
+                            </div>
+                        </GlassCard>
+
+                        <div className="text-center mb-6">
+                            <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-[#FFF5E6] border-2 border-[#FF9500] shadow-[10px_10px_20px_#d9d9d9,-10px_-10px_20px_#ffffff]">
+                                <span className="text-2xl">💬</span>
+                                <span className="text-lg font-bold text-[#FF9500] uppercase tracking-wider">Close</span>
+                                <span className="text-2xl">🤝</span>
+                            </div>
+                        </div>
+
+                        <GlassCard className="bg-[#EFF3F6]">
+                            <h3 className="text-xs text-[#1C1C1E] mb-2 font-bold uppercase tracking-wide">
+                                Outcome-Only Display
+                            </h3>
+                            <p className="text-xs text-[#666666]">
+                                This link shows only the final outcome (success/close/fail), not the original inputs from either party.
+                            </p>
+                        </GlassCard>
+
+                        <p className="text-[#666666] text-xs text-center mt-6">
+                            Created {new Date(data.createdAt).toLocaleDateString()}
+                        </p>
+                    </div>
+                );
+            }
+
+            // status === 'fail'
+            return (
+                <div className="max-w-xl mx-auto animate-enter text-center">
+                    {/* Conversation needed emoji for failed deals */}
+                    <div className="text-7xl mb-6 animate-enter" style={{ animation: 'fade-in-up 0.6s ease-out' }}>
+                        🗨️
+                    </div>
+                    
+                    <div className="w-24 h-24 mx-auto rounded-full bg-[#FF3B30] shadow-[0_4px_20px_rgba(255,59,48,0.4)] flex items-center justify-center mb-8">
+                        <Icons.Phone className="w-12 h-12 text-white" />
+                    </div>
+
+                    <h2 className="text-4xl md:text-5xl font-extrabold text-[#1C1C1E] mb-6">
+                        No Auto-Deal 💭
+                    </h2>
+                    <p className="text-lg text-[#666666] mb-10 leading-relaxed">
+                        The ranges were too far apart—conversation needed.
+                    </p>
+
+                    <GlassCard className="border-l-4 border-[#FF3B30] mb-6">
+                        <div className="bg-[#FFEBEB] border border-[#FF3B30]/30 p-5 rounded-xl text-center">
+                            <p className="text-[#FF3B30] font-bold text-lg mb-2">
+                                📊 Gap too large
+                            </p>
+                            <p className="text-[#666666] text-sm mb-3">
+                                The mechanism found the two sides more than 10% apart. It couldn't auto-propose a fair split.
+                            </p>
+                            <p className="text-[#666666] font-semibold text-sm">
+                                🗣️ Both parties should talk to see if there's a path forward.
+                            </p>
+                        </div>
+                    </GlassCard>
+
+                    <div className="text-center mb-6">
+                        <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-[#FFEBEB] border-2 border-[#FF3B30] shadow-[10px_10px_20px_#d9d9d9,-10px_-10px_20px_#ffffff]">
+                            <span className="text-2xl">🗨️</span>
+                            <span className="text-lg font-bold text-[#FF3B30] uppercase tracking-wider">No Deal</span>
+                            <span className="text-2xl">💬</span>
+                        </div>
+                    </div>
+
+                    <GlassCard className="bg-[#EFF3F6]">
+                        <h3 className="text-xs text-[#1C1C1E] mb-2 font-bold uppercase tracking-wide">
+                            🔒 Privacy Protected
+                        </h3>
+                        <p className="text-xs text-[#666666]">
+                            This link shows only the final outcome (success/close/fail)—not anyone's original numbers. The mechanism kept both parties' inputs private.
+                        </p>
+                    </GlassCard>
+
+                    <p className="text-[#666666] text-xs text-center mt-6">
+                        Created {new Date(data.createdAt).toLocaleDateString()}
+                    </p>
                 </div>
             );
         };
@@ -2350,7 +2301,7 @@
             if (!isReady) return null;
 
             return (
-                <div className="app-shell min-h-screen w-full flex flex-col items-center p-4 md:p-8 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]">
+                <div className="app-shell min-h-screen w-full flex flex-col items-center p-4 md:p-8">
                     <div className="w-full max-w-6xl relative z-10 flex-1">
                         {resultId ? (
                             <ResultView resultId={resultId} />

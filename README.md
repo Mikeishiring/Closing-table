@@ -1,17 +1,17 @@
 # The Closing Table
 
-The Closing Table is a web application that implements a **single-shot, double-blind salary negotiation mechanism**. It's designed to eliminate negotiation gamesmanship by having both parties submit their true walk-away numbers simultaneously, then automatically computing a fair outcome if ranges overlap.
+The Closing Table is a web application that implements a **single-shot salary negotiation mechanism**. It's designed to simplify negotiations by having both parties submit their numbers once, then automatically computing a fair outcome if ranges overlap.
 
 ## What This Project Is About
 
-The Closing Table addresses a fundamental problem in salary negotiations: **information asymmetry and strategic gaming**. Traditional negotiations often devolve into back-and-forth haggling where neither party reveals their true limits, leading to inefficient outcomes and potential deal failures.
+The Closing Table addresses a fundamental problem in salary negotiations: **back-and-forth haggling and negotiation fatigue**. Traditional negotiations often involve multiple rounds where neither party reveals their true limits, leading to inefficient outcomes and potential deal failures.
 
 **The core idea:**
-> Company sets its true maximum salary. Candidate sets their true minimum.  
+> Company sets its maximum salary. Candidate sets their minimum.  
 > If the ranges overlap, the app instantly closes a fair deal by splitting the difference 50/50.  
 > If they don't overlap, the app clearly signals whether a human conversation could bridge the gap.
 
-This is a **prototype** to explore fair, transparent, double-blind negotiation mechanisms — not a production compensation tool.
+This is a **prototype** to explore fair, transparent negotiation mechanisms — not a production compensation tool.
 
 ---
 
@@ -43,20 +43,21 @@ The mechanism operates on a simple mathematical principle: when two parties' acc
    - Status: `fail` (deal cannot be closed)
 
 **Key Properties:**
-- **Double-blind:** Neither party sees the other's number until after submission
+- **Single-shot submission:** Each party inputs a single number
 - **Single-use:** Each offer can only be submitted once
 - **Fair split:** When overlap exists, surplus is divided exactly 50/50
-- **Rounding:** Final offers are rounded to nearest $1,000 for privacy and simplicity
+- **Outcome-only display:** Only the final outcome (deal/no deal/close) and final number are shown
+- **Rounding:** Final offers are rounded to nearest $1,000 for simplicity
 
 ---
 
 ## What It's Good For
 
 ✅ **Single-shot negotiations** — When both parties want to make one final offer and close the deal quickly  
-✅ **Transparency and fairness** — Eliminates negotiation gamesmanship; both parties know the mechanism is fair  
+✅ **Transparency and fairness** — The mechanism is simple and predictable; both parties know how it works  
 ✅ **Time-sensitive situations** — Fast resolution when there's urgency to close  
 ✅ **Reducing negotiation fatigue** — No back-and-forth; submit numbers once and get an answer  
-✅ **Protecting privacy** — Neither party sees the other's number until the mechanism computes the outcome  
+✅ **Outcome-only display** — The app only displays the final outcome and number, not the original inputs  
 ✅ **Clear boundaries** — Explicitly shows when a deal is possible vs. when ranges are too far apart  
 ✅ **Fair surplus distribution** — When ranges overlap, the surplus is split 50/50, ensuring both parties benefit equally
 
@@ -210,7 +211,7 @@ The application consists of:
 - **No permanent storage** — All data is in-memory and lost on server restart
 - **Time-limited** — Offers expire after 24 hours, results after 7 days
 - **Single-use** — Each offer can only be submitted once
-- **Double-blind** — Neither party sees the other's number until outcome is computed
+- **Outcome-only display** — The app only displays the final outcome and number, not the original inputs from either party
 - **No negotiation thread** — No history, no audit trail, no records
 
-This prototype prioritizes privacy and transparency over persistence.
+This prototype prioritizes simplicity and transparency over persistence.

@@ -50,10 +50,10 @@ const BRIDGE_ZONE_PCT = 0.10;                   // 10% bridge zone
 const ROUNDING_GRANULARITY = 1000;              // $1,000 rounding
 
 // --- IN-MEMORY STORES ---
-// offerId -> { max, email, createdAt, expiresAt, used }
+// offerId -> { max, email, createdAt, expiresAt, used, equityEnabled, companyBaseMax, companyEquityMax }
 const offers = new Map();
 
-// resultId -> { status, final, surplus, min, max, createdAt }
+// resultId -> { status, final, createdAt } (no input values stored)
 const results = new Map();
 
 // --- HELPERS ---
@@ -145,29 +145,62 @@ app.get('/health', (req, res) => {
 
 // --- CREATE OFFER ---
 app.post('/api/offers', (req, res) => {
-  const { max, email } = req.body || {};
+  const { max, email, equityEnabled, companyBaseMax, companyEquityMax } = req.body || {};
 
-  if (typeof max !== 'number' || !Number.isFinite(max) || max <= 0) {
-    return res.status(400).json({ error: 'Invalid or missing "max"' });
+  // Support both old (single max) and new (base+equity) formats
+  let baseMax, equityMax, equity;
+  
+  if (typeof equityEnabled === 'boolean') {
+    // New format: base + equity
+    equity = equityEnabled;
+    baseMax = companyBaseMax;
+    equityMax = equityEnabled ? (companyEquityMax || 0) : 0;
+    
+    if (typeof baseMax !== 'number' || !Number.isFinite(baseMax) || baseMax <= 0) {
+      return res.status(400).json({ error: 'Invalid or missing "companyBaseMax"' });
+    }
+    if (equityEnabled && (typeof equityMax !== 'number' || !Number.isFinite(equityMax) || equityMax < 0)) {
+      return res.status(400).json({ error: 'Invalid "companyEquityMax"' });
+    }
+  } else {
+    // Old format: single max (treat as base-only)
+    if (typeof max !== 'number' || !Number.isFinite(max) || max <= 0) {
+      return res.status(400).json({ error: 'Invalid or missing "max"' });
+    }
+    baseMax = max;
+    equityMax = 0;
+    equity = false;
   }
 
   if (!email || typeof email !== 'string') {
     return res.status(400).json({ error: 'Email is required' });
   }
 
+  const totalMax = baseMax + equityMax;
   const createdAt = Date.now();
   const expiresAt = createdAt + OFFER_TTL_MS;
   const offerId = generateId('o');
 
   offers.set(offerId, {
-    max,
+    max: totalMax, // Store total for backward compatibility with mechanism
     email,
     createdAt,
     expiresAt,
     used: false,
+    equityEnabled: equity,
+    companyBaseMax: baseMax,
+    companyEquityMax: equityMax,
   });
 
-  console.log('[offer_created]', { offerId, max, email, createdAt });
+  console.log('[offer_created]', { 
+    offerId, 
+    max: totalMax, 
+    baseMax, 
+    equityMax, 
+    equityEnabled: equity, 
+    email, 
+    createdAt 
+  });
 
   return res.json({ offerId });
 });
@@ -190,17 +223,40 @@ app.get('/api/offers/:offerId', (req, res) => {
     return res.json({ status: 'used' });
   }
 
-  // Frontend only cares that it's "ok"
-  return res.json({ status: 'ok' });
+  // Include equity information for candidate
+  return res.json({ 
+    status: 'ok',
+    equityEnabled: offer.equityEnabled || false
+  });
 });
 
 // --- SUBMIT CANDIDATE MIN & RUN MECHANISM ---
 app.post('/api/offers/:offerId/submit', async (req, res) => {
   const { offerId } = req.params;
-  const { min, email } = req.body || {};
+  const { min, email, candidateBaseMin, candidateEquityMin } = req.body || {};
 
-  if (typeof min !== 'number' || !Number.isFinite(min) || min <= 0) {
-    return res.status(400).json({ error: 'Invalid or missing "min"' });
+  // Support both old (single min) and new (base+equity) formats
+  let totalMin;
+  
+  if (typeof candidateBaseMin === 'number') {
+    // New format: base + equity
+    const baseMin = candidateBaseMin;
+    const equityMin = candidateEquityMin || 0;
+    
+    if (!Number.isFinite(baseMin) || baseMin <= 0) {
+      return res.status(400).json({ error: 'Invalid or missing "candidateBaseMin"' });
+    }
+    if (equityMin < 0 || !Number.isFinite(equityMin)) {
+      return res.status(400).json({ error: 'Invalid "candidateEquityMin"' });
+    }
+    
+    totalMin = baseMin + equityMin;
+  } else {
+    // Old format: single min
+    if (typeof min !== 'number' || !Number.isFinite(min) || min <= 0) {
+      return res.status(400).json({ error: 'Invalid or missing "min"' });
+    }
+    totalMin = min;
   }
 
   if (!email || typeof email !== 'string') {
@@ -226,27 +282,25 @@ app.post('/api/offers/:offerId/submit', async (req, res) => {
   }
 
   const cMax = offer.max;
-  const cMin = min;
+  const cMin = totalMin;
 
   // Use pure calculateDeal function
   const dealResult = calculateDeal(cMax, cMin);
   const { status, final, surplus, gap } = dealResult;
   let resultId = null;
 
-  // Store result snapshot only for successful deals
+  // Store result snapshot for ALL outcomes (success, close, fail)
+  const createdAt = Date.now();
+  resultId = generateId('r');
+
+  results.set(resultId, {
+    status,
+    final: status === 'success' ? final : null,
+    createdAt,
+  });
+
+  // Send email only for successful deals
   if (status === 'success') {
-    const createdAt = Date.now();
-    resultId = generateId('r');
-
-    results.set(resultId, {
-      status,
-      final,
-      surplus,
-      min: cMin,
-      max: cMax,
-      createdAt,
-    });
-
     const frontendBase = process.env.FRONTEND_BASE || 'https://closing-table.pages.dev';
     const base = frontendBase.replace(/\/+$/, '');
     const revealLink = `${base}/#result=${encodeURIComponent(resultId)}`;
@@ -264,20 +318,16 @@ app.post('/api/offers/:offerId/submit', async (req, res) => {
 
   console.log('[offer_submitted]', {
     offerId,
-    min: cMin,
     email,
     status,
-    surplus,
-    gap,
     resultId,
   });
 
   return res.json({
     status,
-    final,
-    surplus,
-    gap,
+    final: status === 'success' || status === 'close' ? final : null,
     resultId,
+    createdAt,
   });
 });
 
@@ -298,9 +348,6 @@ app.get('/api/results/:resultId', (req, res) => {
   return res.json({
     status: result.status,
     final: result.final,
-    surplus: result.surplus,
-    min: result.min,
-    max: result.max,
     createdAt: result.createdAt,
   });
 });
