@@ -1113,19 +1113,6 @@
             );
         };
 
-        const BandIndicator = ({ value }) => {
-            const bandSize = 10000;
-            const lower = Math.floor(value / bandSize) * bandSize;
-            const upper = lower + bandSize;
-
-            return (
-                <div className="flex justify-center mt-2">
-                    <span className="text-xs font-medium text-[#CBD5E1] uppercase tracking-wider border border-[#CBD5E1]/50 px-3 py-1 rounded-full">
-                        Band: <span className="financial-number">${lower.toLocaleString()} - ${upper.toLocaleString()}</span>
-                    </span>
-                </div>
-            );
-        };
 
         const SplitDiagram = () => (
             <div className="my-8 p-6 bg-white/5 rounded-2xl border border-white/10">
@@ -1153,8 +1140,6 @@
                 </p>
             </div>
         );
-
-        // --- DEAL EXPLORER PLAYGROUND ---
 
         // --- COMPANY VIEW ---
 
@@ -1372,7 +1357,7 @@
                         }}
                     >
                         <label className="block text-sm font-bold text-[#A7EF00] uppercase tracking-widest mb-4">
-                            Your Maximum Budget
+                            YOUR TRUE MAXIMUM (CMax)
                         </label>
                         <p className="text-xs text-[#CBD5E1] mb-6 opacity-70">
                             This is your absolute ceiling. The candidate won't see this number until after they submit theirs.
@@ -1391,7 +1376,6 @@
                                 {budget.toLocaleString()}
                             </span>
                         </div>
-                        <BandIndicator value={budget} />
 
                         <div className="mb-10 px-4 mt-8">
                             <Slider
@@ -1403,14 +1387,6 @@
                                 onDragStart={() => {}}
                                 onDragEnd={() => {}}
                             />
-                            <div className="flex justify-between mt-3 text-xs text-[#CBD5E1] font-semibold uppercase tracking-wider" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", letterSpacing: '0.1em' }}>
-                                <WhisperTooltip text="Lower risk, conservative approach">
-                                    <span>Conservative</span>
-                                </WhisperTooltip>
-                                <WhisperTooltip text="Higher risk, maximum budget">
-                                    <span>Aggressive</span>
-                                </WhisperTooltip>
-                            </div>
                         </div>
 
                         <div className="space-y-8">
@@ -1457,7 +1433,7 @@
                                 <WhisperTooltip text="This locks the terms forever.">
                                     <Icons.Lock className="w-6 h-6 lock-charge-up" />
                                 </WhisperTooltip>
-                                {loading ? 'Creating Link...' : 'Create Offer Link'}
+                                {loading ? 'Creating Link...' : '🔒 Commit Max & Generate Link'}
                             </Button>
 
                             <p className="text-center text-xs text-[#CBD5E1] opacity-70">
@@ -1747,7 +1723,7 @@
                                 The Closing Table
                             </h1>
                             <p className="hero-subtitle text-lg md:text-xl max-w-2xl mx-auto mb-6">
-                                Enter your minimum salary. If it fits within the company's budget, we split the difference 50/50.
+                                The double-blind mechanism secures the fairest cost by splitting the surplus 50/50. Commit your true minimum to secure your highest possible offer.
                             </p>
                             <p className="text-sm text-[#CBD5E1] max-w-2xl mx-auto leading-relaxed mb-8 opacity-80">
                                 No negotiation. No back-and-forth. Just one number, one result.
@@ -1757,7 +1733,7 @@
                         <GlassCard className="mb-8">
                             <div className="text-center">
                                 <Button onClick={() => setStep('input')} className="w-full md:w-auto">
-                                    Get Started{' '}
+                                    Secure Your Fair Offer Now{' '}
                                     <Icons.ArrowRight className="w-5 h-5" />
                                 </Button>
                             </div>
@@ -1800,7 +1776,7 @@
 
                             <div className="text-left mb-8">
                                 <label className="block text-sm font-bold text-[#A7EF00] uppercase tracking-widest mb-2">
-                                    Your Minimum Salary
+                                    YOUR TRUE MINIMUM (CMin)
                                 </label>
                                 <p className="text-xs text-[#CBD5E1] mb-6 opacity-70">
                                     The lowest amount you'd accept. The company won't see this until after you submit.
@@ -1867,7 +1843,7 @@
                                     disabled={!email} 
                                     className="w-full"
                                 >
-                                    Submit & See Result
+                                    🔒 Commit Min & Reveal Deal
                                 </Button>
                             </div>
                         </GlassCard>

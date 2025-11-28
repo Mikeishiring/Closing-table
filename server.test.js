@@ -95,3 +95,4 @@ describe('calculateDeal Function - Unit Tests', () => {
 // We'll create a separate test file for integration tests
 // For now, these are the core unit tests
 
+
