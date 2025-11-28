@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const path = require('path');
 
 const app = express();
 
@@ -50,6 +51,11 @@ async function sendResultEmail(email, revealLink, final) {
     `[email stub] Would send email to ${email} with final ${final} and link: ${revealLink} (frontend: ${frontendBase})`
   );
 }
+
+// --- SERVE FRONTEND ---
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
+});
 
 // --- HEALTHCHECK ---
 app.get('/health', (req, res) => {

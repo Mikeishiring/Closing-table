@@ -398,10 +398,10 @@
 
         @keyframes pulse-subtle {
             0%, 100% {
-                opacity: 0.6;
+                opacity: 0.5;
             }
             50% {
-                opacity: 0.9;
+                opacity: 0.7;
             }
         }
 
@@ -412,14 +412,25 @@
             padding: 20px;
             position: relative;
             overflow: hidden;
+            transition: border-color 0.3s ease-out, background-color 0.3s ease-out;
+        }
+
+        .mechanism-highlight-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            background: rgba(45, 20, 85, 0.6);
         }
 
         .mechanism-highlight-card::before {
             content: "";
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, rgba(167, 239, 0, 0.05) 0%, transparent 50%);
+            background: linear-gradient(135deg, rgba(167, 239, 0, 0.03) 0%, transparent 50%);
             pointer-events: none;
+            transition: opacity 0.3s ease-out;
+        }
+
+        .mechanism-highlight-card:hover::before {
+            opacity: 0.8;
         }
 
         .surplus-bar {
@@ -427,7 +438,8 @@
             background: #A7EF00;
             border-radius: 4px;
             position: relative;
-            animation: surplus-split 3s ease-in-out infinite;
+            animation: surplus-split 6s ease-in-out infinite;
+            opacity: 0.8;
         }
 
         .bridge-bar {
@@ -435,7 +447,8 @@
             background: #FACC15;
             border-radius: 4px;
             width: 90%;
-            animation: bridge-approach 3s ease-in-out infinite;
+            animation: bridge-approach 6s ease-in-out infinite;
+            opacity: 0.8;
         }
 
         .bridge-limit {
@@ -451,7 +464,7 @@
         .no-deal-container {
             display: flex;
             gap: 0;
-            animation: no-deal-separate 3s ease-in-out infinite;
+            animation: no-deal-separate 6s ease-in-out infinite;
         }
 
         .no-deal-bar {
@@ -491,7 +504,7 @@
 
         .deal-bar-overlap {
             background: linear-gradient(to right, #A7EF00, #C8FF4D);
-            animation: pulse-subtle 2s ease-in-out infinite;
+            animation: pulse-subtle 4s ease-in-out infinite;
         }
 
         .deal-bar-gap {
@@ -577,6 +590,68 @@
 
         .card-sink {
             animation: card-sink 0.2s ease-out;
+        }
+
+        /* --- VISUAL METAPHOR BAR (Hero Animation) --- */
+        @keyframes marker-slide-left {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(15px); }
+        }
+
+        @keyframes marker-slide-right {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(-15px); }
+        }
+
+        @keyframes overlap-highlight {
+            0%, 100% { opacity: 0.3; }
+            25%, 75% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .visual-metaphor-bar {
+            height: 8px;
+            background: linear-gradient(to right, #A7EF00 50%, #FCD34D 50%);
+            border-radius: 9999px;
+            position: relative;
+            overflow: visible;
+        }
+
+        .visual-metaphor-marker {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid;
+        }
+
+        .visual-metaphor-marker.left {
+            left: 20%;
+            background: #A7EF00;
+            border-color: #A7EF00;
+            box-shadow: 0 0 8px rgba(167, 239, 0, 0.5);
+            animation: marker-slide-left 4s ease-in-out infinite;
+        }
+
+        .visual-metaphor-marker.right {
+            right: 20%;
+            background: #FCD34D;
+            border-color: #FCD34D;
+            box-shadow: 0 0 8px rgba(252, 211, 77, 0.5);
+            animation: marker-slide-right 4s ease-in-out infinite;
+        }
+
+        .visual-metaphor-overlap {
+            position: absolute;
+            left: 45%;
+            width: 10%;
+            height: 100%;
+            background: linear-gradient(to right, #A7EF00, #FCD34D);
+            border-radius: 9999px;
+            opacity: 0.3;
+            animation: overlap-highlight 4s ease-in-out infinite;
         }
 
         /* --- TOOLTIP STYLES (Pristine Theme) --- */
@@ -1412,57 +1487,32 @@
 
             return (
                 <div className="max-w-2xl mx-auto animate-enter">
-                    <div className="text-left mb-12">
+                    {/* Hero Section */}
+                    <div className="text-left mb-8">
                         <h1 className="hero-heading text-4xl md:text-6xl font-bold mb-6" style={{ textShadow: '0 0 20px rgba(252, 211, 77, 0.3)' }}>
                             <span style={{ fontSize: '1.1em' }}>The</span>{' '}
                             <span className="gold-text-gradient" style={{ fontWeight: '800', fontSize: '1.15em' }}>Closing</span>{' '}
                             <span style={{ fontSize: '1.1em' }}>Table</span>
                         </h1>
-                        <p className="hero-subtitle mt-2 text-left">
-                            A fair, private way to close the deal. Set your walk-away number.
-                            If they fit within it, the mechanism closes the gap for you.
+                        <p className="hero-subtitle mt-2 text-left leading-relaxed">
+                            One decision. Zero negotiation.
+                            <br />
+                            A fair, private mechanism for closing salary offers in a single step.
                         </p>
                     </div>
 
-                    {/* Mechanism Highlights Strip */}
-                    <section className="mb-8">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="mechanism-highlight-card">
-                                <div className="h-16 mb-3 relative flex items-center">
-                                    <div className="w-full h-2 bg-[#1D0D32] rounded-full relative">
-                                        <div className="surplus-bar"></div>
-                                    </div>
-                                </div>
-                                <p className="text-xs font-semibold text-[#A7EF00] uppercase tracking-wider">Fair Split</p>
-                                <p className="text-[10px] text-[#CBD5E1] mt-1 opacity-70">Surplus divided 50/50</p>
+                    {/* Visual Metaphor Bar */}
+                    <div className="mb-10 flex justify-center">
+                        <div className="w-full max-w-md relative">
+                            <div className="visual-metaphor-bar">
+                                <div className="visual-metaphor-overlap"></div>
                             </div>
-
-                            <div className="mechanism-highlight-card">
-                                <div className="h-16 mb-3 relative flex items-center">
-                                    <div className="w-full h-2 bg-[#1D0D32] rounded-full relative">
-                                        <div className="bridge-bar"></div>
-                                        <div className="bridge-limit"></div>
-                                    </div>
-                                </div>
-                                <p className="text-xs font-semibold text-[#FACC15] uppercase tracking-wider">Bridge Zone (10%)</p>
-                                <p className="text-[10px] text-[#CBD5E1] mt-1 opacity-70">Close but needs human touch</p>
-                            </div>
-
-                            <div className="mechanism-highlight-card">
-                                <div className="h-16 mb-3 relative flex items-center justify-center">
-                                    <div className="no-deal-container">
-                                        <div className="no-deal-bar left"></div>
-                                        <div className="no-deal-bar right"></div>
-                                    </div>
-                                </div>
-                                <p className="text-xs font-semibold text-[#EF4444] uppercase tracking-wider">No Deal Case</p>
-                                <p className="text-[10px] text-[#CBD5E1] mt-1 opacity-70">Gap too large to bridge</p>
-                            </div>
+                            <div className="visual-metaphor-marker left"></div>
+                            <div className="visual-metaphor-marker right"></div>
                         </div>
-                    </section>
+                    </div>
 
-                    <DealExplorer />
-
+                    {/* Company Input Card - Main Feature */}
                     <GlassCard 
                         className={cardSink ? 'card-sink' : ''}
                         onInteraction={(active) => {
@@ -1565,6 +1615,53 @@
                             </p>
                         </div>
                     </GlassCard>
+
+                    {/* Deal Explorer - Collapsed by default */}
+                    <div className="mt-10">
+                        <DealExplorer />
+                    </div>
+
+                    {/* Mechanism Highlights Strip */}
+                    <section className="mt-10 mb-8">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="mechanism-highlight-card">
+                                <div className="h-16 mb-3 relative flex items-center">
+                                    <div className="w-full h-2 bg-[#1D0D32] rounded-full relative">
+                                        <div className="surplus-bar"></div>
+                                    </div>
+                                </div>
+                                <p className="text-xs font-semibold text-[#A7EF00] uppercase tracking-wider">Fair Split</p>
+                                <p className="text-[10px] text-[#CBD5E1] mt-1 opacity-70">Surplus divided 50/50</p>
+                            </div>
+
+                            <div className="mechanism-highlight-card">
+                                <div className="h-16 mb-3 relative flex items-center">
+                                    <div className="w-full h-2 bg-[#1D0D32] rounded-full relative">
+                                        <div className="bridge-bar"></div>
+                                        <div className="bridge-limit"></div>
+                                    </div>
+                                </div>
+                                <p className="text-xs font-semibold text-[#FACC15] uppercase tracking-wider">Bridge Zone (10%)</p>
+                                <p className="text-[10px] text-[#CBD5E1] mt-1 opacity-70">Close but needs human touch</p>
+                            </div>
+
+                            <div className="mechanism-highlight-card">
+                                <div className="h-16 mb-3 relative flex items-center justify-center">
+                                    <div className="no-deal-container">
+                                        <div className="no-deal-bar left"></div>
+                                        <div className="no-deal-bar right"></div>
+                                    </div>
+                                </div>
+                                <p className="text-xs font-semibold text-[#EF4444] uppercase tracking-wider">No Deal Case</p>
+                                <p className="text-[10px] text-[#CBD5E1] mt-1 opacity-70">Gap too large to bridge</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Mechanism Specification */}
+                    <div className="mt-10">
+                        <MechanismSpec />
+                    </div>
                 </div>
             );
         };
@@ -2466,7 +2563,6 @@
                         ) : (
                             <>
                                 <CompanyView />
-                                <MechanismSpec />
                                 <Scenarios />
                             </>
                         )}
