@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="A fair, private way to close salary negotiations. Double-blind mechanism that splits the difference when ranges overlap.">
-    <meta name="theme-color" content="#0F0518">
+    <meta name="theme-color" content="#0F0F0F">
     <meta name="robots" content="noindex, nofollow">
     
     <!-- Security Headers -->
@@ -33,7 +33,7 @@
     <script src="https://cdn.tailwindcss.com" defer></script>
     <style>
         body {
-            background: radial-gradient(circle at center, #2e1846 0%, #1e102c 100%);
+            background: linear-gradient(180deg, #1A1A1A 0%, #0F0F0F 100%);
             color: #ffffff;
             font-family: 'Inter', sans-serif;
         }
@@ -100,7 +100,7 @@
         }
 
         .glass-panel {
-            background: rgba(30, 10, 60, 0.55);
+            background: rgba(26, 26, 26, 0.55);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(245, 192, 74, 0.25);
             box-shadow: 
@@ -279,7 +279,7 @@
             transform: translateY(-4px);
             box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75);
             border-color: rgba(148, 163, 184, 0.55);
-            background-color: rgba(30, 10, 60, 0.78);
+            background-color: rgba(26, 26, 26, 0.78);
         }
 
         /* --- JACKPOT NUMBER ANIMATION & SCALING --- */
@@ -554,7 +554,7 @@
             position: relative;
             width: 100%;
             height: 12px;
-            background: #1D0D32;
+            background: #0F0F0F;
             border-radius: 6px;
             overflow: visible;
         }
@@ -648,7 +648,7 @@
             position: relative;
             width: 100%;
             height: 16px;
-            background: #1D0D32;
+            background: #0F0F0F;
             border-radius: 8px;
             overflow: visible;
             margin: 24px 0;
@@ -902,8 +902,8 @@
 
         // --- CONFIGURATION (visual only) ---
         const COLORS = {
-            BG: '#0F0518',
-            CARD: '#2D1455',
+            BG: '#0F0F0F',
+            CARD: '#1A1A1A',
             ACCENT: '#A7EF00',
             ACCENT_SEC: '#A7EF00',
             GOLD: '#FCD34D',
@@ -1072,7 +1072,7 @@
 
             return (
                 <div className="relative w-full h-12 flex items-center group" onMouseUp={handleMouseUp} onTouchEnd={handleMouseUp}>
-                    <div className="absolute w-full h-3 bg-gradient-to-r from-[#1D0D32] via-[#2D1455] to-[#3D1C65] rounded-full overflow-hidden" style={{ boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.4)' }}>
+                    <div className="absolute w-full h-3 bg-gradient-to-r from-[#0F0F0F] via-[#1A1A1A] to-[#2A2A2A] rounded-full overflow-hidden" style={{ boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.4)' }}>
                         <div
                             className="h-full bg-gradient-to-r from-yellow-300 to-amber-400"
                             style={{ width: `${percent}%` }}
@@ -1108,7 +1108,7 @@
                 "hover:-translate-y-0.5 active:translate-y-0 active:scale-95 " +
                 "disabled:opacity-50 disabled:cursor-not-allowed " +
                 "focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F5C04A]/80 " +
-                "focus-visible:ring-offset-2 focus-visible:ring-offset-[#0F0518]";
+                "focus-visible:ring-offset-2 focus-visible:ring-offset-[#0F0F0F]";
 
             const variants = {
                 primary: "bg-yellow-400 text-black font-semibold py-4 px-6 rounded-xl shadow-[0_0_20px_rgba(245,192,74,0.4)] hover:shadow-[0_0_30px_rgba(245,192,74,0.6)] transition-all",
@@ -1160,7 +1160,7 @@
             }, [onInteraction]);
 
             return (
-                <div ref={cardRef} className={`backdrop-blur-xl bg-[rgba(30,10,60,0.55)] border border-[rgba(245,192,74,0.25)] shadow-[0_0_20px_rgba(245,192,74,0.15)] rounded-2xl p-8 card-hover ${className}`}>
+                <div ref={cardRef} className={`backdrop-blur-xl bg-[rgba(26,26,26,0.55)] border border-[rgba(245,192,74,0.25)] shadow-[0_0_20px_rgba(245,192,74,0.15)] rounded-2xl p-8 card-hover ${className}`}>
                     {children}
                 </div>
             );
@@ -1198,9 +1198,9 @@
         };
 
         const SplitDiagram = () => (
-            <div className="my-8 p-6 bg-[#2e1846]/50 rounded-2xl border border-[#F5C04A]/20">
+            <div className="my-8 p-6 bg-[#1A1A1A]/50 rounded-2xl border border-[#F5C04A]/20">
                 <div className="relative h-16 w-full flex items-center">
-                    <div className="absolute w-full h-2 bg-[#2e1846] rounded-full"></div>
+                    <div className="absolute w-full h-2 bg-[#1A1A1A] rounded-full"></div>
                     <div className="absolute inset-0 rounded-full bg-yellow-400/40 oracle-glow"></div>
                     <div className="absolute left-1/4 right-1/4 h-2 bg-[#F5C04A] rounded-full opacity-80"></div>
                     <div className="absolute left-1/4 top-[-16px] flex flex-col items-center">
@@ -1369,7 +1369,7 @@
                                     {link}
                                 </code>
                                 <div className="url-checkmark">
-                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0F0518" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0F0F0F" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                                         <polyline points="20 6 9 17 4 12"></polyline>
                                     </svg>
                                 </div>
@@ -1423,7 +1423,7 @@
                             <strong>CMin</strong>, and if the numbers overlap, the surplus is split 50/50 for the fairest possible final offer.
                         </p>
 
-                        <div className="max-w-3xl mx-auto mt-8 mb-10 p-6 rounded-2xl bg-[rgba(30,10,60,0.55)] border border-[rgba(245,192,74,0.25)] shadow-[0_0_25px_rgba(245,192,74,0.15)] text-gray-200">
+                        <div className="max-w-3xl mx-auto mt-8 mb-10 p-6 rounded-2xl bg-[rgba(26,26,26,0.55)] border border-[rgba(245,192,74,0.25)] shadow-[0_0_25px_rgba(245,192,74,0.15)] text-gray-200">
                             <h3 className="text-yellow-400 font-bold text-lg mb-2">What This Tool Does</h3>
                             <p className="text-gray-300 leading-relaxed text-sm">
                                 This mechanism privately compares your <strong>CMax</strong> (true maximum budget) with the candidate's
@@ -2070,7 +2070,7 @@
                                     <GlassCard className="border-[#A7EF00]/30 bg-gradient-to-br from-[#A7EF00]/10 to-transparent">
                                         <div className="text-center py-6">
                                             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#A7EF00] mb-4">
-                                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0F0518" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0F0F0F" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                                                     <polyline points="20 6 9 17 4 12"></polyline>
                                                 </svg>
                                             </div>
