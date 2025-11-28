@@ -1116,28 +1116,22 @@
 
         const SplitDiagram = () => (
             <div className="my-8 p-6 bg-black/30 rounded-2xl border border-white/10">
-                <h3 className="text-[#A7EF00] font-bold mb-4 text-sm tracking-widest uppercase">
-                    The Fair Split Logic
-                </h3>
                 <div className="relative h-16 w-full flex items-center">
                     <div className="absolute w-full h-2 bg-gray-700 rounded-full"></div>
-                    <div className="absolute left-1/4 right-1/4 h-2 bg-[#A7EF00] rounded-full opacity-50 animate-pulse"></div>
-                    <div className="absolute left-1/4 top-[-25px] flex flex-col items-center">
+                    <div className="absolute left-1/4 right-1/4 h-2 bg-[#A7EF00] rounded-full opacity-80 animate-pulse"></div>
+                    <div className="absolute left-1/4 top-[-16px] flex flex-col items-center">
                         <span className="text-xs font-bold text-[#F1F5F9] mb-1">You</span>
                         <div className="w-4 h-4 bg-[#A7EF00] rounded-full border-4 border-[#0F0518]"></div>
                     </div>
                     <div className="absolute left-1/2 top-4 flex flex-col items-center">
                         <div className="h-6 w-px bg-white/20 mb-1"></div>
-                        <span className="text-xs font-bold text-[#FACC15]">Split Surplus</span>
+                        <span className="text-xs font-bold text-[#A7EF00]">Split Surplus</span>
                     </div>
-                    <div className="absolute right-1/4 top-[-25px] flex flex-col items-center">
+                    <div className="absolute right-1/4 top-[-16px] flex flex-col items-center">
                         <span className="text-xs font-bold text-[#CBD5E1] mb-1">Company</span>
                         <div className="w-4 h-4 bg-[#CBD5E1] rounded-full border-4 border-[#0F0518]"></div>
                     </div>
                 </div>
-                <p className="text-[#CBD5E1] text-sm mt-4 text-center">
-                    We calculate the surplus overlap and split it 50/50. The final number is rounded to protect privacy.
-                </p>
             </div>
         );
 
@@ -1340,7 +1334,7 @@
                             <span style={{ fontSize: '1.1em' }}>Table</span>
                         </h1>
                         <p className="hero-subtitle mt-2 text-left leading-relaxed text-lg">
-                            Set your maximum budget. If the candidate's minimum fits within it, we split the difference 50/50.
+                            The single-shot mechanism for securing top talent. Set your CMax (True Maximum Budget). If the candidate's CMin fits, the resulting surplus is split 50/50.
                         </p>
                     </div>
 
@@ -1357,7 +1351,7 @@
                         }}
                     >
                         <label className="block text-sm font-bold text-[#A7EF00] uppercase tracking-widest mb-4">
-                            YOUR TRUE MAXIMUM (CMax)
+                            TRUE MAXIMUM (CMax) - Private Commitment
                         </label>
                         <p className="text-xs text-[#CBD5E1] mb-6 opacity-70">
                             This is your absolute ceiling. The candidate won't see this number until after they submit theirs.
@@ -1433,11 +1427,11 @@
                                 <WhisperTooltip text="This locks the terms forever.">
                                     <Icons.Lock className="w-6 h-6 lock-charge-up" />
                                 </WhisperTooltip>
-                                {loading ? 'Creating Link...' : 'Commit Max & Generate Link'}
+                                {loading ? 'Creating Link...' : 'Commit Maximum & Generate Link'}
                             </Button>
 
                             <p className="text-center text-xs text-[#CBD5E1] opacity-70">
-                                Link expires in 24 hours. One use only.
+                                The candidate will never see your CMax. This mechanism protects your budget from negotiation gamesmanship. Link expires in 24 hours. One use only.
                             </p>
                         </div>
                     </GlassCard>
@@ -1721,99 +1715,72 @@
                         {/* Value Proposition */}
                         <div className="text-center mb-12">
                             <h1 className="hero-heading text-5xl md:text-7xl font-bold mb-4 text-[#F1F5F9]">
-                                The Closing Table
+                                Fair, Fast, Private Negotiation
                             </h1>
                             <p className="hero-subtitle text-lg md:text-xl max-w-2xl mx-auto mb-6 font-semibold">
-                                Enter Your True Minimum. Secure Your Highest Possible Offer.
+                                Your true salary is secured here. Commit your minimum, and if it aligns with the company's maximum, the final, fairest offer is instantly secured. Zero Haggling. Zero Regrets.
                             </p>
-                            <div className="max-w-2xl mx-auto mb-8">
-                                <p className="text-base text-[#CBD5E1] leading-relaxed">
-                                    <strong className="text-[#F1F5F9]">The Closing Table is a single-shot, double-blind mechanism.</strong> You commit your true minimum (CMin), and the company has already committed its maximum (CMax). If your numbers overlap, the system automatically splits the surplus 50/50, guaranteeing you the fairest possible salary.
-                                </p>
-                            </div>
                         </div>
 
-                        {/* How It Works Section */}
+                        {/* How It Works Section with Diagram */}
                         <GlassCard className="mb-8 border-[#A7EF00]/20">
-                            <h3 className="text-xl font-bold text-[#F1F5F9] mb-6 text-center">
-                                How It Works
-                            </h3>
-                            <ul className="space-y-4 max-w-2xl mx-auto">
-                                <li className="flex items-start gap-4">
-                                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#A7EF00]/20 flex items-center justify-center mt-1">
-                                        <span className="text-[#A7EF00] font-bold text-lg">1</span>
-                                    </div>
-                                    <div className="flex-1">
-                                        <p className="text-lg text-white leading-relaxed">
-                                            You enter your true minimum salary (CMin) that you would accept.
+                            <div className="grid md:grid-cols-2 gap-8">
+                                {/* Left Column: How It Works List */}
+                                <div>
+                                    <h3 className="text-xl font-bold text-[#F1F5F9] mb-6">
+                                        How It Works
+                                    </h3>
+                                    <ul className="space-y-4">
+                                        <li className="flex items-start gap-4">
+                                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#A7EF00]/20 flex items-center justify-center mt-1">
+                                                <span className="text-[#A7EF00] font-bold text-lg">1</span>
+                                            </div>
+                                            <div className="flex-1">
+                                                <p className="text-lg text-white leading-relaxed">
+                                                    The Company commits their CMax (Maximum Budget), sealed in the system.
+                                                </p>
+                                            </div>
+                                        </li>
+                                        <li className="flex items-start gap-4">
+                                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#A7EF00]/20 flex items-center justify-center mt-1">
+                                                <span className="text-[#A7EF00] font-bold text-lg">2</span>
+                                            </div>
+                                            <div className="flex-1">
+                                                <p className="text-lg text-white leading-relaxed">
+                                                    You commit your CMin (Minimum Acceptable Salary), secured in the system.
+                                                </p>
+                                            </div>
+                                        </li>
+                                        <li className="flex items-start gap-4">
+                                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#A7EF00]/20 flex items-center justify-center mt-1">
+                                                <span className="text-[#A7EF00] font-bold text-lg">3</span>
+                                            </div>
+                                            <div className="flex-1">
+                                                <p className="text-lg text-white leading-relaxed">
+                                                    If ranges overlap (CMin ≤ CMax), the Surplus is split 50/50 for a binding offer.
+                                                </p>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                
+                                {/* Right Column: SplitDiagram and Math Explanation */}
+                                <div>
+                                    <SplitDiagram />
+                                    <div className="mt-6 text-sm text-[#CBD5E1] bg-black/40 p-4 rounded-xl border border-white/10">
+                                        <p className="font-semibold text-[#A7EF00] mb-2">The Algorithm for Fairness:</p>
+                                        <p className="mb-2">If CMin ≤ CMax, then:</p>
+                                        <p className="mb-2 font-mono text-[#F1F5F9]">
+                                            Final Offer = CMin + (CMax - CMin) / 2
                                         </p>
-                                    </div>
-                                </li>
-                                <li className="flex items-start gap-4">
-                                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#A7EF00]/20 flex items-center justify-center mt-1">
-                                        <span className="text-[#A7EF00] font-bold text-lg">2</span>
-                                    </div>
-                                    <div className="flex-1">
-                                        <p className="text-lg text-white leading-relaxed">
-                                            The company has already committed their maximum budget (CMax) privately.
+                                        <p className="mt-2 text-xs text-[#CBD5E1] opacity-70">
+                                            *Final Offer is rounded to the nearest $1,000 for privacy.
                                         </p>
-                                    </div>
-                                </li>
-                                <li className="flex items-start gap-4">
-                                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#A7EF00]/20 flex items-center justify-center mt-1">
-                                        <span className="text-[#A7EF00] font-bold text-lg">3</span>
-                                    </div>
-                                    <div className="flex-1">
-                                        <p className="text-lg text-white leading-relaxed">
-                                            If your numbers overlap, the system splits the surplus 50/50 automatically.
-                                        </p>
-                                    </div>
-                                </li>
-                            </ul>
-                        </GlassCard>
-
-                        {/* Mechanism Visualization */}
-                        <GlassCard className="mb-8 border-[#A7EF00]/20">
-                            <h3 className="text-xl font-bold text-[#F1F5F9] mb-6 text-center">
-                                How the Fair Deal is Calculated
-                            </h3>
-                            <div className="relative">
-                                {/* Visual Bar */}
-                                <div className="relative w-full h-16 bg-[#1D0D32] rounded-lg overflow-hidden mb-4" style={{ border: '1px solid rgba(255, 255, 255, 0.1)' }}>
-                                    {/* CMin Section */}
-                                    <div className="absolute left-0 top-0 bottom-0 bg-[#A7EF00]/30 flex items-center justify-center" style={{ width: '35%' }}>
-                                        <span className="text-xs font-bold text-[#A7EF00] px-2">CMin</span>
-                                    </div>
-                                    {/* Surplus Section (Overlap) */}
-                                    <div className="absolute left-[35%] top-0 bottom-0 bg-gradient-to-r from-[#A7EF00]/50 via-[#FCD34D]/50 to-[#FCD34D]/50 flex items-center justify-center" style={{ width: '30%' }}>
-                                        <span className="text-xs font-bold text-[#F1F5F9] px-2">Surplus</span>
-                                    </div>
-                                    {/* CMax Section */}
-                                    <div className="absolute right-0 top-0 bottom-0 bg-[#FCD34D]/30 flex items-center justify-center" style={{ width: '35%' }}>
-                                        <span className="text-xs font-bold text-[#FCD34D] px-2">CMax</span>
-                                    </div>
-                                    {/* Split Point Indicator */}
-                                    <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-[#F1F5F9] transform -translate-x-1/2" style={{ boxShadow: '0 0 8px rgba(241, 245, 249, 0.6)' }}>
-                                        <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs font-bold text-[#F1F5F9] whitespace-nowrap">
-                                            Final Offer
-                                        </div>
-                                        <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-[#CBD5E1] whitespace-nowrap">
-                                            50/50 Split
-                                        </div>
                                     </div>
                                 </div>
-                                {/* Arrow pointing to split */}
-                                <div className="flex justify-center mb-4">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#A7EF00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <line x1="12" y1="2" x2="12" y2="16"></line>
-                                        <polyline points="8 12 12 16 16 12"></polyline>
-                                    </svg>
-                                </div>
-                                <p className="text-sm text-[#CBD5E1] text-center max-w-xl mx-auto">
-                                    When CMin and CMax overlap, the surplus (the difference) is split equally. Both sides get exactly half of the surplus, ensuring fairness.
-                                </p>
                             </div>
                         </GlassCard>
+
 
                         {/* Security & Action Block */}
                         <GlassCard className="mb-8 border-[#A7EF00]/20">
