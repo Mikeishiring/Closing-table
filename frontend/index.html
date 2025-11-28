@@ -1412,32 +1412,25 @@
 
             return (
                 <div className="max-w-2xl mx-auto animate-enter">
-                    {/* Hero Section */}
-                    <div className="text-left mb-10">
+                    {/* Hero / Intro zone */}
+                    <div className="text-center mb-10">
                         <div className="relative inline-block mb-4">
                             <div className="absolute inset-0 blur-3xl opacity-20 bg-yellow-300 rounded-full"></div>
                             <h1 className="relative text-6xl font-extrabold text-yellow-400 tracking-tight drop-shadow-[0_0_10px_rgba(245,192,74,0.4)]">
                                 The Closing Table
                             </h1>
                         </div>
-                        <p className="text-xl text-gray-200/80 mt-4 leading-relaxed max-w-3xl mx-auto">
-                            A single-shot, private mechanism for closing offers. Set your <strong>CMax</strong>, the candidate sets their
-                            <strong>CMin</strong>, and if the numbers overlap, the surplus is split 50/50 for the fairest possible final offer.
+                        <p className="text-xl text-gray-200/80 mt-4 leading-relaxed mb-4">
+                            A single-shot, private way to close compensation offers without negotiation or anchoring.
                         </p>
-
-                        <div className="max-w-3xl mx-auto mt-8 mb-10 p-6 rounded-2xl bg-[rgba(26,26,26,0.55)] border border-[rgba(245,192,74,0.25)] shadow-[0_0_25px_rgba(245,192,74,0.15)] text-gray-200">
-                            <h3 className="text-yellow-400 font-bold text-lg mb-2">What This Tool Does</h3>
-                            <p className="text-gray-300 leading-relaxed text-sm">
-                                This mechanism privately compares your <strong>CMax</strong> (true maximum budget) with the candidate's
-                                <strong> CMin</strong> (minimum acceptable salary). If the numbers overlap, the surplus is split 50/50 to generate the
-                                fairest possible binding offer — instantly, without negotiation or anchoring tactics.
-                            </p>
-                        </div>
+                        <p className="text-base text-gray-300 leading-relaxed max-w-2xl mx-auto">
+                            Enter your true maximum salary budget. The candidate enters their minimum acceptable salary. If the numbers overlap, the tool instantly calculates a fair final offer by splitting the surplus 50/50. Neither side ever sees the other's number.
+                        </p>
                     </div>
 
-                    {/* Company Input Card - Main Feature */}
+                    {/* Action zone - Main Feature Card */}
                     <GlassCard 
-                        className={`${cardSink ? 'card-sink' : ''} border-l-4 border-yellow-400/40`}
+                        className={`${cardSink ? 'card-sink' : ''} border-l-4 border-yellow-400/40 mb-8`}
                         onInteraction={(active) => {
                             const body = document.body;
                             if (active) {
@@ -1447,18 +1440,20 @@
                             }
                         }}
                     >
-                        <p className="text-yellow-300 font-semibold uppercase text-sm tracking-wider mb-4">
-                            TRUE MAXIMUM (CMax) — PRIVATE COMMITMENT
-                        </p>
-                        <p className="text-xs text-[#CBD5E1] mb-6 opacity-70">
-                            This is your absolute ceiling. The candidate won't see this number until after they submit theirs.
-                        </p>
+                        <div className="mb-6">
+                            <h2 className="text-base font-bold text-yellow-400 tracking-wide mb-2">
+                                Your True Maximum (CMax)
+                            </h2>
+                            <p className="text-sm text-gray-300">
+                                This is your absolute ceiling. It's private — the candidate never sees this number.
+                            </p>
+                        </div>
 
                         <div className="flex items-baseline justify-start mb-4">
-                            <span className="text-[#CBD5E1] text-4xl font-bold mr-2">$</span>
+                            <span className="text-gray-300 text-4xl font-bold mr-2">$</span>
                             <span
                                 className={
-                                    "text-7xl font-bold text-[#F1F5F9] tracking-tighter jackpot-number financial-number " +
+                                    "text-7xl font-bold text-white tracking-tighter jackpot-number financial-number " +
                                     (budgetAnimating ? "jackpot-active" : "") +
                                     (ledFlicker ? " led-flicker" : "")
                                 }
@@ -1480,32 +1475,25 @@
                             />
                         </div>
 
-                        <div className="space-y-8">
+                        <div className="space-y-6">
                             <div>
-                                <label className="block text-xs font-bold text-[#CBD5E1] uppercase tracking-widest mb-4">
-                                    Your Email
+                                <label className="block text-xs font-medium text-gray-300 mb-3">
+                                    Your email
                                 </label>
                                 <div className="relative">
-                                    <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#CBD5E1]" />
+                                    <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                                     <input
                                         type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        onFocus={(e) => {
-                                            const hint = e.target.nextElementSibling;
-                                            if (hint) {
-                                                hint.classList.add('hidden');
-                                                setTimeout(() => hint.classList.remove('hidden'), 300);
-                                            }
-                                        }}
                                         placeholder="you@company.com"
                                         aria-label="Company email address"
                                         autoComplete="email"
-                                        className="w-full frosted-input border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-[#F1F5F9] placeholder-[#CBD5E1] focus:outline-none focus:border-[#F5C04A] focus:ring-2 focus:ring-[#F5C04A]/30 hover:border-[#F5C04A]/50 transition-all duration-200"
+                                        className="w-full frosted-input border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white placeholder-gray-400 focus:outline-none focus:border-[#F5C04A] focus:ring-2 focus:ring-[#F5C04A]/30 hover:border-[#F5C04A]/50 transition-all duration-200"
                                     />
                                 </div>
-                                <p className="mt-3 text-xs text-[#CBD5E1] hush-hint">
-                                    We'll send you the final result here. No spam, no storage beyond 7 days.
+                                <p className="mt-2 text-xs text-gray-400">
+                                    We'll email you the final agreed salary once both sides submit. No spam; data auto-deletes after 7 days.
                                 </p>
                             </div>
 
@@ -1525,8 +1513,128 @@
                             </button>
 
                             <p className="text-center text-xs text-gray-300 opacity-80">
-                                The candidate will never see your CMax. This mechanism protects your budget from negotiation gamesmanship.
+                                The candidate will never see your CMax. This protects your budget from negotiation gamesmanship.
                             </p>
+                        </div>
+                    </GlassCard>
+
+                    {/* Assurance / Details zone */}
+                    <GlassCard className="border-[#F5C04A]/25">
+                        <h3 className="text-base font-bold text-yellow-400 tracking-wide mb-4">
+                            Why this is fair and safe
+                        </h3>
+
+                        <ul className="space-y-3 text-sm text-gray-200 mb-6">
+                            <li className="flex items-start gap-2">
+                                <span className="text-yellow-400 mt-1">•</span>
+                                <div>
+                                    <span className="font-semibold">No negotiation or anchoring.</span> Both sides commit their true numbers up front.
+                                </div>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-yellow-400 mt-1">•</span>
+                                <div>
+                                    <span className="font-semibold">Fair to both parties.</span> If your CMax and their CMin overlap, the surplus is split 50/50.
+                                </div>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-yellow-400 mt-1">•</span>
+                                <div>
+                                    <span className="font-semibold">Private by design.</span> Neither side ever sees the other's number; only the final result is shown.
+                                </div>
+                            </li>
+                        </ul>
+
+                        <div className="border-t border-gray-700 pt-4 space-y-3 text-sm">
+                            <details className="group">
+                                <summary className="cursor-pointer font-medium text-gray-200 hover:text-yellow-400 transition-colors list-none flex items-center gap-2">
+                                    <span className="text-yellow-400 group-open:rotate-90 transition-transform">▶</span>
+                                    How exactly is the final salary calculated?
+                                </summary>
+                                <p className="mt-2 text-sm text-gray-300 pl-5">
+                                    We compare your CMax to the candidate's CMin. If your CMax is at or above their minimum, we take the overlap and split it 50/50. The result is the binding final salary.
+                                </p>
+                            </details>
+
+                            <details className="group">
+                                <summary className="cursor-pointer font-medium text-gray-200 hover:text-yellow-400 transition-colors list-none flex items-center gap-2">
+                                    <span className="text-yellow-400 group-open:rotate-90 transition-transform">▶</span>
+                                    What if our numbers don't overlap?
+                                </summary>
+                                <p className="mt-2 text-sm text-gray-300 pl-5">
+                                    If your CMax is below the candidate's minimum, there is no overlap and the tool simply reports that there is no fair agreement. No one sees the other side's number.
+                                </p>
+                            </details>
+
+                            <details className="group">
+                                <summary className="cursor-pointer font-medium text-gray-200 hover:text-yellow-400 transition-colors list-none flex items-center gap-2">
+                                    <span className="text-yellow-400 group-open:rotate-90 transition-transform">▶</span>
+                                    What happens to our data?
+                                </summary>
+                                <p className="mt-2 text-sm text-gray-300 pl-5">
+                                    We only store the numbers long enough to run the comparison and send the final result. All data is automatically deleted after 7 days.
+                                </p>
+                            </details>
+                        </div>
+                    </GlassCard>
+
+                    {/* Assurance / Details zone */}
+                    <GlassCard className="border-[#F5C04A]/25">
+                        <h3 className="text-base font-bold text-yellow-400 tracking-wide mb-4">
+                            Why this is fair and safe
+                        </h3>
+
+                        <ul className="space-y-3 text-sm text-gray-200 mb-6">
+                            <li className="flex items-start gap-2">
+                                <span className="text-yellow-400 mt-1">•</span>
+                                <div>
+                                    <span className="font-semibold">No negotiation or anchoring.</span> Both sides commit their true numbers up front.
+                                </div>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-yellow-400 mt-1">•</span>
+                                <div>
+                                    <span className="font-semibold">Fair to both parties.</span> If your CMax and their CMin overlap, the surplus is split 50/50.
+                                </div>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-yellow-400 mt-1">•</span>
+                                <div>
+                                    <span className="font-semibold">Private by design.</span> Neither side ever sees the other's number; only the final result is shown.
+                                </div>
+                            </li>
+                        </ul>
+
+                        <div className="border-t border-gray-700 pt-4 space-y-3 text-sm">
+                            <details className="group">
+                                <summary className="cursor-pointer font-medium text-gray-200 hover:text-yellow-400 transition-colors list-none flex items-center gap-2">
+                                    <span className="text-yellow-400 group-open:rotate-90 transition-transform">▶</span>
+                                    How exactly is the final salary calculated?
+                                </summary>
+                                <p className="mt-2 text-sm text-gray-300 pl-5">
+                                    We compare your CMax to the candidate's CMin. If your CMax is at or above their minimum, we take the overlap and split it 50/50. The result is the binding final salary.
+                                </p>
+                            </details>
+
+                            <details className="group">
+                                <summary className="cursor-pointer font-medium text-gray-200 hover:text-yellow-400 transition-colors list-none flex items-center gap-2">
+                                    <span className="text-yellow-400 group-open:rotate-90 transition-transform">▶</span>
+                                    What if our numbers don't overlap?
+                                </summary>
+                                <p className="mt-2 text-sm text-gray-300 pl-5">
+                                    If your CMax is below the candidate's minimum, there is no overlap and the tool simply reports that there is no fair agreement. No one sees the other side's number.
+                                </p>
+                            </details>
+
+                            <details className="group">
+                                <summary className="cursor-pointer font-medium text-gray-200 hover:text-yellow-400 transition-colors list-none flex items-center gap-2">
+                                    <span className="text-yellow-400 group-open:rotate-90 transition-transform">▶</span>
+                                    What happens to our data?
+                                </summary>
+                                <p className="mt-2 text-sm text-gray-300 pl-5">
+                                    We only store the numbers long enough to run the comparison and send the final result. All data is automatically deleted after 7 days.
+                                </p>
+                            </details>
                         </div>
                     </GlassCard>
 
