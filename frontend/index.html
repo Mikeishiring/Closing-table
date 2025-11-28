@@ -366,6 +366,158 @@
             animation: candidate-lime-flash 0.8s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
+        /* --- MECHANISM HIGHLIGHTS STRIP ANIMATIONS --- */
+        @keyframes surplus-split {
+            0%, 100% {
+                width: 100%;
+                left: 0%;
+            }
+            50% {
+                width: 50%;
+                left: 25%;
+            }
+        }
+
+        @keyframes bridge-approach {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            50% {
+                transform: translateX(85%);
+            }
+        }
+
+        @keyframes no-deal-separate {
+            0%, 100% {
+                gap: 0px;
+            }
+            50% {
+                gap: 40px;
+            }
+        }
+
+        @keyframes pulse-subtle {
+            0%, 100% {
+                opacity: 0.6;
+            }
+            50% {
+                opacity: 0.9;
+            }
+        }
+
+        .mechanism-highlight-card {
+            background: #2D1455;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mechanism-highlight-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(167, 239, 0, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .surplus-bar {
+            height: 8px;
+            background: #A7EF00;
+            border-radius: 4px;
+            position: relative;
+            animation: surplus-split 3s ease-in-out infinite;
+        }
+
+        .bridge-bar {
+            height: 8px;
+            background: #FACC15;
+            border-radius: 4px;
+            width: 90%;
+            animation: bridge-approach 3s ease-in-out infinite;
+        }
+
+        .bridge-limit {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #A7EF00;
+            opacity: 0.5;
+        }
+
+        .no-deal-container {
+            display: flex;
+            gap: 0;
+            animation: no-deal-separate 3s ease-in-out infinite;
+        }
+
+        .no-deal-bar {
+            height: 8px;
+            width: 45%;
+            border-radius: 4px;
+        }
+
+        .no-deal-bar.left {
+            background: #A7EF00;
+        }
+
+        .no-deal-bar.right {
+            background: #EF4444;
+        }
+
+        /* --- DEAL EXPLORER ANIMATIONS --- */
+        @keyframes bar-grow {
+            from {
+                width: 0%;
+            }
+        }
+
+        .deal-bar {
+            transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            height: 12px;
+            border-radius: 6px;
+        }
+
+        .deal-bar-company {
+            background: linear-gradient(to right, #FCD34D, #F59E0B);
+        }
+
+        .deal-bar-candidate {
+            background: linear-gradient(to right, #A7EF00, #C8FF4D);
+        }
+
+        .deal-bar-overlap {
+            background: linear-gradient(to right, #A7EF00, #C8FF4D);
+            animation: pulse-subtle 2s ease-in-out infinite;
+        }
+
+        .deal-bar-gap {
+            background: #FACC15;
+        }
+
+        .deal-bar-no-deal {
+            background: #EF4444;
+        }
+
+        /* --- SCENARIO CAROUSEL ANIMATIONS --- */
+        @keyframes fade-in-slide {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .scenario-card-enter {
+            animation: fade-in-slide 0.4s ease-out;
+        }
+
         /* --- INTERACTIVE VIGNETTE --- */
         .vignette-active {
             animation: vignette-focus 0.4s ease-out forwards;
@@ -1124,7 +1276,7 @@
             return (
                 <div className="max-w-2xl mx-auto animate-enter">
                     <div className="text-left mb-12">
-                        <h1 className="hero-heading text-4xl md:text-6xl font-bold mb-6" style={{ textShadow: '0 0 20px rgba(192, 154, 77, 0.3)' }}>
+                        <h1 className="hero-heading text-4xl md:text-6xl font-bold mb-6" style={{ textShadow: '0 0 20px rgba(252, 211, 77, 0.3)' }}>
                             <span style={{ fontSize: '1.1em' }}>The</span>{' '}
                             <span className="gold-text-gradient" style={{ fontWeight: '800', fontSize: '1.15em' }}>Closing</span>{' '}
                             <span style={{ fontSize: '1.1em' }}>Table</span>
@@ -1134,6 +1286,45 @@
                             If they fit within it, the mechanism closes the gap for you.
                         </p>
                     </div>
+
+                    {/* Mechanism Highlights Strip */}
+                    <section className="mb-8">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="mechanism-highlight-card">
+                                <div className="h-16 mb-3 relative flex items-center">
+                                    <div className="w-full h-2 bg-[#1D0D32] rounded-full relative">
+                                        <div className="surplus-bar"></div>
+                                    </div>
+                                </div>
+                                <p className="text-xs font-semibold text-[#A7EF00] uppercase tracking-wider">Fair Split</p>
+                                <p className="text-[10px] text-[#CBD5E1] mt-1 opacity-70">Surplus divided 50/50</p>
+                            </div>
+
+                            <div className="mechanism-highlight-card">
+                                <div className="h-16 mb-3 relative flex items-center">
+                                    <div className="w-full h-2 bg-[#1D0D32] rounded-full relative">
+                                        <div className="bridge-bar"></div>
+                                        <div className="bridge-limit"></div>
+                                    </div>
+                                </div>
+                                <p className="text-xs font-semibold text-[#FACC15] uppercase tracking-wider">Bridge Zone (10%)</p>
+                                <p className="text-[10px] text-[#CBD5E1] mt-1 opacity-70">Close but needs human touch</p>
+                            </div>
+
+                            <div className="mechanism-highlight-card">
+                                <div className="h-16 mb-3 relative flex items-center justify-center">
+                                    <div className="no-deal-container">
+                                        <div className="no-deal-bar left"></div>
+                                        <div className="no-deal-bar right"></div>
+                                    </div>
+                                </div>
+                                <p className="text-xs font-semibold text-[#EF4444] uppercase tracking-wider">No Deal Case</p>
+                                <p className="text-[10px] text-[#CBD5E1] mt-1 opacity-70">Gap too large to bridge</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <DealExplorer />
 
                     <GlassCard 
                         className={cardSink ? 'card-sink' : ''}
@@ -1884,6 +2075,228 @@
             );
         };
 
+        // --- MECHANISM SPEC SECTION ---
+        const MechanismSpec = () => {
+            const [isOpen, setIsOpen] = useState(false);
+
+            if (!isOpen) {
+                return (
+                    <div className="text-center mt-12 mb-8">
+                        <Button
+                            variant="outline"
+                            onClick={() => setIsOpen(true)}
+                            className="text-sm"
+                        >
+                            Learn More About the Mechanism
+                        </Button>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="max-w-4xl mx-auto mt-12 mb-8">
+                    <GlassCard>
+                        <div className="flex justify-between items-center mb-8">
+                            <h2 className="text-2xl font-bold text-[#F1F5F9]">Mechanism Specification</h2>
+                            <button
+                                onClick={() => setIsOpen(false)}
+                                className="text-[#CBD5E1] hover:text-[#F1F5F9] text-sm"
+                            >
+                                Close
+                            </button>
+                        </div>
+
+                        <div className="space-y-8">
+                            <section id="inputs">
+                                <h3 className="text-lg font-bold text-[#A7EF00] mb-4">Inputs</h3>
+                                <div className="bg-[#1D0D32] rounded-lg p-4 mb-4">
+                                    <div className="flex gap-4 items-center">
+                                        <div className="flex-1">
+                                            <div className="h-3 bg-gradient-to-r from-[#FCD34D] to-[#F59E0B] rounded-full mb-2"></div>
+                                            <p className="text-xs text-[#CBD5E1]">Company Maximum</p>
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="h-3 bg-[#A7EF00] rounded-full mb-2"></div>
+                                            <p className="text-xs text-[#CBD5E1]">Candidate Minimum</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p className="text-sm text-[#CBD5E1]">Both parties submit their walk-away numbers privately. Neither sees the other's input until the mechanism computes the outcome.</p>
+                            </section>
+
+                            <section id="outcomes">
+                                <h3 className="text-lg font-bold text-[#A7EF00] mb-4">Outcomes</h3>
+                                <div className="space-y-3">
+                                    <div className="bg-[#1D0D32] rounded-lg p-4 border border-[#A7EF00]/20">
+                                        <p className="text-sm font-semibold text-[#A7EF00] mb-2">Success</p>
+                                        <p className="text-xs text-[#CBD5E1]">When ranges overlap, the mechanism splits the surplus 50/50 and rounds to the nearest $1,000.</p>
+                                    </div>
+                                    <div className="bg-[#1D0D32] rounded-lg p-4 border border-[#FACC15]/20">
+                                        <p className="text-sm font-semibold text-[#FACC15] mb-2">Bridge Zone (10%)</p>
+                                        <p className="text-xs text-[#CBD5E1]">If the gap is within 10% of the company's maximum, the mechanism flags it for human conversation.</p>
+                                    </div>
+                                    <div className="bg-[#1D0D32] rounded-lg p-4 border border-[#EF4444]/20">
+                                        <p className="text-sm font-semibold text-[#EF4444] mb-2">No Deal</p>
+                                        <p className="text-xs text-[#CBD5E1]">If the gap exceeds 10%, the mechanism cannot bridge it automatically.</p>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section id="rules">
+                                <h3 className="text-lg font-bold text-[#A7EF00] mb-4">Rules</h3>
+                                <div className="space-y-4">
+                                    <div>
+                                        <p className="text-sm font-semibold text-[#F1F5F9] mb-2">Surplus Calculation</p>
+                                        <p className="text-xs text-[#CBD5E1]">Surplus = Company Max - Candidate Min (when Min ≤ Max)</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-[#F1F5F9] mb-2">Split</p>
+                                        <p className="text-xs text-[#CBD5E1]">Final = Candidate Min + (Surplus / 2)</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-[#F1F5F9] mb-2">Rounding</p>
+                                        <p className="text-xs text-[#CBD5E1]">Rounded to nearest $1,000 for privacy and simplicity.</p>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section id="privacy">
+                                <h3 className="text-lg font-bold text-[#A7EF00] mb-4">Privacy Model</h3>
+                                <div className="bg-[#1D0D32] rounded-lg p-4 border border-[#2D1455]">
+                                    <ul className="space-y-2 text-sm text-[#CBD5E1]">
+                                        <li>• No permanent storage of negotiation data</li>
+                                        <li>• Offers expire after 24 hours</li>
+                                        <li>• Results expire after 7 days</li>
+                                        <li>• No negotiation thread or history</li>
+                                        <li>• Single-use mechanism (one shot per offer)</li>
+                                    </ul>
+                                </div>
+                            </section>
+
+                            <section id="edge-cases">
+                                <h3 className="text-lg font-bold text-[#A7EF00] mb-4">Edge Cases</h3>
+                                <div className="space-y-3 text-sm text-[#CBD5E1]">
+                                    <p><strong className="text-[#F1F5F9]">Exact match:</strong> If Min = Max, final equals that value (no surplus to split).</p>
+                                    <p><strong className="text-[#F1F5F9]">Very small surplus:</strong> Still split 50/50, then rounded.</p>
+                                    <p><strong className="text-[#F1F5F9]">Boundary at 10%:</strong> Gap exactly equal to 10% of max triggers bridge zone.</p>
+                                </div>
+                            </section>
+                        </div>
+                    </GlassCard>
+                </div>
+            );
+        };
+
+        // --- SCENARIO CAROUSEL ---
+        const Scenarios = () => {
+            const [currentIndex, setCurrentIndex] = useState(0);
+            const scenarios = [
+                {
+                    role: "Senior Software Engineer",
+                    companyMax: "$180,000 - $220,000",
+                    candidateMin: "$160,000 - $200,000",
+                    outcome: "Success",
+                    insight: "Typical overlap leads to fair split around $190k"
+                },
+                {
+                    role: "Product Manager",
+                    companyMax: "$140,000 - $170,000",
+                    candidateMin: "$150,000 - $180,000",
+                    outcome: "Bridge Zone",
+                    insight: "Close gap often resolved with brief conversation"
+                },
+                {
+                    role: "Design Lead",
+                    companyMax: "$120,000 - $150,000",
+                    candidateMin: "$160,000 - $190,000",
+                    outcome: "No Deal",
+                    insight: "Significant mismatch suggests role/level misalignment"
+                },
+                {
+                    role: "Data Scientist",
+                    companyMax: "$200,000 - $250,000",
+                    candidateMin: "$190,000 - $230,000",
+                    outcome: "Success",
+                    insight: "High-demand roles show consistent overlap patterns"
+                }
+            ];
+
+            const nextScenario = () => {
+                setCurrentIndex((prev) => (prev + 1) % scenarios.length);
+            };
+
+            const prevScenario = () => {
+                setCurrentIndex((prev) => (prev - 1 + scenarios.length) % scenarios.length);
+            };
+
+            const current = scenarios[currentIndex];
+
+            return (
+                <div className="max-w-4xl mx-auto mt-12 mb-8">
+                    <GlassCard>
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-bold text-[#F1F5F9]">Example Scenarios</h2>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={prevScenario}
+                                    className="px-3 py-1 text-sm text-[#CBD5E1] hover:text-[#F1F5F9] border border-white/10 rounded hover:border-[#A7EF00]/50 transition"
+                                >
+                                    ←
+                                </button>
+                                <button
+                                    onClick={nextScenario}
+                                    className="px-3 py-1 text-sm text-[#CBD5E1] hover:text-[#F1F5F9] border border-white/10 rounded hover:border-[#A7EF00]/50 transition"
+                                >
+                                    →
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="bg-[#1D0D32] rounded-lg p-6 border border-[#2D1455] transition-all duration-300 hover:scale-[1.02] hover:border-[#A7EF00]/30 hover:shadow-lg hover:shadow-[#A7EF00]/10 scenario-card-enter">
+                            <div className="mb-4">
+                                <h3 className="text-lg font-bold text-[#F1F5F9] mb-2">{current.role}</h3>
+                                <div className="grid grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                        <p className="text-[#CBD5E1] text-xs mb-1">Company Max Range</p>
+                                        <p className="text-[#FCD34D] font-mono">{current.companyMax}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[#CBD5E1] text-xs mb-1">Candidate Min Range</p>
+                                        <p className="text-[#A7EF00] font-mono">{current.candidateMin}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="mt-4 pt-4 border-t border-white/10">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                                        current.outcome === 'Success' ? 'bg-[#A7EF00]/20 text-[#A7EF00]' :
+                                        current.outcome === 'Bridge Zone' ? 'bg-[#FACC15]/20 text-[#FACC15]' :
+                                        'bg-[#EF4444]/20 text-[#EF4444]'
+                                    }`}>
+                                        {current.outcome}
+                                    </span>
+                                </div>
+                                <p className="text-sm text-[#CBD5E1]">{current.insight}</p>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-center gap-2 mt-4">
+                            {scenarios.map((_, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => setCurrentIndex(idx)}
+                                    className={`w-2 h-2 rounded-full transition ${
+                                        idx === currentIndex ? 'bg-[#A7EF00]' : 'bg-[#CBD5E1]/30'
+                                    }`}
+                                    aria-label={`Go to scenario ${idx + 1}`}
+                                />
+                            ))}
+                        </div>
+                    </GlassCard>
+                </div>
+            );
+        };
+
         // --- ROOT APP ---
 
         const App = () => {
@@ -1907,14 +2320,18 @@
             if (!isReady) return null;
 
             return (
-                <div className="app-shell min-h-screen w-full flex items-center justify-center p-4 md:p-8 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]">
-                    <div className="w-full max-w-6xl relative z-10">
+                <div className="app-shell min-h-screen w-full flex flex-col items-center p-4 md:p-8 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]">
+                    <div className="w-full max-w-6xl relative z-10 flex-1">
                         {resultId ? (
                             <ResultView resultId={resultId} />
                         ) : offerId ? (
                             <CandidateView offerId={offerId} />
                         ) : (
-                            <CompanyView />
+                            <>
+                                <CompanyView />
+                                <MechanismSpec />
+                                <Scenarios />
+                            </>
                         )}
                     </div>
                 </div>
