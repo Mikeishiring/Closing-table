@@ -33,10 +33,10 @@
     <script src="https://cdn.tailwindcss.com" defer></script>
     <style>
         body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #0F0518;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: radial-gradient(circle at center, #2e1846 0%, #1e102c 100%);
             background-attachment: fixed;
-            color: #F1F5F9;
+            color: #ffffff;
             min-height: 100vh;
             position: relative;
         }
@@ -45,23 +45,68 @@
             content: "";
             position: fixed;
             inset: 0;
-            background: radial-gradient(ellipse at center, #0F0518 0%, rgba(11, 5, 20, 0.95) 50%, rgba(8, 3, 15, 0.98) 100%);
+            background: radial-gradient(circle at center, #2e1846 0%, #1e102c 100%);
             pointer-events: none;
             z-index: 0;
         }
 
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) translateX(0); opacity: 0.05; }
+            50% { opacity: 0.12; }
+            100% { transform: translateY(-120vh) translateX(10vw); opacity: 0; }
+        }
+
+        .floating-symbol {
+            position: fixed;
+            font-size: 12px;
+            color: #F5C04A;
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: 1;
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes goldPulse {
+            0% { box-shadow: 0 0 0 0 rgba(245, 192, 74, 0.4); }
+            100% { box-shadow: 0 0 30px 20px rgba(245, 192, 74, 0); }
+        }
+
+        .gold-pulse {
+            animation: goldPulse 1.6s ease-out infinite;
+        }
+
+        @keyframes sliderGlow {
+            0% { filter: drop-shadow(0 0 4px rgba(245,192,74,0.4)); }
+            50% { filter: drop-shadow(0 0 10px rgba(245,192,74,0.8)); }
+            100% { filter: drop-shadow(0 0 4px rgba(245,192,74,0.4)); }
+        }
+
+        .slider-glow {
+            animation: sliderGlow 2.5s ease-in-out infinite;
+        }
+
+        @keyframes illuminate {
+            0% { opacity: 0.4; transform: scale(0.95); }
+            100% { opacity: 0.8; transform: scale(1.05); }
+        }
+
+        .oracle-glow {
+            animation: illuminate 1.8s ease-in-out infinite alternate;
+        }
+
         .glass-panel {
-            background: rgba(30, 10, 60, 0.7);
+            background: rgba(30, 10, 60, 0.55);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(245, 192, 74, 0.25);
             box-shadow: 
                 0 32px 80px rgba(0, 0, 0, 0.45),
                 0 16px 40px rgba(0, 0, 0, 0.35),
                 0 8px 20px rgba(0, 0, 0, 0.4),
-                0 0 0 1px rgba(255, 255, 255, 0.05) inset,
-                0 2px 8px rgba(0, 0, 0, 0.4) inset,
-                0 -2px 8px rgba(255, 255, 255, 0.02) inset;
+                0 0 20px rgba(245, 192, 74, 0.15);
+            border-radius: 1rem;
             position: relative;
+            padding: 2rem;
         }
 
         .glass-panel::before {
@@ -693,16 +738,20 @@
             position: relative;
             width: 32px;
             height: 32px;
-            background: linear-gradient(135deg, #FCD34D 0%, #F59E0B 30%, #FCD34D 60%, #D97706 100%);
-            border: 2px solid rgba(252, 211, 77, 0.4);
+            background: linear-gradient(135deg, #F5C04A 0%, #E6AC2E 30%, #F5C04A 60%, #D97706 100%);
+            border: 2px solid rgba(245, 192, 74, 0.4);
             border-radius: 50%;
             box-shadow: 
-                0 0 16px rgba(252, 211, 77, 0.6),
-                0 0 8px rgba(252, 211, 77, 0.3),
+                0 0 16px rgba(245, 192, 74, 0.6),
+                0 0 8px rgba(245, 192, 74, 0.3),
                 0 2px 8px rgba(0, 0, 0, 0.5),
                 inset 0 2px 4px rgba(255, 255, 255, 0.2),
                 inset 0 -2px 4px rgba(0, 0, 0, 0.4);
             transition: transform 0.1s linear;
+        }
+
+        .safe-knob.slider-glow {
+            animation: sliderGlow 2.5s ease-in-out infinite;
         }
 
         .safe-knob::before {
@@ -1038,7 +1087,7 @@
                         className="absolute w-full h-full opacity-0 cursor-pointer z-20"
                     />
                     <div
-                        className="safe-knob absolute z-10 pointer-events-none"
+                        className="safe-knob slider-glow absolute z-10 pointer-events-none"
                         style={{ 
                             left: `calc(${percent}% - 16px)`,
                             transform: `rotate(${rotation}deg)`
@@ -1058,10 +1107,10 @@
                 "focus-visible:ring-offset-2 focus-visible:ring-offset-[#0F0518]";
 
             const variants = {
-                primary: "bg-[#A7EF00] text-[#0F0518] hover:bg-[#C8FF4D] shadow-lg shadow-[#A7EF00]/30 hover:shadow-2xl hover:shadow-[#A7EF00]/40 btn-lime-sweep font-bold",
+                primary: "bg-yellow-400 text-black font-semibold shadow-[0_0_10px_rgba(245,192,74,0.4)] hover:shadow-[0_0_20px_rgba(245,192,74,0.6)] transition-all",
                 secondary: "bg-white/10 text-[#F1F5F9] border border-white/10 hover:bg-white/20 backdrop-blur-md",
-                outline: "border-2 border-[#CBD5E1] text-[#CBD5E1] hover:border-[#A7EF00] hover:text-[#A7EF00]",
-                gold: "bg-gradient-to-r from-[#FCD34D] to-[#F59E0B] text-[#0F0518] shadow-lg shadow-[#FCD34D]/25 hover:shadow-2xl hover:shadow-[#FCD34D]/45 font-bold",
+                outline: "border-2 border-[#CBD5E1] text-[#CBD5E1] hover:border-[#F5C04A] hover:text-[#F5C04A]",
+                gold: "bg-yellow-400 text-black font-semibold shadow-[0_0_10px_rgba(245,192,74,0.4)] hover:shadow-[0_0_20px_rgba(245,192,74,0.6)] transition-all",
                 danger: "bg-[#EF4444] text-[#F1F5F9] shadow-lg shadow-[#EF4444]/20 hover:bg-[#DC2626]",
                 ai: "bg-lime-900/40 text-lime-400 border border-lime-700 hover:bg-lime-900/60 shadow-md shadow-lime-900/50",
             };
@@ -1107,29 +1156,60 @@
             }, [onInteraction]);
 
             return (
-                <div ref={cardRef} className={`glass-panel card-hover rounded-3xl p-10 md:p-14 shadow-2xl ${className}`}>
+                <div ref={cardRef} className={`glass-panel card-hover rounded-2xl p-8 shadow-2xl ${className}`}>
                     {children}
                 </div>
             );
         };
 
 
+        const FloatingSymbols = () => {
+            const symbols = ["🔑", "✨", "💰", "🔒", "👑"];
+            const items = Array.from({ length: 18 });
+
+            return (
+                <div>
+                    {items.map((_, i) => {
+                        const sym = symbols[Math.floor(Math.random() * symbols.length)];
+                        const left = Math.random() * 100;
+                        const delay = Math.random() * 20;
+                        const dur = 20 + Math.random() * 30;
+
+                        return (
+                            <div
+                                key={i}
+                                className="floating-symbol"
+                                style={{
+                                    left: `${left}vw`,
+                                    bottom: `-10vh`,
+                                    animationDuration: `${dur}s`,
+                                    animationDelay: `${delay}s`,
+                                }}
+                            >
+                                {sym}
+                            </div>
+                        );
+                    })}
+                </div>
+            );
+        };
+
         const SplitDiagram = () => (
-            <div className="my-8 p-6 bg-black/30 rounded-2xl border border-white/10">
+            <div className="my-8 p-6 bg-[#2e1846]/50 rounded-2xl border border-[#F5C04A]/20">
                 <div className="relative h-16 w-full flex items-center">
-                    <div className="absolute w-full h-2 bg-gray-700 rounded-full"></div>
-                    <div className="absolute left-1/4 right-1/4 h-2 bg-[#A7EF00] rounded-full opacity-80 animate-pulse"></div>
+                    <div className="absolute w-full h-2 bg-[#2e1846] rounded-full"></div>
+                    <div className="absolute left-1/4 right-1/4 h-2 bg-[#F5C04A] rounded-full opacity-80 oracle-glow"></div>
                     <div className="absolute left-1/4 top-[-16px] flex flex-col items-center">
                         <span className="text-xs font-bold text-[#F1F5F9] mb-1">You</span>
-                        <div className="w-4 h-4 bg-[#A7EF00] rounded-full border-4 border-[#0F0518]"></div>
+                        <div className="w-4 h-4 bg-[#F5C04A] rounded-full border-2 border-[#F5C04A] shadow-[0_0_8px_rgba(245,192,74,0.6)]"></div>
                     </div>
                     <div className="absolute left-1/2 top-4 flex flex-col items-center">
-                        <div className="h-6 w-px bg-white/20 mb-1"></div>
-                        <span className="text-xs font-bold text-[#A7EF00]">Split Surplus</span>
+                        <div className="h-6 w-px bg-[#F5C04A] mb-1" style={{ boxShadow: '0 0 4px rgba(245, 192, 74, 0.8)' }}></div>
+                        <span className="text-xs font-bold text-yellow-400">Split Surplus</span>
                     </div>
                     <div className="absolute right-1/4 top-[-16px] flex flex-col items-center">
                         <span className="text-xs font-bold text-[#CBD5E1] mb-1">Company</span>
-                        <div className="w-4 h-4 bg-[#CBD5E1] rounded-full border-4 border-[#0F0518]"></div>
+                        <div className="w-4 h-4 bg-[#CBD5E1] rounded-full border-2 border-[#F5C04A] shadow-[0_0_8px_rgba(245,192,74,0.4)]"></div>
                     </div>
                 </div>
             </div>
@@ -1328,13 +1408,13 @@
                 <div className="max-w-2xl mx-auto animate-enter">
                     {/* Hero Section */}
                     <div className="text-left mb-10">
-                        <h1 className="hero-heading text-4xl md:text-6xl font-bold mb-4" style={{ textShadow: '0 0 20px rgba(252, 211, 77, 0.3)' }}>
+                        <h1 className="text-4xl md:text-6xl font-bold mb-4 text-yellow-400" style={{ textShadow: '0 0 20px rgba(245, 192, 74, 0.5)' }}>
                             <span style={{ fontSize: '1.1em' }}>The</span>{' '}
-                            <span className="gold-text-gradient" style={{ fontWeight: '800', fontSize: '1.15em' }}>Closing</span>{' '}
+                            <span style={{ fontWeight: '800', fontSize: '1.15em' }}>Closing</span>{' '}
                             <span style={{ fontSize: '1.1em' }}>Table</span>
                         </h1>
-                        <p className="hero-subtitle mt-2 text-left leading-relaxed text-lg">
-                            The single-shot mechanism for securing top talent. Set your CMax (True Maximum Budget). If the candidate's CMin fits, the resulting surplus is split 50/50.
+                        <p className="hero-subtitle mt-2 text-left leading-relaxed text-lg opacity-80">
+                            The single-shot mechanism for securing top talent. Set your CMax (True Maximum Budget). If the candidate's CMin fits, the surplus is split 50/50.
                         </p>
                     </div>
 
@@ -1350,8 +1430,8 @@
                             }
                         }}
                     >
-                        <label className="block text-sm font-bold text-[#A7EF00] uppercase tracking-widest mb-4">
-                            TRUE MAXIMUM (CMax) - Private Commitment
+                        <label className="block text-sm font-bold text-yellow-400 uppercase tracking-widest mb-4">
+                            TRUE MAXIMUM (CMax) — Private Commitment
                         </label>
                         <p className="text-xs text-[#CBD5E1] mb-6 opacity-70">
                             This is your absolute ceiling. The candidate won't see this number until after they submit theirs.
@@ -1404,7 +1484,7 @@
                                         placeholder="you@company.com"
                                         aria-label="Company email address"
                                         autoComplete="email"
-                                        className="w-full frosted-input border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-[#F1F5F9] placeholder-[#CBD5E1] focus:outline-none focus:border-[#A7EF00] focus:ring-2 focus:ring-[#A7EF00]/30 hover:border-[#A7EF00]/50 transition-all duration-200"
+                                        className="w-full frosted-input border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-[#F1F5F9] placeholder-[#CBD5E1] focus:outline-none focus:border-[#F5C04A] focus:ring-2 focus:ring-[#F5C04A]/30 hover:border-[#F5C04A]/50 transition-all duration-200"
                                     />
                                 </div>
                                 <p className="mt-3 text-xs text-[#CBD5E1] hush-hint">
@@ -1430,8 +1510,8 @@
                                 {loading ? 'Creating Link...' : 'Commit Maximum & Generate Link'}
                             </Button>
 
-                            <p className="text-center text-xs text-[#CBD5E1] opacity-70">
-                                The candidate will never see your CMax. This mechanism protects your budget from negotiation gamesmanship. Link expires in 24 hours. One use only.
+                            <p className="text-center text-xs text-gray-300 opacity-80">
+                                The candidate will never see your CMax. This mechanism protects your budget from negotiation gamesmanship.
                             </p>
                         </div>
                     </GlassCard>
@@ -1701,7 +1781,7 @@
                             </div>
                         </div>
                         <div className="space-y-3 text-lg text-[#CBD5E1]">
-                            <p className="commitment-text font-bold text-[#A7EF00]">Your number is locked.</p>
+                            <p className="commitment-text font-bold text-yellow-400">Your number is locked.</p>
                             <p className="commitment-text">Calculating result...</p>
                             <p className="commitment-text font-bold text-[#FCD34D]">Almost there...</p>
                         </div>
@@ -1713,50 +1793,50 @@
                 return (
                     <div className="max-w-3xl mx-auto animate-enter">
                         {/* Value Proposition */}
-                        <div className="text-center mb-12">
-                            <h1 className="hero-heading text-5xl md:text-7xl font-bold mb-4 text-[#F1F5F9]">
+                        <div className="text-center mb-16">
+                            <h1 className="text-5xl md:text-7xl font-extrabold mb-4 text-yellow-400" style={{ textShadow: '0 0 20px rgba(245, 192, 74, 0.5)' }}>
                                 Fair, Fast, Private Negotiation
                             </h1>
-                            <p className="hero-subtitle text-lg md:text-xl max-w-2xl mx-auto mb-6 font-semibold">
+                            <p className="text-lg md:text-xl max-w-2xl mx-auto mb-6 text-gray-200 opacity-80 leading-relaxed">
                                 Your true salary is secured here. Commit your minimum, and if it aligns with the company's maximum, the final, fairest offer is instantly secured. Zero Haggling. Zero Regrets.
                             </p>
                         </div>
 
                         {/* How It Works Section with Diagram */}
-                        <GlassCard className="mb-8 border-[#A7EF00]/20">
-                            <div className="grid md:grid-cols-2 gap-8">
+                        <GlassCard className="mb-16 border-[#F5C04A]/25">
+                            <div className="grid md:grid-cols-2 gap-8 p-8">
                                 {/* Left Column: How It Works List */}
                                 <div>
-                                    <h3 className="text-xl font-bold text-[#F1F5F9] mb-6">
+                                    <h3 className="text-xl font-extrabold text-yellow-400 mb-6">
                                         How It Works
                                     </h3>
                                     <ul className="space-y-4">
                                         <li className="flex items-start gap-4">
-                                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#A7EF00]/20 flex items-center justify-center mt-1">
-                                                <span className="text-[#A7EF00] font-bold text-lg">1</span>
+                                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#F5C04A]/20 flex items-center justify-center mt-1">
+                                                <span className="text-[#F5C04A] font-bold text-lg">1</span>
                                             </div>
                                             <div className="flex-1">
-                                                <p className="text-lg text-white leading-relaxed">
+                                                <p className="text-lg text-gray-300 leading-relaxed">
                                                     The Company commits their CMax (Maximum Budget), sealed in the system.
                                                 </p>
                                             </div>
                                         </li>
                                         <li className="flex items-start gap-4">
-                                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#A7EF00]/20 flex items-center justify-center mt-1">
-                                                <span className="text-[#A7EF00] font-bold text-lg">2</span>
+                                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#F5C04A]/20 flex items-center justify-center mt-1">
+                                                <span className="text-[#F5C04A] font-bold text-lg">2</span>
                                             </div>
                                             <div className="flex-1">
-                                                <p className="text-lg text-white leading-relaxed">
+                                                <p className="text-lg text-gray-300 leading-relaxed">
                                                     You commit your CMin (Minimum Acceptable Salary), secured in the system.
                                                 </p>
                                             </div>
                                         </li>
                                         <li className="flex items-start gap-4">
-                                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#A7EF00]/20 flex items-center justify-center mt-1">
-                                                <span className="text-[#A7EF00] font-bold text-lg">3</span>
+                                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#F5C04A]/20 flex items-center justify-center mt-1">
+                                                <span className="text-[#F5C04A] font-bold text-lg">3</span>
                                             </div>
                                             <div className="flex-1">
-                                                <p className="text-lg text-white leading-relaxed">
+                                                <p className="text-lg text-gray-300 leading-relaxed">
                                                     If ranges overlap (CMin ≤ CMax), the Surplus is split 50/50 for a binding offer.
                                                 </p>
                                             </div>
@@ -1767,13 +1847,13 @@
                                 {/* Right Column: SplitDiagram and Math Explanation */}
                                 <div>
                                     <SplitDiagram />
-                                    <div className="mt-6 text-sm text-[#CBD5E1] bg-black/40 p-4 rounded-xl border border-white/10">
-                                        <p className="font-semibold text-[#A7EF00] mb-2">The Algorithm for Fairness:</p>
+                                    <div className="mt-6 text-sm text-gray-400 bg-black/40 p-4 rounded-xl border border-white/10">
+                                        <p className="font-semibold text-yellow-400 mb-2">The Algorithm for Fairness:</p>
                                         <p className="mb-2">If CMin ≤ CMax, then:</p>
-                                        <p className="mb-2 font-mono text-[#F1F5F9]">
+                                        <p className="mt-1 font-mono text-white">
                                             Final Offer = CMin + (CMax - CMin) / 2
                                         </p>
-                                        <p className="mt-2 text-xs text-[#CBD5E1] opacity-70">
+                                        <p className="mt-2 text-xs text-gray-500">
                                             *Final Offer is rounded to the nearest $1,000 for privacy.
                                         </p>
                                     </div>
@@ -1783,13 +1863,13 @@
 
 
                         {/* Security & Action Block */}
-                        <GlassCard className="mb-8 border-[#A7EF00]/20">
+                        <GlassCard className="mb-16 border-[#F5C04A]/25">
                             <div className="text-center mb-6">
-                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#A7EF00]/10 border border-[#A7EF00]/30 mb-4">
-                                    <Icons.Lock className="w-5 h-5 text-[#A7EF00]" />
-                                    <span className="text-sm font-bold text-[#A7EF00]">Your Number is Private</span>
+                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#F5C04A]/10 border border-[#F5C04A]/30 mb-4">
+                                    <Icons.Lock className="w-5 h-5 text-yellow-400" />
+                                    <span className="text-sm font-bold text-yellow-400">Your Number is Private</span>
                                 </div>
-                                <p className="text-sm text-[#CBD5E1] max-w-xl mx-auto leading-relaxed">
+                                <p className="text-sm text-gray-300 max-w-xl mx-auto leading-relaxed">
                                     The company cannot see your CMin before you submit it, and you cannot see their CMax. This mechanism protects you from gamesmanship.
                                 </p>
                             </div>
@@ -1837,7 +1917,7 @@
                             </div>
 
                             <div className="text-left mb-8">
-                                <label className="block text-sm font-bold text-[#A7EF00] uppercase tracking-widest mb-2">
+                                <label className="block text-sm font-extrabold text-yellow-400 uppercase tracking-widest mb-2">
                                     YOUR TRUE MINIMUM (CMin)
                                 </label>
                                 <p className="text-xs text-[#CBD5E1] mb-6 opacity-70">
@@ -1890,7 +1970,7 @@
                                         placeholder="you@email.com"
                                         aria-label="Candidate email address"
                                         autoComplete="email"
-                                        className="w-full frosted-input border border-white/10 rounded-2xl py-4 px-4 text-[#F1F5F9] focus:outline-none focus:border-[#A7EF00] focus:ring-2 focus:ring-[#A7EF00]/30 hover:border-[#A7EF00]/50 transition-all duration-200"
+                                        className="w-full frosted-input border border-white/10 rounded-2xl py-4 px-4 text-[#F1F5F9] focus:outline-none focus:border-[#F5C04A] focus:ring-2 focus:ring-[#F5C04A]/30 hover:border-[#F5C04A]/50 transition-all duration-200"
                                     />
                                     <p className="mt-3 text-xs text-[#CBD5E1] hush-hint">
                                         We'll send your result here. No spam, no long-term storage.
@@ -1982,9 +2062,9 @@
                                     </GlassCard>
 
                                     {/* Final Offer with Surplus Counter */}
-                                    <GlassCard className="border-[#A7EF00]/30">
-                                        <p className="text-2xl font-bold text-[#F1F5F9] mb-2">Final Salary</p>
-                                        <p className="text-7xl font-bold text-[#A7EF00] mb-6 tracking-tighter">
+                                    <GlassCard className="border-[#F5C04A]/30">
+                                        <p className="text-2xl font-extrabold text-yellow-400 mb-2">Final Salary</p>
+                                        <p className="text-6xl font-bold text-white gold-pulse mb-6 tracking-tighter">
                                             ${result.final.toLocaleString()}
                                         </p>
                                         
@@ -2229,9 +2309,9 @@
                             </div>
                         </GlassCard>
 
-                        <GlassCard className="border-[#A7EF00]/30">
-                            <h3 className="text-lg font-bold text-[#F1F5F9] mb-4 text-left">Final Salary</h3>
-                            <p className="text-7xl font-bold text-[#A7EF00] mb-4 tracking-tighter financial-number">
+                        <GlassCard className="border-[#F5C04A]/30">
+                            <h3 className="text-lg font-extrabold text-yellow-400 mb-4 text-left">Final Salary</h3>
+                            <p className="text-6xl font-bold text-white gold-pulse mb-4 tracking-tighter financial-number">
                                 ${data.final.toLocaleString()}
                             </p>
                             <div className="bg-[#A7EF00]/10 rounded-lg p-4 text-left">
@@ -2290,6 +2370,7 @@
 
             return (
                 <div className="app-shell min-h-screen w-full flex flex-col items-center p-4 md:p-8 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]">
+                    <FloatingSymbols />
                     <div className="w-full max-w-6xl relative z-10 flex-1">
                         {resultId ? (
                             <ResultView resultId={resultId} />
