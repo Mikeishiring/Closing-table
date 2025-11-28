@@ -51,7 +51,7 @@
         }
 
         .glass-panel {
-            background: #2D1455;
+            background: rgba(30, 10, 60, 0.7);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 
@@ -1115,7 +1115,7 @@
 
 
         const SplitDiagram = () => (
-            <div className="my-8 p-6 bg-white/5 rounded-2xl border border-white/10">
+            <div className="my-8 p-6 bg-black/30 rounded-2xl border border-white/10">
                 <h3 className="text-[#A7EF00] font-bold mb-4 text-sm tracking-widest uppercase">
                     The Fair Split Logic
                 </h3>
@@ -1433,7 +1433,7 @@
                                 <WhisperTooltip text="This locks the terms forever.">
                                     <Icons.Lock className="w-6 h-6 lock-charge-up" />
                                 </WhisperTooltip>
-                                {loading ? 'Creating Link...' : '🔒 Commit Max & Generate Link'}
+                                {loading ? 'Creating Link...' : 'Commit Max & Generate Link'}
                             </Button>
 
                             <p className="text-center text-xs text-[#CBD5E1] opacity-70">
@@ -1718,22 +1718,117 @@
             if (step === 'intro') {
                 return (
                     <div className="max-w-3xl mx-auto animate-enter">
+                        {/* Value Proposition */}
                         <div className="text-center mb-12">
                             <h1 className="hero-heading text-5xl md:text-7xl font-bold mb-4 text-[#F1F5F9]">
                                 The Closing Table
                             </h1>
-                            <p className="hero-subtitle text-lg md:text-xl max-w-2xl mx-auto mb-6">
-                                The double-blind mechanism secures the fairest cost by splitting the surplus 50/50. Commit your true minimum to secure your highest possible offer.
+                            <p className="hero-subtitle text-lg md:text-xl max-w-2xl mx-auto mb-6 font-semibold">
+                                Enter Your True Minimum. Secure Your Highest Possible Offer.
                             </p>
-                            <p className="text-sm text-[#CBD5E1] max-w-2xl mx-auto leading-relaxed mb-8 opacity-80">
-                                No negotiation. No back-and-forth. Just one number, one result.
-                            </p>
+                            <div className="max-w-2xl mx-auto mb-8">
+                                <p className="text-base text-[#CBD5E1] leading-relaxed">
+                                    <strong className="text-[#F1F5F9]">The Closing Table is a single-shot, double-blind mechanism.</strong> You commit your true minimum (CMin), and the company has already committed its maximum (CMax). If your numbers overlap, the system automatically splits the surplus 50/50, guaranteeing you the fairest possible salary.
+                                </p>
+                            </div>
                         </div>
 
-                        <GlassCard className="mb-8">
+                        {/* How It Works Section */}
+                        <GlassCard className="mb-8 border-[#A7EF00]/20">
+                            <h3 className="text-xl font-bold text-[#F1F5F9] mb-6 text-center">
+                                How It Works
+                            </h3>
+                            <ul className="space-y-4 max-w-2xl mx-auto">
+                                <li className="flex items-start gap-4">
+                                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#A7EF00]/20 flex items-center justify-center mt-1">
+                                        <span className="text-[#A7EF00] font-bold text-lg">1</span>
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="text-lg text-white leading-relaxed">
+                                            You enter your true minimum salary (CMin) that you would accept.
+                                        </p>
+                                    </div>
+                                </li>
+                                <li className="flex items-start gap-4">
+                                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#A7EF00]/20 flex items-center justify-center mt-1">
+                                        <span className="text-[#A7EF00] font-bold text-lg">2</span>
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="text-lg text-white leading-relaxed">
+                                            The company has already committed their maximum budget (CMax) privately.
+                                        </p>
+                                    </div>
+                                </li>
+                                <li className="flex items-start gap-4">
+                                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#A7EF00]/20 flex items-center justify-center mt-1">
+                                        <span className="text-[#A7EF00] font-bold text-lg">3</span>
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="text-lg text-white leading-relaxed">
+                                            If your numbers overlap, the system splits the surplus 50/50 automatically.
+                                        </p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </GlassCard>
+
+                        {/* Mechanism Visualization */}
+                        <GlassCard className="mb-8 border-[#A7EF00]/20">
+                            <h3 className="text-xl font-bold text-[#F1F5F9] mb-6 text-center">
+                                How the Fair Deal is Calculated
+                            </h3>
+                            <div className="relative">
+                                {/* Visual Bar */}
+                                <div className="relative w-full h-16 bg-[#1D0D32] rounded-lg overflow-hidden mb-4" style={{ border: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                                    {/* CMin Section */}
+                                    <div className="absolute left-0 top-0 bottom-0 bg-[#A7EF00]/30 flex items-center justify-center" style={{ width: '35%' }}>
+                                        <span className="text-xs font-bold text-[#A7EF00] px-2">CMin</span>
+                                    </div>
+                                    {/* Surplus Section (Overlap) */}
+                                    <div className="absolute left-[35%] top-0 bottom-0 bg-gradient-to-r from-[#A7EF00]/50 via-[#FCD34D]/50 to-[#FCD34D]/50 flex items-center justify-center" style={{ width: '30%' }}>
+                                        <span className="text-xs font-bold text-[#F1F5F9] px-2">Surplus</span>
+                                    </div>
+                                    {/* CMax Section */}
+                                    <div className="absolute right-0 top-0 bottom-0 bg-[#FCD34D]/30 flex items-center justify-center" style={{ width: '35%' }}>
+                                        <span className="text-xs font-bold text-[#FCD34D] px-2">CMax</span>
+                                    </div>
+                                    {/* Split Point Indicator */}
+                                    <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-[#F1F5F9] transform -translate-x-1/2" style={{ boxShadow: '0 0 8px rgba(241, 245, 249, 0.6)' }}>
+                                        <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs font-bold text-[#F1F5F9] whitespace-nowrap">
+                                            Final Offer
+                                        </div>
+                                        <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-xs text-[#CBD5E1] whitespace-nowrap">
+                                            50/50 Split
+                                        </div>
+                                    </div>
+                                </div>
+                                {/* Arrow pointing to split */}
+                                <div className="flex justify-center mb-4">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#A7EF00" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <line x1="12" y1="2" x2="12" y2="16"></line>
+                                        <polyline points="8 12 12 16 16 12"></polyline>
+                                    </svg>
+                                </div>
+                                <p className="text-sm text-[#CBD5E1] text-center max-w-xl mx-auto">
+                                    When CMin and CMax overlap, the surplus (the difference) is split equally. Both sides get exactly half of the surplus, ensuring fairness.
+                                </p>
+                            </div>
+                        </GlassCard>
+
+                        {/* Security & Action Block */}
+                        <GlassCard className="mb-8 border-[#A7EF00]/20">
+                            <div className="text-center mb-6">
+                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#A7EF00]/10 border border-[#A7EF00]/30 mb-4">
+                                    <Icons.Lock className="w-5 h-5 text-[#A7EF00]" />
+                                    <span className="text-sm font-bold text-[#A7EF00]">Your Number is Private</span>
+                                </div>
+                                <p className="text-sm text-[#CBD5E1] max-w-xl mx-auto leading-relaxed">
+                                    The company cannot see your CMin before you submit it, and you cannot see their CMax. This mechanism protects you from gamesmanship.
+                                </p>
+                            </div>
                             <div className="text-center">
-                                <Button onClick={() => setStep('input')} className="w-full md:w-auto">
-                                    Secure Your Fair Offer Now{' '}
+                                <Button onClick={() => setStep('input')} className="w-full md:w-auto text-lg font-bold py-4 px-8">
+                                    Take Your Seat at the Table{' '}
                                     <Icons.ArrowRight className="w-5 h-5" />
                                 </Button>
                             </div>
@@ -2220,6 +2315,7 @@
                 } else if (offerMatch) {
                     setOfferId(offerMatch[1]);
                 }
+                // No hash = default to CompanyView (company creates offer first)
                 setIsReady(true);
             }, []);
 
