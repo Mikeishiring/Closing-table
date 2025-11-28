@@ -22,8 +22,8 @@
     <link rel="dns-prefetch" href="https://grainy-gradients.vercel.app">
     
     <!-- Optimized Font Loading -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"></noscript>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;900&family=JetBrains+Mono:wght@400;500;600&display=swap"></noscript>
     
     <!-- Core React Imports - Production Builds for Better Performance -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
@@ -34,17 +34,56 @@
     <style>
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #0a0514 0%, #1a0f2e 25%, #0f0518 50%, #1a0f2e 75%, #0a0514 100%);
+            background: 
+                linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"><defs><radialGradient id="dof" cx="50%" cy="50%"><stop offset="0%" stop-color="%23ffffff" stop-opacity="0.1"/><stop offset="50%" stop-color="%23ffffff" stop-opacity="0.05"/><stop offset="100%" stop-color="%23000000" stop-opacity="0.8"/></radialGradient></defs><rect width="100%" height="100%" fill="%231a0f2e"/><rect width="100%" height="100%" fill="url(%23dof)"/><rect x="0" y="400" width="100%" height="280" fill="%23402010" opacity="0.3"/></svg>');
+            background-size: cover;
+            background-position: center;
             background-attachment: fixed;
             color: #E2E8F0;
             min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.6) 70%);
+            pointer-events: none;
+            z-index: 0;
         }
 
         .glass-panel {
-            background: linear-gradient(to top, rgba(20, 8, 45, 0.7) 0%, rgba(30, 10, 60, 0.5) 100%);
+            background: 
+                linear-gradient(135deg, rgba(30, 30, 30, 0.3) 0%, rgba(20, 20, 20, 0.5) 100%),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(255, 255, 255, 0.02) 2px,
+                    rgba(255, 255, 255, 0.02) 4px
+                );
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.4), 
+                0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+                0 2px 8px rgba(0, 0, 0, 0.3) inset,
+                0 -2px 8px rgba(255, 255, 255, 0.02) inset;
+            position: relative;
+        }
+
+        .glass-panel::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: 
+                linear-gradient(135deg, rgba(100, 100, 100, 0.05) 0%, transparent 50%),
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><pattern id="metal" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"><rect width="100" height="100" fill="%23000000"/><path d="M0 50 L100 50" stroke="%23ffffff" stroke-width="0.5" opacity="0.03"/><path d="M50 0 L50 100" stroke="%23ffffff" stroke-width="0.5" opacity="0.03"/></pattern><rect width="100%" height="100%" fill="url(%23metal)"/></svg>');
+            opacity: 0.3;
+            pointer-events: none;
+            border-radius: inherit;
         }
 
         .gold-text-gradient {
@@ -94,9 +133,17 @@
 
         /* --- TYPOGRAPHY POLISH --- */
         .hero-heading {
+            font-family: 'Playfair Display', serif;
             font-size: clamp(2.8rem, 4vw, 3.8rem);
             letter-spacing: -0.04em;
             line-height: 1.03;
+            font-weight: 700;
+        }
+
+        .financial-number {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-weight: 600;
+            letter-spacing: 0.02em;
         }
 
         .hero-subtitle {
@@ -183,6 +230,144 @@
                 opacity: 1;
             }
         }
+
+        /* --- INTERACTIVE VIGNETTE --- */
+        .vignette-active {
+            animation: vignette-focus 0.4s ease-out forwards;
+        }
+
+        @keyframes vignette-focus {
+            0% {
+                background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.6) 70%);
+            }
+            100% {
+                background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.4) 60%);
+            }
+        }
+
+        /* --- LED FLICKER ANIMATION --- */
+        @keyframes led-flicker {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            10% { opacity: 0.3; transform: scale(0.98); }
+            20% { opacity: 1; transform: scale(1.02); }
+            30% { opacity: 0.5; transform: scale(0.99); }
+            40% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.01); }
+            60% { opacity: 1; transform: scale(1); }
+        }
+
+        .led-flicker {
+            animation: led-flicker 0.15s ease-out;
+        }
+
+        /* --- SECURITY SEAL ANIMATION --- */
+        @keyframes security-seal {
+            0% { 
+                background: linear-gradient(to right, #FCD34D, #F59E0B);
+                border-color: transparent;
+            }
+            50% {
+                background: linear-gradient(to right, #FCD34D, #F59E0B);
+                border-color: transparent;
+            }
+            100% {
+                background: linear-gradient(to right, #FCD34D, #F59E0B);
+                border: 2px solid;
+                border-image: linear-gradient(135deg, #FCD34D, #F59E0B, #D97706) 1;
+            }
+        }
+
+        .security-seal-active {
+            animation: security-seal 2s ease-out forwards;
+        }
+
+        /* --- CARD SINK EFFECT --- */
+        @keyframes card-sink {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(2px); }
+            100% { transform: translateY(0); }
+        }
+
+        .card-sink {
+            animation: card-sink 0.2s ease-out;
+        }
+
+        /* --- TOOLTIP STYLES --- */
+        .whisper-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-8px);
+            background: rgba(10, 5, 20, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: #94A3B8;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .whisper-tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: rgba(10, 5, 20, 0.95);
+        }
+
+        .tooltip-trigger:hover .whisper-tooltip {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-12px);
+        }
+
+        /* --- SAFE DIAL KNOB --- */
+        .safe-knob {
+            position: relative;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 50%, #1a202c 100%);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            box-shadow: 
+                0 0 12px rgba(167, 239, 0, 0.6),
+                0 2px 8px rgba(0, 0, 0, 0.5),
+                inset 0 2px 4px rgba(255, 255, 255, 0.1),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+            transition: transform 0.1s linear;
+        }
+
+        .safe-knob::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 4px;
+            height: 4px;
+            background: rgba(167, 239, 0, 0.8);
+            border-radius: 50%;
+            box-shadow: 0 0 6px rgba(167, 239, 0, 0.8);
+        }
+
+        .safe-knob::after {
+            content: "";
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 1px;
+        }
     </style>
 </head>
 
@@ -207,6 +392,72 @@
                 ...payload,
             };
             console.log('[closing-table-event]', event);
+        }
+
+        // --- AUDIO CONTEXT FOR SOUND EFFECTS ---
+        let audioContext = null;
+        let tensionOscillator = null;
+
+        function initAudio() {
+            if (!audioContext && typeof AudioContext !== 'undefined') {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playTensionSound(progress) {
+            initAudio();
+            if (!audioContext) return;
+
+            if (tensionOscillator) {
+                tensionOscillator.stop();
+            }
+
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.value = 80 + (progress * 40);
+            oscillator.type = 'sine';
+            gainNode.gain.value = 0.05 * (0.3 + progress * 0.7);
+
+            oscillator.start();
+            tensionOscillator = oscillator;
+        }
+
+        function stopTensionSound() {
+            if (tensionOscillator) {
+                tensionOscillator.stop();
+                tensionOscillator = null;
+            }
+        }
+
+        function playThunkSound() {
+            initAudio();
+            if (!audioContext) return;
+
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.setValueAtTime(60, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(30, audioContext.currentTime + 0.1);
+            oscillator.type = 'sawtooth';
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.1);
+        }
+
+        // --- HAPTIC FEEDBACK ---
+        function triggerHaptic() {
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
         }
 
         // --- CONFIGURATION (visual only) ---
@@ -332,11 +583,56 @@
 
         // --- COMPONENTS ---
 
-        const Slider = ({ value, onChange, min, max, step }) => {
-            const percent = ((value - min) / (max - min)) * 100;
+        const WhisperTooltip = ({ text, children }) => {
             return (
-                <div className="relative w-full h-12 flex items-center group">
-                    <div className="absolute w-full h-2 bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 rounded-full overflow-hidden">
+                <div className="tooltip-trigger relative inline-block">
+                    {children}
+                    <div className="whisper-tooltip">
+                        {text}
+                    </div>
+                </div>
+            );
+        };
+
+        const Slider = ({ value, onChange, min, max, step, onDragStart, onDragEnd }) => {
+            const [isDragging, setIsDragging] = useState(false);
+            const [rotation, setRotation] = useState(0);
+            const percent = ((value - min) / (max - min)) * 100;
+            const prevValueRef = useRef(value);
+
+            const handleChange = (e) => {
+                const newValue = parseInt(e.target.value, 10);
+                const progress = (newValue - min) / (max - min);
+                
+                if (!isDragging) {
+                    setIsDragging(true);
+                    if (onDragStart) onDragStart();
+                }
+
+                setRotation(prev => prev + (newValue - prevValueRef.current) * 2);
+                prevValueRef.current = newValue;
+                playTensionSound(progress);
+                onChange(e);
+            };
+
+            const handleMouseUp = () => {
+                if (isDragging) {
+                    setIsDragging(false);
+                    stopTensionSound();
+                    playThunkSound();
+                    if (onDragEnd) onDragEnd();
+                }
+            };
+
+            useEffect(() => {
+                if (!isDragging) {
+                    setRotation(0);
+                }
+            }, [isDragging]);
+
+            return (
+                <div className="relative w-full h-12 flex items-center group" onMouseUp={handleMouseUp} onTouchEnd={handleMouseUp}>
+                    <div className="absolute w-full h-3 bg-gradient-to-r from-gray-800 via-gray-700 to-gray-600 rounded-full overflow-hidden" style={{ boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.3)' }}>
                         <div
                             className="h-full bg-gradient-to-r from-lime-400 to-lime-500"
                             style={{ width: `${percent}%` }}
@@ -348,21 +644,19 @@
                         max={max}
                         step={step}
                         value={value}
-                        onChange={onChange}
+                        onChange={handleChange}
+                        onMouseDown={() => setIsDragging(true)}
+                        onTouchStart={() => setIsDragging(true)}
                         aria-label={`Slider value: ${value}`}
                         className="absolute w-full h-full opacity-0 cursor-pointer z-20"
                     />
                     <div
-                        className="absolute h-7 w-7 bg-white border-2 border-lime-400 rounded-full shadow-lg shadow-lime-400/50 z-10 pointer-events-none transition-all duration-150 group-active:scale-110"
+                        className="safe-knob absolute z-10 pointer-events-none"
                         style={{ 
-                            left: `calc(${percent}% - 14px)`,
-                            boxShadow: '0 0 12px rgba(167, 239, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.3)'
+                            left: `calc(${percent}% - 16px)`,
+                            transform: `rotate(${rotation}deg)`
                         }}
-                    >
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-2 h-2 bg-lime-400 rounded-full"></div>
-                        </div>
-                    </div>
+                    />
                 </div>
             );
         };
@@ -397,11 +691,40 @@
             );
         };
 
-        const GlassCard = ({ children, className = '' }) => (
-            <div className={`glass-panel card-hover rounded-3xl p-8 md:p-12 shadow-2xl ${className}`}>
-                {children}
-            </div>
-        );
+        const GlassCard = ({ children, className = '', onInteraction }) => {
+            const cardRef = useRef(null);
+
+            useEffect(() => {
+                if (!cardRef.current || !onInteraction) return;
+
+                const card = cardRef.current;
+                const handleFocus = () => {
+                    if (onInteraction) onInteraction(true);
+                };
+                const handleBlur = () => {
+                    if (onInteraction) onInteraction(false);
+                };
+
+                const inputs = card.querySelectorAll('input, button, [role="slider"]');
+                inputs.forEach(input => {
+                    input.addEventListener('focus', handleFocus);
+                    input.addEventListener('blur', handleBlur);
+                });
+
+                return () => {
+                    inputs.forEach(input => {
+                        input.removeEventListener('focus', handleFocus);
+                        input.removeEventListener('blur', handleBlur);
+                    });
+                };
+            }, [onInteraction]);
+
+            return (
+                <div ref={cardRef} className={`glass-panel card-hover rounded-3xl p-8 md:p-12 shadow-2xl ${className}`}>
+                    {children}
+                </div>
+            );
+        };
 
         const BandIndicator = ({ value }) => {
             const bandSize = 10000;
@@ -411,7 +734,7 @@
             return (
                 <div className="flex justify-center mt-2">
                     <span className="text-xs font-medium text-gray-600 uppercase tracking-wider border border-gray-700/50 px-3 py-1 rounded-full">
-                        Band: ${lower.toLocaleString()} - ${upper.toLocaleString()}
+                        Band: <span className="financial-number">${lower.toLocaleString()} - ${upper.toLocaleString()}</span>
                     </span>
                 </div>
             );
@@ -453,6 +776,10 @@
             const [loading, setLoading] = useState(false);
             const [error, setError] = useState(null);
             const [budgetAnimating, setBudgetAnimating] = useState(false);
+            const [ledFlicker, setLedFlicker] = useState(false);
+            const [cardSink, setCardSink] = useState(false);
+            const [securitySeal, setSecuritySeal] = useState(false);
+            const cardRef = useRef(null);
 
             const COMPANY_MIN = 50000;
             const COMPANY_MAX = 300000;
@@ -545,10 +872,30 @@
                 setBudget(prev => {
                     if (value !== prev) {
                         setBudgetAnimating(true);
-                        setTimeout(() => setBudgetAnimating(false), 200);
+                        setLedFlicker(true);
+                        setTimeout(() => {
+                            setBudgetAnimating(false);
+                            setLedFlicker(false);
+                        }, 200);
                     }
                     return value;
                 });
+            };
+
+            const handleGenerateLink = async () => {
+                triggerHaptic();
+                setCardSink(true);
+                setTimeout(() => setCardSink(false), 200);
+                
+                await generateLink();
+                
+                // Check if link was successfully created
+                setTimeout(() => {
+                    if (link) {
+                        setSecuritySeal(true);
+                        setTimeout(() => setSecuritySeal(false), 2000);
+                    }
+                }, 100);
             };
 
             if (link) {
@@ -612,7 +959,17 @@
                         </p>
                     </div>
 
-                    <GlassCard>
+                    <GlassCard 
+                        className={cardSink ? 'card-sink' : ''}
+                        onInteraction={(active) => {
+                            const body = document.body;
+                            if (active) {
+                                body.classList.add('vignette-active');
+                            } else {
+                                body.classList.remove('vignette-active');
+                            }
+                        }}
+                    >
                         <label className="block text-xs font-bold text-lime-400 uppercase tracking-widest mb-4">
                             Maximum Offer Limit (Private)
                         </label>
@@ -621,8 +978,9 @@
                             <span className="text-gray-500 text-4xl font-bold mr-2">$</span>
                             <span
                                 className={
-                                    "text-7xl font-bold text-white tracking-tighter jackpot-number " +
-                                    (budgetAnimating ? "jackpot-active" : "")
+                                    "text-7xl font-bold text-white tracking-tighter jackpot-number financial-number " +
+                                    (budgetAnimating ? "jackpot-active" : "") +
+                                    (ledFlicker ? " led-flicker" : "")
                                 }
                                 style={{ transform: `scale(${budgetScale})` }}
                             >
@@ -638,10 +996,16 @@
                                 step={5000}
                                 value={budget}
                                 onChange={handleBudgetChange}
+                                onDragStart={() => {}}
+                                onDragEnd={() => {}}
                             />
                             <div className="flex justify-between mt-2 text-xs text-gray-400 font-semibold uppercase tracking-wider" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", letterSpacing: '0.1em' }}>
-                                <span>Conservative</span>
-                                <span>Aggressive</span>
+                                <WhisperTooltip text="Lower risk, conservative approach">
+                                    <span>Conservative</span>
+                                </WhisperTooltip>
+                                <WhisperTooltip text="Higher risk, maximum budget">
+                                    <span>Aggressive</span>
+                                </WhisperTooltip>
                             </div>
                         </div>
 
@@ -673,8 +1037,15 @@
                                 </div>
                             )}
 
-                            <Button onClick={generateLink} disabled={!email || loading} variant="gold" className="w-full">
-                                <Icons.Lock className="w-6 h-6" />
+                            <Button 
+                                onClick={handleGenerateLink} 
+                                disabled={!email || loading} 
+                                variant="gold" 
+                                className={`w-full ${securitySeal ? 'security-seal-active' : ''}`}
+                            >
+                                <WhisperTooltip text="This locks the terms forever.">
+                                    <Icons.Lock className="w-6 h-6" />
+                                </WhisperTooltip>
                                 {loading ? 'Creating Offer...' : 'Lock Budget & Create Link'}
                             </Button>
 
@@ -770,7 +1141,11 @@
                 setAsk(prev => {
                     if (value !== prev) {
                         setAskAnimating(true);
-                        setTimeout(() => setAskAnimating(false), 200);
+                        setLedFlicker(true);
+                        setTimeout(() => {
+                            setAskAnimating(false);
+                            setLedFlicker(false);
+                        }, 200);
                     }
                     return value;
                 });
@@ -995,8 +1370,9 @@
                                 <span className="text-gray-500 text-4xl font-bold mr-2">$</span>
                                 <span
                                     className={
-                                        "text-7xl font-bold text-white tracking-tighter jackpot-number " +
-                                        (askAnimating ? "jackpot-active" : "")
+                                        "text-7xl font-bold text-white tracking-tighter jackpot-number financial-number " +
+                                        (askAnimating ? "jackpot-active" : "") +
+                                        (ledFlicker ? " led-flicker" : "")
                                     }
                                     style={{ transform: `scale(${askScale})` }}
                                 >
@@ -1012,6 +1388,8 @@
                                     step={1000}
                                     value={ask}
                                     onChange={handleAskChange}
+                                    onDragStart={() => {}}
+                                    onDragEnd={() => {}}
                                 />
                             </div>
 
