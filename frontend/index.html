@@ -654,6 +654,59 @@
             animation: overlap-highlight 4s ease-in-out infinite;
         }
 
+        /* --- MECHANISM CALCULATION BAR --- */
+        .calculation-bar-container {
+            position: relative;
+            width: 100%;
+            height: 12px;
+            background: #1D0D32;
+            border-radius: 6px;
+            overflow: visible;
+        }
+
+        .calculation-bar-range {
+            position: absolute;
+            height: 100%;
+            background: linear-gradient(to right, #A7EF00 0%, #A7EF00 50%, #FCD34D 50%, #FCD34D 100%);
+            border-radius: 6px;
+        }
+
+        .calculation-bar-split-point {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 20px;
+            background: #F1F5F9;
+            box-shadow: 0 0 8px rgba(241, 245, 249, 0.6);
+            z-index: 2;
+        }
+
+        .calculation-bar-label {
+            position: absolute;
+            top: -24px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #CBD5E1;
+            white-space: nowrap;
+        }
+
+        .calculation-bar-label.left {
+            left: 0;
+            color: #A7EF00;
+        }
+
+        .calculation-bar-label.right {
+            right: 0;
+            color: #FCD34D;
+        }
+
+        .calculation-bar-label.center {
+            left: 50%;
+            transform: translateX(-50%);
+            color: #F1F5F9;
+        }
+
         /* --- TOOLTIP STYLES (Pristine Theme) --- */
         .whisper-tooltip {
             position: absolute;
@@ -1497,7 +1550,7 @@
                         <p className="hero-subtitle mt-2 text-left leading-relaxed">
                             One decision. Zero negotiation.
                             <br />
-                            A fair, private mechanism for closing salary offers in a single step.
+                            Commit to your maximum.
                         </p>
                     </div>
 
@@ -1525,7 +1578,7 @@
                         }}
                     >
                         <label className="block text-xs font-bold text-[#A7EF00] uppercase tracking-widest mb-6">
-                            Maximum Offer Limit (Private)
+                            Maximum Offer Limit (CMax)
                         </label>
 
                         <div className="flex items-baseline justify-start mb-4">
@@ -1607,7 +1660,7 @@
                                 <WhisperTooltip text="This locks the terms forever.">
                                     <Icons.Lock className="w-6 h-6 lock-charge-up" />
                                 </WhisperTooltip>
-                                {loading ? 'Creating Offer...' : 'Lock Budget & Create Link'}
+                                {loading ? 'Creating Offer...' : '🔒 Lock Budget & Create Link'}
                             </Button>
 
                             <p className="text-center text-xs text-[#CBD5E1]">
@@ -1906,10 +1959,12 @@
                                 <Icons.Lock className="w-4 h-4" /> Single-Step, Private Mechanism
                             </div>
                             <h1 className="hero-heading text-5xl md:text-7xl font-bold mb-6 text-[#F1F5F9]">
-                                Set Your Walk-Away Number
+                                The Closing Table
                             </h1>
                             <p className="hero-subtitle text-xl md:text-2xl max-w-2xl mx-auto">
-                                Enter the lowest base salary you would happily sign for today. Your number remains private until the system determines the final, closed deal.
+                                One decision. Zero negotiation.
+                                <br />
+                                Commit to your minimum.
                             </p>
                             <p className="mt-8 text-xs text-[#CBD5E1]">
                                 For broader compensation context, see the{' '}
@@ -1941,8 +1996,8 @@
                     <div className="max-w-xl mx-auto animate-enter">
                         <GlassCard>
                             <div className="text-left mb-8">
-                                <label className="block text-sm font-medium text-[#CBD5E1] mb-4">
-                                    Your Minimum Acceptable Base Salary:
+                                <label className="block text-xs font-bold text-[#A7EF00] uppercase tracking-widest mb-6">
+                                    My True Minimum (CMin)
                                 </label>
                                 <div className="flex items-baseline justify-start mb-6">
                                     <span className="text-[#CBD5E1] text-4xl font-bold mr-2">$</span>
@@ -2052,7 +2107,7 @@
                                     disabled={!email} 
                                     className="w-full"
                                 >
-                                    Lock In My Minimum
+                                    🔒 Lock Minimum & Submit
                                 </Button>
                             </div>
                         </GlassCard>
@@ -2095,53 +2150,107 @@
                                 : 'No Deal.'}
                         </h2>
 
-                        {isSuccess ? (
-                            <GlassCard className="border-[#A7EF00]/30">
-                                <p className="text-[#CBD5E1] text-lg mb-2">
-                                    Final Binding Offer (from the mechanism)
-                                </p>
-                                <p className="text-7xl font-bold text-[#A7EF00] mb-4 tracking-tighter">
-                                    ${result.final.toLocaleString()}
-                                </p>
-                                <div className="bg-[#A7EF00]/10 rounded-lg p-4 inline-block">
-                                    <p className="text-[#A7EF00]/90 text-sm font-medium">
-                                        Rounded for privacy. Includes a{' '}
-                                        <strong>
-                                            ${result.surplus.toLocaleString()}
-                                        </strong>{' '}
-                                        fair split of the surplus between your minimum and their maximum.
-                                    </p>
-                                </div>
-                                <p className="mt-8 text-[#CBD5E1] text-sm">
-                                    In a future full system, this is where an official offer workflow (emails, docs)
-                                    would kick in using the final number and your email: {email}. This prototype does not send emails automatically.
-                                </p>
-                                {revealLink && (
-                                    <div className="mt-8 bg-black/30 border border-white/10 rounded-xl p-4 text-left">
-                                        <p className="text-xs font-semibold text-[#CBD5E1] mb-2">
-                                            Shareable reveal link
+                        {isSuccess ? (() => {
+                            const cMin = ask;
+                            const cMax = ask + result.surplus;
+                            const benefitAboveMin = result.final - ask;
+                            const splitAmount = result.surplus / 2;
+                            
+                            return (
+                                <div className="space-y-8">
+                                    {/* II. The Mechanism Run */}
+                                    <GlassCard className="border-[#A7EF00]/30">
+                                        <h3 className="text-lg font-bold text-[#F1F5F9] mb-6 text-left">The Mechanism Run</h3>
+                                        
+                                        <div className="space-y-4 mb-6">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm text-[#CBD5E1]">CMin (Your Min)</span>
+                                                <span className="text-xl font-bold text-[#A7EF00]">${cMin.toLocaleString()}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm text-[#CBD5E1]">CMax (Company Max)</span>
+                                                <span className="text-sm text-[#FACC15] opacity-70">REVEALED:</span>
+                                                <span className="text-xl font-bold text-[#FCD34D]">${cMax.toLocaleString()}</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Visual Calculation Bar */}
+                                        <div className="mb-6">
+                                            <div className="calculation-bar-container" style={{ marginBottom: '32px' }}>
+                                                <div 
+                                                    className="calculation-bar-range"
+                                                    style={{ 
+                                                        left: '0%',
+                                                        width: '100%'
+                                                    }}
+                                                />
+                                                <div 
+                                                    className="calculation-bar-split-point"
+                                                    style={{ 
+                                                        left: '50%'
+                                                    }}
+                                                />
+                                                <div className="calculation-bar-label left">${cMin.toLocaleString()}</div>
+                                                <div className="calculation-bar-label center">${result.final.toLocaleString()}</div>
+                                                <div className="calculation-bar-label right">${cMax.toLocaleString()}</div>
+                                            </div>
+                                            <p className="text-xs text-[#CBD5E1] text-center mt-2">
+                                                Surplus: ${result.surplus.toLocaleString()} split 50/50
+                                            </p>
+                                        </div>
+                                    </GlassCard>
+
+                                    {/* III. Final Outcome */}
+                                    <GlassCard className="border-[#A7EF00]/30">
+                                        <h3 className="text-lg font-bold text-[#F1F5F9] mb-4 text-left">Final Outcome</h3>
+                                        <p className="text-7xl font-bold text-[#A7EF00] mb-4 tracking-tighter">
+                                            ${result.final.toLocaleString()}
                                         </p>
-                                        <p className="text-[11px] text-[#A7EF00] break-all mb-2">
-                                            {revealLink}
-                                        </p>
-                                        <Button
-                                            variant="secondary"
-                                            className="w-full justify-center text-xs py-2"
-                                            onClick={async () => {
-                                                try {
-                                                    await navigator.clipboard.writeText(revealLink);
-                                                    alert('Reveal link copied');
-                                                } catch {
-                                                    alert('Copy failed, select and copy manually.');
-                                                }
-                                            }}
-                                        >
-                                            Copy Reveal Link
-                                        </Button>
+                                        <div className="bg-[#A7EF00]/10 rounded-lg p-4 text-left">
+                                            <p className="text-sm text-[#CBD5E1]">
+                                                <strong className="text-[#A7EF00]">Benefit above your minimum:</strong> ${benefitAboveMin.toLocaleString()}
+                                            </p>
+                                            <p className="text-xs text-[#CBD5E1] mt-2 opacity-70">
+                                                (Surplus Split: ${splitAmount.toLocaleString()} to each side)
+                                            </p>
+                                        </div>
+                                    </GlassCard>
+
+                                    {/* IV. Case Results */}
+                                    <div className="text-center">
+                                        <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#A7EF00]/20 border-2 border-[#A7EF00]">
+                                            <span className="text-2xl">✅</span>
+                                            <span className="text-lg font-bold text-[#A7EF00] uppercase tracking-wider">FAIR SPLIT</span>
+                                        </div>
                                     </div>
-                                )}
-                            </GlassCard>
-                        ) : (
+
+                                    {revealLink && (
+                                        <div className="mt-8 bg-black/30 border border-white/10 rounded-xl p-4 text-left">
+                                            <p className="text-xs font-semibold text-[#CBD5E1] mb-2">
+                                                Shareable reveal link
+                                            </p>
+                                            <p className="text-[11px] text-[#A7EF00] break-all mb-2">
+                                                {revealLink}
+                                            </p>
+                                            <Button
+                                                variant="secondary"
+                                                className="w-full justify-center text-xs py-2"
+                                                onClick={async () => {
+                                                    try {
+                                                        await navigator.clipboard.writeText(revealLink);
+                                                        alert('Reveal link copied');
+                                                    } catch {
+                                                        alert('Copy failed, select and copy manually.');
+                                                    }
+                                                }}
+                                            >
+                                                Copy Reveal Link
+                                            </Button>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })() : (
                             <GlassCard
                                 className={
                                     result.status === 'close'
@@ -2281,19 +2390,67 @@
                         This is the final base salary produced by the Closing Table mechanism.
                     </p>
 
-                    <GlassCard className="border-[#A7EF00]/30">
-                        <p className="text-[#CBD5E1] text-lg mb-2">
-                            Final Binding Offer (from the mechanism)
-                        </p>
-                        <p className="text-7xl font-bold text-[#A7EF00] mb-4 tracking-tighter financial-number">
-                            ${data.final.toLocaleString()}
-                        </p>
-                        <div className="bg-[#A7EF00]/10 rounded-lg p-4 inline-block">
-                            <p className="text-[#A7EF00]/90 text-sm font-medium">
-                                Rounded for privacy. Includes a{' '}
-                                <strong>${data.surplus.toLocaleString()}</strong> fair split
-                                of the surplus between the candidate's minimum and the company's maximum.
+                    <div className="space-y-8">
+                        {/* II. The Mechanism Run */}
+                        <GlassCard className="border-[#A7EF00]/30">
+                            <h3 className="text-lg font-bold text-[#F1F5F9] mb-6 text-left">The Mechanism Run</h3>
+                            
+                            <div className="space-y-4 mb-6">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-sm text-[#CBD5E1]">CMin (Candidate Min)</span>
+                                    <span className="text-xl font-bold text-[#A7EF00]">${data.min.toLocaleString()}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-sm text-[#CBD5E1]">CMax (Company Max)</span>
+                                    <span className="text-xl font-bold text-[#FCD34D]">${data.max.toLocaleString()}</span>
+                                </div>
+                            </div>
+
+                            {/* Visual Calculation Bar */}
+                            <div className="mb-6">
+                                <div className="calculation-bar-container" style={{ marginBottom: '32px' }}>
+                                    <div 
+                                        className="calculation-bar-range"
+                                        style={{ 
+                                            left: '0%',
+                                            width: '100%'
+                                        }}
+                                    />
+                                    <div 
+                                        className="calculation-bar-split-point"
+                                        style={{ 
+                                            left: '50%'
+                                        }}
+                                    />
+                                    <div className="calculation-bar-label left">${data.min.toLocaleString()}</div>
+                                    <div className="calculation-bar-label center">${data.final.toLocaleString()}</div>
+                                    <div className="calculation-bar-label right">${data.max.toLocaleString()}</div>
+                                </div>
+                                <p className="text-xs text-[#CBD5E1] text-center mt-2">
+                                    Surplus: ${data.surplus.toLocaleString()} split 50/50
+                                </p>
+                            </div>
+                        </GlassCard>
+
+                        {/* III. Final Outcome */}
+                        <GlassCard className="border-[#A7EF00]/30">
+                            <h3 className="text-lg font-bold text-[#F1F5F9] mb-4 text-left">Final Outcome</h3>
+                            <p className="text-7xl font-bold text-[#A7EF00] mb-4 tracking-tighter financial-number">
+                                ${data.final.toLocaleString()}
                             </p>
+                            <div className="bg-[#A7EF00]/10 rounded-lg p-4 text-left">
+                                <p className="text-sm text-[#CBD5E1]">
+                                    <strong className="text-[#A7EF00]">Surplus Split:</strong> ${(data.surplus / 2).toLocaleString()} to each side
+                                </p>
+                            </div>
+                        </GlassCard>
+
+                        {/* IV. Case Results */}
+                        <div className="text-center">
+                            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#A7EF00]/20 border-2 border-[#A7EF00]">
+                                <span className="text-2xl">✅</span>
+                                <span className="text-lg font-bold text-[#A7EF00] uppercase tracking-wider">FAIR SPLIT</span>
+                            </div>
                         </div>
 
                         <div className="mt-8 p-4 bg-black/30 rounded-xl border border-white/10 text-left text-xs text-[#CBD5E1] space-y-1">
@@ -2301,10 +2458,10 @@
                             <p className="text-[11px] text-[#A7EF00] break-all">{revealUrl}</p>
                         </div>
 
-                        <p className="mt-6 text-[#CBD5E1] text-xs">
+                        <p className="text-[#CBD5E1] text-xs text-center">
                             This view does not run the mechanism again. It only reveals a stored result.
                         </p>
-                    </GlassCard>
+                    </div>
                 </div>
             );
         };
