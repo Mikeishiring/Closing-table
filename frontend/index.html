@@ -111,36 +111,64 @@
         }
 
         /* --- TYPOGRAPHY --- */
-        .hero-heading {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            font-size: clamp(2.4rem, 4vw, 3.2rem);
-            letter-spacing: -0.03em;
-            line-height: 1.1;
-            font-weight: 800;
-            color: var(--text-primary);
+        /* Apple-like Typography System */
+        .page-container {
+            font-family: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif;
         }
 
-        .financial-number {
-            font-family: 'JetBrains Mono', 'SF Mono', 'Menlo', monospace;
-            font-weight: 600;
+        .hero-heading {
+            font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            font-size: clamp(2.5rem, 5vw, 2.75rem);
             letter-spacing: -0.02em;
+            line-height: 1.1;
+            font-weight: 600;
             color: var(--text-primary);
         }
 
         .hero-subtitle {
-            font-size: clamp(1rem, 1.3vw, 1.15rem);
+            font-size: 1rem;
+            font-weight: 400;
             color: var(--text-secondary);
-            max-width: 36rem;
+            max-width: 32rem;
             margin-inline: auto;
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
-        .section-label {
+        .section-heading {
+            font-size: 1.375rem;
+            font-weight: 600;
+            line-height: 1.3;
+            color: var(--text-primary);
+        }
+
+        .body-text {
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.5;
+            color: var(--text-primary);
+        }
+
+        .helper-text {
+            font-size: 0.875rem;
+            font-weight: 400;
+            line-height: 1.4;
+            color: var(--text-secondary);
+        }
+
+        .financial-number {
+            font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            font-variant-numeric: tabular-nums;
+            color: var(--text-primary);
+        }
+
+        .small-label {
             font-size: 0.75rem;
-            letter-spacing: 0.1em;
+            font-weight: 500;
+            letter-spacing: 0.01em;
             text-transform: uppercase;
             color: var(--text-secondary);
-            font-weight: 600;
         }
 
         /* --- INPUT STYLES (Neumorphic Indented) --- */
@@ -409,7 +437,7 @@
         .two-column-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 1.5rem;
+            padding: 2.5rem 1.5rem;
         }
 
         .two-column-layout {
@@ -422,17 +450,17 @@
             .two-column-layout {
                 flex-direction: row;
                 align-items: flex-start;
-                gap: 2rem;
+                gap: 2.5rem;
             }
 
             .main-content-column {
-                flex: 0 0 67%;
-                max-width: 67%;
+                flex: 0 0 62%;
+                max-width: 62%;
             }
 
             .sidebar-column {
-                flex: 0 0 31%;
-                max-width: 31%;
+                flex: 0 0 35%;
+                max-width: 35%;
                 position: sticky;
                 top: 2rem;
             }
@@ -448,11 +476,102 @@
         }
 
         .how-it-works-card h3 {
-            font-size: 0.875rem;
-            font-weight: 700;
+            font-size: 1.375rem;
+            font-weight: 600;
             color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        .how-it-works-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .step-item {
+            display: flex;
+            gap: 0.875rem;
+            align-items: start;
+        }
+
+        .step-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+            line-height: 1.3;
+        }
+
+        .step-content p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .privacy-note {
+            display: flex;
+            align-items: start;
+            gap: 0.5rem;
+            padding: 0.875rem;
+            background: var(--bg-input);
+            border-radius: 10px;
             margin-bottom: 1rem;
-            letter-spacing: 0.02em;
+        }
+
+        .privacy-note p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        .details-section {
+            padding-top: 1rem;
+            border-top: 1px solid #E5E5E7;
+        }
+
+        .details-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .details-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-right: 0.25rem;
+        }
+
+        .detail-link {
+            font-size: 0.75rem;
+            color: var(--accent-primary);
+            text-decoration: none;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            transition: background 0.2s ease;
+        }
+
+        .detail-link:hover {
+            background: var(--hover-highlight);
         }
 
         .how-it-works-bullets {
@@ -498,9 +617,46 @@
             cursor: pointer;
             text-align: left;
             font-size: 0.8125rem;
-            font-weight: 600;
+            font-weight: 500;
             color: var(--text-primary);
             transition: color 0.2s ease;
+        }
+
+        .accordion-trigger:hover {
+            color: var(--accent-primary);
+        }
+
+        .accordion-content {
+            margin-top: 0.75rem;
+            padding: 0.875rem;
+            background: var(--bg-input);
+            border-radius: 8px;
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .accordion-content p {
+            margin: 0.5rem 0;
+        }
+
+        .accordion-content p:first-child {
+            margin-top: 0;
+        }
+
+        .accordion-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .accordion-content ul {
+            margin: 0.5rem 0;
+            padding-left: 1rem;
+            list-style: none;
+        }
+
+        .accordion-content li {
+            margin: 0.25rem 0;
+            position: relative;
         }
 
         .accordion-trigger:hover {
@@ -969,7 +1125,8 @@
 
             const faqs = isCandidate ? [
                 {
-                    question: "How is the final salary calculated?",
+                    id: "fair-split",
+                    question: "Fair split",
                     answer: (
                         <>
                             <p>If your minimum (CMin) is less than or equal to the company's maximum (CMax), we:</p>
@@ -983,7 +1140,8 @@
                     )
                 },
                 {
-                    question: "What if our numbers don't overlap?",
+                    id: "no-overlap",
+                    question: "No overlap",
                     answer: (
                         <>
                             <p>If your minimum is above the company's maximum, there are two cases:</p>
@@ -996,7 +1154,8 @@
                     )
                 },
                 {
-                    question: "Who can see my number?",
+                    id: "privacy",
+                    question: "Privacy",
                     answer: (
                         <>
                             <p>The app only displays the final outcome and number.</p>
@@ -1011,15 +1170,18 @@
                 }
             ] : [
                 {
-                    question: "How is the final salary calculated?",
+                    id: "fair-split",
+                    question: "Fair split",
                     answer: <p>If your CMax meets their CMin, we split the overlap 50/50.</p>
                 },
                 {
-                    question: "What if numbers don't overlap?",
+                    id: "no-overlap",
+                    question: "No overlap",
                     answer: <p>No deal. Neither side sees the other's number.</p>
                 },
                 {
-                    question: "What happens to our data?",
+                    id: "privacy",
+                    question: "Privacy",
                     answer: <p>Auto-deleted after 7 days.</p>
                 }
             ];
@@ -1028,33 +1190,58 @@
                 <div className="how-it-works-card">
                     <h3>How it works</h3>
                     
-                    <ul className="how-it-works-bullets">
-                        <li>
-                            <strong>Single-shot decision.</strong> Both sides submit {isCandidate ? 'their numbers once' : 'up front'}.
-                        </li>
-                        <li>
-                            <strong>Fair split.</strong> If {isCandidate ? 'your minimum and their maximum' : 'ranges'} overlap, {isCandidate ? 'the surplus is split' : 'surplus splits'} 50/50.
-                        </li>
-                        <li>
-                            <strong>Outcome-only display.</strong> The app only displays the final outcome and number, not the original inputs.
-                        </li>
-                        {isCandidate && (
-                            <li>
-                                <strong>Clear outcome.</strong> You immediately see whether there's a deal, a close gap, or no deal.
-                            </li>
-                        )}
-                    </ul>
+                    {/* Three-step visual layout */}
+                    <div className="how-it-works-steps">
+                        <div className="step-item">
+                            <div className="step-number">1</div>
+                            <div className="step-content">
+                                <h4>You set a minimum</h4>
+                                <p>You choose the lowest total you'd accept.</p>
+                            </div>
+                        </div>
+                        <div className="step-item">
+                            <div className="step-number">2</div>
+                            <div className="step-content">
+                                <h4>Company sets a maximum</h4>
+                                <p>They add the most they're willing to pay.</p>
+                            </div>
+                        </div>
+                        <div className="step-item">
+                            <div className="step-number">3</div>
+                            <div className="step-content">
+                                <h4>We find a fair split</h4>
+                                <p>If amounts overlap, we split the difference.</p>
+                            </div>
+                        </div>
+                    </div>
 
-                    <div>
-                        {faqs.map((faq, index) => (
-                            <AccordionItem
-                                key={index}
-                                question={faq.question}
-                                answer={faq.answer}
-                                isOpen={openIndex === index}
-                                onToggle={() => toggleAccordion(index)}
-                            />
-                        ))}
+                    {/* Privacy note */}
+                    <div className="privacy-note">
+                        <Icons.Lock className="w-4 h-4 text-[#666666] flex-shrink-0 mt-0.5" />
+                        <p>We only show the final number, never your inputs.</p>
+                    </div>
+
+                    {/* Compact details section */}
+                    <div className="details-section">
+                        <div className="details-links">
+                            <span className="details-label">Details:</span>
+                            {faqs.map((faq, index) => (
+                                <React.Fragment key={faq.id}>
+                                    <button
+                                        className="detail-link"
+                                        onClick={() => toggleAccordion(index)}
+                                    >
+                                        {faq.question}
+                                    </button>
+                                    {index < faqs.length - 1 && <span className="text-[#E0E0E0]">•</span>}
+                                </React.Fragment>
+                            ))}
+                        </div>
+                        {openIndex !== null && (
+                            <div className="accordion-content animate-enter">
+                                {faqs[openIndex].answer}
+                            </div>
+                        )}
                     </div>
                 </div>
             );
@@ -1311,15 +1498,12 @@
             return (
                 <div className="two-column-container animate-enter">
                     {/* Hero / Intro zone */}
-                    <div className="text-center mb-10">
-                        <h1 className="text-5xl md:text-6xl font-extrabold text-[#1C1C1E] tracking-tight mb-4">
+                    <div className="text-center mb-12 page-container">
+                        <h1 className="hero-heading mb-3">
                             The Closing Table
                         </h1>
-                        <p className="text-lg text-[#666666] mt-4 leading-relaxed mb-4">
-                            Close salary negotiations fairly. No back-and-forth.
-                        </p>
-                        <p className="text-base text-[#666666] leading-relaxed max-w-2xl mx-auto">
-                            Set your maximum compensation (base {equityEnabled ? '+ equity' : 'only'}). The candidate sets their minimum. If they overlap, the app splits the difference 50/50.
+                        <p className="hero-subtitle">
+                            Set your maximum. We'll find a fair match with the candidate.
                         </p>
                     </div>
 
@@ -1332,15 +1516,13 @@
                                 className={`${cardSink ? 'card-sink' : ''} border-l-4 border-[#00C4CC]`}
                                 onInteraction={(active) => {}}
                             >
+                                {/* Card heading */}
                                 <div className="mb-6">
-                                    <h2 className="text-sm font-bold text-[#00C4CC] tracking-wide uppercase mb-2">
-                                        Configure Your Side of the Offer
+                                    <h2 className="section-heading mb-2">
+                                        What's the highest total you'd offer?
                                     </h2>
-                                    <p className="text-sm text-[#666666] mb-2">
-                                        Set your private maximum compensation (base salary and equity if applicable).
-                                    </p>
-                                    <p className="text-xs text-[#666666] italic">
-                                        These numbers set your ceiling. The app only displays the final outcome to the candidate, not your original inputs.
+                                    <p className="helper-text">
+                                        Use the slider to set your maximum.
                                     </p>
                                 </div>
 
@@ -1349,7 +1531,7 @@
                                     <label className="flex items-center justify-between cursor-pointer">
                                         <div>
                                             <p className="text-sm font-semibold text-[#1C1C1E]">Include equity in this offer</p>
-                                            <p className="text-xs text-[#666666]">Toggle to add equity component to compensation</p>
+                                            <p className="text-xs text-[#666666]">Toggle to add equity component</p>
                                         </div>
                                         <div className="relative">
                                             <input
@@ -1375,73 +1557,114 @@
                                 </div>
 
 
-                                {/* Total Display */}
-                                <div className="flex items-baseline justify-center mb-8">
-                                    <span className="text-[#666666] text-2xl font-bold mr-2">Total:</span>
-                                    <span className="text-[#666666] text-3xl font-bold mr-2">$</span>
-                                    <span
-                                        className={
-                                            "text-5xl font-bold text-[#1C1C1E] tracking-tight jackpot-number financial-number " +
-                                            ((baseAnimating || equityAnimating) ? "jackpot-active" : "") +
-                                            (ledFlicker ? " led-flicker" : "")
-                                        }
-                                        style={{ transform: `scale(${totalScale})` }}
-                                    >
-                                        {totalComp.toLocaleString()}
-                                    </span>
-                                </div>
-
                                 {/* Base Salary Slider */}
                                 <div className="mb-8">
-                                    <label className="block text-xs font-semibold text-[#1C1C1E] mb-3 uppercase tracking-wide">
-                                        Base Salary Maximum
-                                    </label>
-                                    <div className="mb-2 text-right">
-                                        <span className="text-lg font-bold text-[#00C4CC] financial-number">
-                                            ${baseMax.toLocaleString()}
+                                    <div className="mb-2">
+                                        <span className="small-label">Base Salary Maximum</span>
+                                    </div>
+                                    <div className="flex items-baseline justify-start mb-4">
+                                        <span className="text-[#666666] text-2xl font-medium mr-2">$</span>
+                                        <span
+                                            className={
+                                                "text-5xl font-medium text-[#1C1C1E] tracking-tight financial-number " +
+                                                (baseAnimating ? "jackpot-active" : "") +
+                                                (ledFlicker ? " led-flicker" : "")
+                                            }
+                                        >
+                                            {baseMax.toLocaleString()}
                                         </span>
                                     </div>
-                                    <Slider
-                                        min={BASE_MIN}
-                                        max={BASE_MAX}
-                                        step={5000}
-                                        value={baseMax}
-                                        onChange={handleBaseChange}
-                                        onDragStart={() => {}}
-                                        onDragEnd={() => {}}
-                                    />
+                                    <div className="px-4 mt-6">
+                                        <Slider
+                                            min={BASE_MIN}
+                                            max={BASE_MAX}
+                                            step={5000}
+                                            value={baseMax}
+                                            onChange={handleBaseChange}
+                                            onDragStart={() => {}}
+                                            onDragEnd={() => {}}
+                                        />
+                                    </div>
+                                    <div className="flex justify-between mt-2 px-4">
+                                        <span className="text-xs text-[#666666]">${(BASE_MIN / 1000)}k</span>
+                                        <span className="text-xs text-[#666666]">${(BASE_MAX / 1000)}k</span>
+                                    </div>
                                 </div>
 
                                 {/* Equity Slider (conditional) */}
                                 {equityEnabled && (
-                                    <div className="mb-8">
-                                        <label className="block text-xs font-semibold text-[#1C1C1E] mb-3 uppercase tracking-wide">
-                                            Equity Value Maximum
-                                        </label>
-                                        <div className="mb-2 text-right">
-                                            <span className="text-lg font-bold text-[#34C759] financial-number">
-                                                ${equityMax.toLocaleString()}
+                                    <div className="mb-8 pt-6 border-t border-[#E0E0E0]">
+                                        <div className="mb-2">
+                                            <span className="small-label">Equity Value Maximum</span>
+                                        </div>
+                                        <div className="flex items-baseline justify-start mb-4">
+                                            <span className="text-[#666666] text-2xl font-medium mr-2">$</span>
+                                            <span
+                                                className={
+                                                    "text-5xl font-medium text-[#1C1C1E] tracking-tight financial-number " +
+                                                    (equityAnimating ? "jackpot-active" : "") +
+                                                    (ledFlicker ? " led-flicker" : "")
+                                                }
+                                            >
+                                                {equityMax.toLocaleString()}
                                             </span>
                                         </div>
-                                        <Slider
-                                            min={EQUITY_MIN}
-                                            max={EQUITY_MAX}
-                                            step={5000}
-                                            value={equityMax}
-                                            onChange={handleEquityChange}
-                                            onDragStart={() => {}}
-                                            onDragEnd={() => {}}
-                                        />
-                                        <p className="mt-2 text-xs text-[#666666]">
-                                            Dollar value of equity component (RSUs, stock options, etc.)
-                                        </p>
+                                        <div className="px-4 mt-6">
+                                            <Slider
+                                                min={EQUITY_MIN}
+                                                max={EQUITY_MAX}
+                                                step={5000}
+                                                value={equityMax}
+                                                onChange={handleEquityChange}
+                                                onDragStart={() => {}}
+                                                onDragEnd={() => {}}
+                                            />
+                                        </div>
+                                        <div className="flex justify-between mt-2 px-4">
+                                            <span className="text-xs text-[#666666]">${(EQUITY_MIN / 1000)}k</span>
+                                            <span className="text-xs text-[#666666]">${(EQUITY_MAX / 1000)}k</span>
+                                        </div>
                                     </div>
                                 )}
 
-                                <div className="space-y-6">
+                                {/* Total Compensation Display */}
+                                <div className="mb-8 pt-6 border-t border-[#E0E0E0]">
+                                    <div className="bg-[#E5F9F0] rounded-xl p-6 shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff]">
+                                        <div className="mb-2">
+                                            <span className="small-label text-[#00C4CC]">Your total maximum (Cmax)</span>
+                                        </div>
+                                        <div className="flex items-baseline justify-start">
+                                            <span className="text-[#666666] text-3xl font-medium mr-2">$</span>
+                                            <span
+                                                className={
+                                                    "text-6xl font-medium text-[#1C1C1E] tracking-tight financial-number " +
+                                                    ((baseAnimating || equityAnimating) ? "jackpot-active" : "") +
+                                                    (ledFlicker ? " led-flicker" : "")
+                                                }
+                                                style={{ transform: `scale(${totalScale})` }}
+                                            >
+                                                {totalComp.toLocaleString()}
+                                            </span>
+                                        </div>
+                                        {equityEnabled && (
+                                            <div className="mt-4 pt-4 border-t border-[#00C4CC]/20 text-sm text-[#666666] space-y-1">
+                                                <div className="flex justify-between">
+                                                    <span>Base:</span>
+                                                    <span className="font-semibold">${baseMax.toLocaleString()}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span>Equity:</span>
+                                                    <span className="font-semibold">${equityMax.toLocaleString()}</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="space-y-6 pt-6 border-t border-[#E0E0E0]">
                                     <div>
-                                        <label className="block text-xs font-semibold text-[#1C1C1E] mb-3 uppercase tracking-wide">
-                                            Your email
+                                        <label className="block text-sm font-medium text-[#1C1C1E] mb-2">
+                                            Email (to send the link)
                                         </label>
                                         <div className="relative">
                                             <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#666666]" />
@@ -1455,8 +1678,8 @@
                                                 className="w-full bg-[#EFF3F6] border-none rounded-xl py-4 pl-12 pr-4 text-[#1C1C1E] placeholder-[#999999] focus:outline-none focus:ring-2 focus:ring-[#00C4CC]/50 shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] transition-all duration-200"
                                             />
                                         </div>
-                                        <p className="mt-2 text-xs text-[#666666]">
-                                            We'll email you the result. No spam. Data auto-deletes after 7 days.
+                                        <p className="mt-2 helper-text">
+                                            Used only for this offer. Auto-deleted in 7 days.
                                         </p>
                                     </div>
 
@@ -1469,15 +1692,18 @@
                                     <button 
                                         onClick={handleGenerateLink} 
                                         disabled={!email || loading}
-                                        className="w-full bg-[#00C4CC] text-white font-bold py-4 rounded-full shadow-[0_4px_14px_rgba(0,196,204,0.35)] hover:bg-[#00B0B8] hover:shadow-[0_6px_20px_rgba(0,196,204,0.45)] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-full bg-[#00C4CC] text-white font-semibold py-4 rounded-full shadow-[0_4px_14px_rgba(0,196,204,0.35)] hover:bg-[#00B0B8] hover:shadow-[0_6px_20px_rgba(0,196,204,0.45)] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         <Icons.Lock className="w-5 h-5" />
-                                        {loading ? 'Creating Link...' : 'Lock Budget & Create Link'}
+                                        {loading ? 'Creating Link...' : 'Create candidate link'}
                                     </button>
 
-                                    <p className="text-center text-xs text-[#666666]">
-                                        The app only displays the final outcome and number to the candidate, not your original input.
-                                    </p>
+                                    <div className="flex items-start gap-2">
+                                        <Icons.Lock className="w-3.5 h-3.5 text-[#666666] flex-shrink-0 mt-0.5" />
+                                        <p className="text-xs text-[#666666]">
+                                            We only store whether a deal is possible and the final salary we compute.
+                                        </p>
+                                    </div>
                                 </div>
                             </GlassCard>
                         </div>
@@ -1787,12 +2013,12 @@
                 return (
                     <div className="two-column-container animate-enter">
                         {/* Hero / Intro zone */}
-                        <div className="text-center mb-10">
-                            <h1 className="text-5xl md:text-6xl font-extrabold text-[#1C1C1E] tracking-tight mb-4">
+                        <div className="text-center mb-12 page-container">
+                            <h1 className="hero-heading mb-3">
                                 The Closing Table
                             </h1>
-                            <p className="text-lg text-[#666666] mt-4 leading-relaxed mb-4">
-                                Set your minimum salary. The tool will check for a fair middle ground.
+                            <p className="hero-subtitle">
+                                Set your minimum. We'll find a fair match with the company.
                             </p>
                         </div>
 
@@ -1815,23 +2041,26 @@
                             <div className="main-content-column">
                                 {/* Action zone - Main Feature Card */}
                                 <GlassCard className="border-l-4 border-[#00C4CC]">
-                                    {/* Instructional copy at top */}
-                                    <div className="mb-8">
-                                        <p className="text-base text-[#666666] leading-relaxed">
-                                            Set the minimum total compensation you would actually accept for this role.
+                                    {/* Card heading */}
+                                    <div className="mb-6">
+                                        <h2 className="section-heading mb-2">
+                                            What's the lowest total you'd accept?
+                                        </h2>
+                                        <p className="helper-text">
+                                            Use the slider to set your minimum.
                                         </p>
                                     </div>
 
                                     {/* Base Salary Slider */}
                                     <div className="mb-8">
-                                        <h3 className="text-sm font-bold text-[#00C4CC] tracking-wide uppercase mb-4">
-                                            Base Salary Minimum
-                                        </h3>
+                                        <div className="mb-2">
+                                            <span className="small-label">Base Salary Minimum</span>
+                                        </div>
                                         <div className="flex items-baseline justify-start mb-4">
-                                            <span className="text-[#666666] text-2xl font-bold mr-2">$</span>
+                                            <span className="text-[#666666] text-2xl font-medium mr-2">$</span>
                                             <span
                                                 className={
-                                                    "text-4xl font-bold text-[#1C1C1E] tracking-tight jackpot-number financial-number " +
+                                                    "text-5xl font-medium text-[#1C1C1E] tracking-tight financial-number " +
                                                     (baseAnimating ? "jackpot-active" : "") +
                                                     (ledFlicker ? " led-flicker" : "")
                                                 }
@@ -1850,19 +2079,23 @@
                                                 onDragEnd={handleSliderRelease}
                                             />
                                         </div>
+                                        <div className="flex justify-between mt-2 px-4">
+                                            <span className="text-xs text-[#666666]">${(BASE_MIN / 1000)}k</span>
+                                            <span className="text-xs text-[#666666]">${(BASE_MAX / 1000)}k</span>
+                                        </div>
                                     </div>
 
                                     {/* Equity Slider (conditional) */}
                                     {equityEnabled && (
                                         <div className="mb-8 pt-6 border-t border-[#E0E0E0]">
-                                            <h3 className="text-sm font-bold text-[#00C4CC] tracking-wide uppercase mb-4">
-                                                Equity Value Minimum
-                                            </h3>
+                                            <div className="mb-2">
+                                                <span className="small-label">Equity Value Minimum</span>
+                                            </div>
                                             <div className="flex items-baseline justify-start mb-4">
-                                                <span className="text-[#666666] text-2xl font-bold mr-2">$</span>
+                                                <span className="text-[#666666] text-2xl font-medium mr-2">$</span>
                                                 <span
                                                     className={
-                                                        "text-4xl font-bold text-[#1C1C1E] tracking-tight jackpot-number financial-number " +
+                                                        "text-5xl font-medium text-[#1C1C1E] tracking-tight financial-number " +
                                                         (equityAnimating ? "jackpot-active" : "") +
                                                         (ledFlicker ? " led-flicker" : "")
                                                     }
@@ -1881,20 +2114,24 @@
                                                     onDragEnd={handleSliderRelease}
                                                 />
                                             </div>
+                                            <div className="flex justify-between mt-2 px-4">
+                                                <span className="text-xs text-[#666666]">${(EQUITY_MIN / 1000)}k</span>
+                                                <span className="text-xs text-[#666666]">${(EQUITY_MAX / 1000)}k</span>
+                                            </div>
                                         </div>
                                     )}
 
                                     {/* Total Compensation Display */}
                                     <div className="mb-8 pt-6 border-t border-[#E0E0E0]">
                                         <div className="bg-[#E5F9F0] rounded-xl p-6 shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff]">
-                                            <h3 className="text-sm font-bold text-[#00C4CC] tracking-wide uppercase mb-3">
-                                                Your Total Minimum (CMin)
-                                            </h3>
+                                            <div className="mb-2">
+                                                <span className="small-label text-[#00C4CC]">Your total minimum (Cmin)</span>
+                                            </div>
                                             <div className="flex items-baseline justify-start">
-                                                <span className="text-[#666666] text-3xl font-bold mr-2">$</span>
+                                                <span className="text-[#666666] text-3xl font-medium mr-2">$</span>
                                                 <span
                                                     className={
-                                                        "text-6xl font-bold text-[#1C1C1E] tracking-tight jackpot-number financial-number " +
+                                                        "text-6xl font-medium text-[#1C1C1E] tracking-tight financial-number " +
                                                         ((baseAnimating || equityAnimating) ? "jackpot-active" : "") +
                                                         (ledFlicker ? " led-flicker" : "") +
                                                         (greenFlash ? " candidate-confirm-flash" : "")
@@ -1922,11 +2159,8 @@
                                     {/* Email Input */}
                                     <div className="space-y-6 pt-6 border-t border-[#E0E0E0]">
                                         <div>
-                                            <p className="text-sm text-[#666666] mb-4">
-                                                We use your email to associate this result with this offer only.
-                                            </p>
-                                            <label className="block text-xs font-semibold text-[#1C1C1E] mb-3 uppercase tracking-wide">
-                                                Your email
+                                            <label className="block text-sm font-medium text-[#1C1C1E] mb-2">
+                                                Email (to send your result)
                                             </label>
                                             <div className="relative">
                                                 <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#666666]" />
@@ -1951,8 +2185,8 @@
                                                     <p className="text-[#FF3B30] text-sm">{validationError}</p>
                                                 </div>
                                             )}
-                                            <p className="mt-2 text-xs text-[#666666]">
-                                                We'll email you the result. No spam. Data auto-deletes after 7 days.
+                                            <p className="mt-2 helper-text">
+                                                Used only for this offer. Auto-deleted in 7 days.
                                             </p>
                                         </div>
 
@@ -1963,15 +2197,18 @@
                                                     submit();
                                                 }
                                             }} 
-                                            className="w-full bg-[#00C4CC] text-white font-bold py-4 rounded-full shadow-[0_4px_14px_rgba(0,196,204,0.35)] hover:bg-[#00B0B8] hover:shadow-[0_6px_20px_rgba(0,196,204,0.45)] transition-all flex items-center justify-center gap-3"
+                                            className="w-full bg-[#00C4CC] text-white font-semibold py-4 rounded-full shadow-[0_4px_14px_rgba(0,196,204,0.35)] hover:bg-[#00B0B8] hover:shadow-[0_6px_20px_rgba(0,196,204,0.45)] transition-all flex items-center justify-center gap-3"
                                         >
                                             <Icons.Lock className="w-5 h-5" />
-                                            Commit Minimum & See Result
+                                            See if there's a deal
                                         </button>
 
-                                        <p className="text-center text-xs text-[#666666]">
-                                            Your number is encrypted and never shared. The company only sees whether a deal is possible and the final salary we compute.
-                                        </p>
+                                        <div className="flex items-start gap-2">
+                                            <Icons.Lock className="w-3.5 h-3.5 text-[#666666] flex-shrink-0 mt-0.5" />
+                                            <p className="text-xs text-[#666666]">
+                                                We only store whether a deal is possible and the final salary we compute.
+                                            </p>
+                                        </div>
                                     </div>
                                 </GlassCard>
                             </div>
