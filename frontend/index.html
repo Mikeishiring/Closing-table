@@ -29,6 +29,8 @@
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js" defer></script>
+    <!-- Framer Motion for spring physics animations -->
+    <script src="https://unpkg.com/framer-motion@11/dist/framer-motion.js"></script>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com" defer></script>
     <style>
@@ -724,6 +726,7 @@
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
+        const { motion, AnimatePresence } = window.Motion;
 
         // --- API CONFIGURATION ---
         const API_BASE = window.location.hostname === 'localhost' 
@@ -827,6 +830,67 @@
             if (navigator.vibrate) {
                 navigator.vibrate([50, 30, 50]);
             }
+        }
+
+        // --- ANIMATED SUBMIT BUTTON SOUND EFFECTS ---
+        function createClickSound() {
+            initAudio();
+            if (!audioContext) return () => {};
+            
+            return () => {
+                const now = audioContext.currentTime;
+                const osc1 = audioContext.createOscillator();
+                const osc2 = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                osc1.connect(gainNode);
+                osc2.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(800, now);
+                osc1.frequency.exponentialRampToValueAtTime(200, now + 0.05);
+                
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(400, now + 0.05);
+                osc2.frequency.exponentialRampToValueAtTime(100, now + 0.15);
+                
+                gainNode.gain.setValueAtTime(0, now);
+                gainNode.gain.linearRampToValueAtTime(0.3, now + 0.01);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                
+                osc1.start(now);
+                osc1.stop(now + 0.1);
+                osc2.start(now + 0.05);
+                osc2.stop(now + 0.2);
+            };
+        }
+
+        function createSuccessSound() {
+            initAudio();
+            if (!audioContext) return () => {};
+            
+            return () => {
+                const now = audioContext.currentTime;
+                const osc = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                osc.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1);
+                osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.2);
+                
+                gainNode.gain.setValueAtTime(0, now);
+                gainNode.gain.linearRampToValueAtTime(0.2, now + 0.01);
+                gainNode.gain.linearRampToValueAtTime(0.15, now + 0.1);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                
+                osc.start(now);
+                osc.stop(now + 0.4);
+            };
         }
 
         // --- HAPTIC FEEDBACK ---
@@ -1027,6 +1091,280 @@
             );
         };
 
+        // --- EQUITY ICON SVG COMPONENT ---
+        const EquityIcon = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" 
+                    fill="url(#equityGradient)" stroke="#00C4CC" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <defs>
+                    <linearGradient id="equityGradient" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                        <stop stopColor="#0D9488"/>
+                        <stop offset="1" stopColor="#14B8A6"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+        );
+
+        // --- ANIMATED SUBMIT BUTTON COMPONENT ---
+        const LockIcon = ({ isLocked, className = "" }) => {
+            return isLocked ? (
+                <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="5" y="11" width="14" height="10" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    <circle cx="12" cy="16" r="1"></circle>
+                </svg>
+            ) : (
+                <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="5" y="11" width="14" height="10" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 9.9-1"></path>
+                    <circle cx="12" cy="16" r="1"></circle>
+                </svg>
+            );
+        };
+
+        const CheckIcon = ({ className = "" }) => {
+            return (
+                <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            );
+        };
+
+        const AnimatedSubmitButton = ({ 
+            onClick, 
+            disabled = false,
+            buttonText = "Lock it in & Get Link",
+            className = ""
+        }) => {
+            const [isHovered, setIsHovered] = useState(false);
+            const [isClicked, setIsClicked] = useState(false);
+            const [showSuccess, setShowSuccess] = useState(false);
+            const clickSound = useRef(null);
+            const successSound = useRef(null);
+
+            useEffect(() => {
+                try {
+                    clickSound.current = createClickSound();
+                    successSound.current = createSuccessSound();
+                } catch (error) {
+                    console.warn('Audio not supported:', error);
+                }
+            }, []);
+
+            const handleClick = async (e) => {
+                if (disabled || isClicked) return;
+                e.preventDefault();
+                
+                try { clickSound.current?.(); } catch (error) {}
+                setIsClicked(true);
+                
+                setTimeout(() => {
+                    setShowSuccess(true);
+                    try { successSound.current?.(); } catch (error) {}
+                }, 150);
+
+                setTimeout(() => { onClick?.(e); }, 650);
+                
+                setTimeout(() => {
+                    setIsClicked(false);
+                    setShowSuccess(false);
+                }, 1500);
+            };
+
+            const baseStyles = "w-full font-semibold py-4 px-6 rounded-full transition-all flex items-center justify-center gap-3 relative overflow-hidden cursor-pointer border-none outline-none";
+            
+            const getButtonStyles = () => {
+                if (disabled) return "bg-gray-300 text-gray-500 cursor-not-allowed opacity-50";
+                if (showSuccess) return "bg-[#34C759] text-white";
+                return "bg-[#00C4CC] text-white shadow-[0_4px_14px_rgba(0,196,204,0.35)]";
+            };
+
+            const buttonVariants = {
+                initial: { scale: 1, y: 0, boxShadow: "0 4px 14px rgba(0,196,204,0.35)" },
+                hover: { y: -6, scale: 1.02, boxShadow: "0 12px 28px rgba(0,196,204,0.5)", transition: { type: "spring", stiffness: 400, damping: 17 } },
+                tap: { scale: 0.95, y: 0, transition: { type: "spring", stiffness: 500, damping: 15 } },
+                success: { scale: 1, borderRadius: "50%", width: "64px", height: "64px", transition: { duration: 0.3, ease: "easeInOut" } }
+            };
+
+            const iconVariants = {
+                initial: { scale: 1, rotate: 0 },
+                hover: { scale: 1.15, rotate: -8, transition: { type: "spring", stiffness: 300, damping: 10 } },
+                locked: { scale: 1, rotate: 0, transition: { type: "spring", stiffness: 500, damping: 15 } }
+            };
+
+            const textVariants = {
+                initial: { opacity: 1, x: 0 },
+                exit: { opacity: 0, x: -20, transition: { duration: 0.2 } }
+            };
+
+            const checkVariants = {
+                initial: { scale: 0, opacity: 0, rotate: -180 },
+                show: { scale: 1, opacity: 1, rotate: 0, transition: { type: "spring", stiffness: 300, damping: 20 } }
+            };
+
+            return (
+                <motion.button
+                    className={`${baseStyles} ${getButtonStyles()} ${className}`}
+                    onClick={handleClick}
+                    disabled={disabled}
+                    onHoverStart={() => !disabled && setIsHovered(true)}
+                    onHoverEnd={() => setIsHovered(false)}
+                    variants={buttonVariants}
+                    initial="initial"
+                    animate={showSuccess ? "success" : isClicked ? "tap" : isHovered ? "hover" : "initial"}
+                    whileTap={!disabled && !isClicked ? "tap" : undefined}
+                >
+                    {showSuccess ? (
+                        <motion.div variants={checkVariants} initial="initial" animate="show" className="absolute inset-0 flex items-center justify-center">
+                            <CheckIcon className="w-8 h-8" />
+                        </motion.div>
+                    ) : (
+                        <>
+                            <motion.div variants={iconVariants} initial="initial" animate={isHovered ? "hover" : "locked"} style={{ width: '20px', height: '20px' }}>
+                                <LockIcon isLocked={isHovered} className="w-full h-full" />
+                            </motion.div>
+                            <motion.span variants={textVariants} initial="initial" animate={isClicked ? "exit" : "initial"}>
+                                {buttonText}
+                            </motion.span>
+                        </>
+                    )}
+                    {isClicked && !showSuccess && (
+                        <motion.div className="absolute inset-0 bg-white rounded-full" initial={{ scale: 0, opacity: 0.5 }} animate={{ scale: 2, opacity: 0 }} transition={{ duration: 0.5 }} style={{ pointerEvents: 'none' }} />
+                    )}
+                </motion.button>
+            );
+        };
+
+        // --- COMPENSATION INPUT BLOCK (Animated Container) ---
+        const CompensationInputBlock = ({ 
+            children, 
+            equityEnabled, 
+            onEquityToggle,
+            isSliderDragging,
+            setIsSliderDragging
+        }) => {
+            const [isHovering, setIsHovering] = useState(false);
+            const [wasEquityJustEnabled, setWasEquityJustEnabled] = useState(false);
+            const prevEquityEnabled = useRef(equityEnabled);
+
+            // Track equity toggle for spring animation
+            useEffect(() => {
+                if (equityEnabled && !prevEquityEnabled.current) {
+                    setWasEquityJustEnabled(true);
+                    const timeout = setTimeout(() => setWasEquityJustEnabled(false), 400);
+                    return () => clearTimeout(timeout);
+                }
+                prevEquityEnabled.current = equityEnabled;
+            }, [equityEnabled]);
+
+            const isActive = isHovering || isSliderDragging;
+
+            // Spring animation variants
+            const containerVariants = {
+                idle: { 
+                    y: 0, 
+                    scale: 1,
+                    boxShadow: "10px 10px 20px #d9d9d9, -10px -10px 20px #ffffff"
+                },
+                active: { 
+                    y: -4, 
+                    scale: 1,
+                    boxShadow: "14px 14px 32px #d1d1d1, -14px -14px 32px #ffffff, 0 8px 24px rgba(0, 196, 204, 0.15)"
+                },
+                equityPop: {
+                    y: 0,
+                    scale: [1, 1.03, 1],
+                    boxShadow: "14px 14px 32px #d1d1d1, -14px -14px 32px #ffffff, 0 8px 24px rgba(0, 196, 204, 0.2)"
+                }
+            };
+
+            const equityIconVariants = {
+                hidden: { 
+                    opacity: 0, 
+                    x: -20, 
+                    scale: 0.8 
+                },
+                visible: { 
+                    opacity: 1, 
+                    x: 0, 
+                    scale: 1,
+                    transition: {
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 25
+                    }
+                },
+                exit: { 
+                    opacity: 0, 
+                    x: -20, 
+                    scale: 0.8,
+                    transition: {
+                        duration: 0.2
+                    }
+                }
+            };
+
+            const getCurrentVariant = () => {
+                if (wasEquityJustEnabled) return "equityPop";
+                if (isActive) return "active";
+                return "idle";
+            };
+
+            return (
+                <motion.div
+                    className={`
+                        glass-panel p-6 rounded-2xl overflow-hidden
+                        ${!isActive ? 'comp-block-breathing' : 'comp-block-active'}
+                        ${equityEnabled ? 'comp-block-equity-bg' : 'bg-white'}
+                    `}
+                    variants={containerVariants}
+                    initial="idle"
+                    animate={getCurrentVariant()}
+                    transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 20,
+                        mass: 1
+                    }}
+                    onMouseEnter={() => setIsHovering(true)}
+                    onMouseLeave={() => setIsHovering(false)}
+                    style={{
+                        transition: equityEnabled 
+                            ? 'background 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)' 
+                            : 'background 0.3s ease-out'
+                    }}
+                >
+                    {/* Equity Icon that slides in when enabled */}
+                    <div className="flex items-center gap-3 mb-4">
+                        <AnimatePresence mode="wait">
+                            {equityEnabled && (
+                                <motion.div
+                                    key="equity-icon"
+                                    variants={equityIconVariants}
+                                    initial="hidden"
+                                    animate="visible"
+                                    exit="exit"
+                                    className="flex-shrink-0"
+                                >
+                                    <EquityIcon />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                        <motion.h3 
+                            className="text-lg font-semibold text-[#1C1C1E]"
+                            layout
+                            transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                        >
+                            Total Compensation
+                        </motion.h3>
+                    </div>
+
+                    {/* Children (equity toggle, input, slider) */}
+                    {children}
+                </motion.div>
+            );
+        };
+
         const Button = ({ children, onClick, disabled, variant = 'primary', className = '' }) => {
             const baseStyle =
                 "btn relative transform transition-all duration-200 " +
@@ -1129,13 +1467,13 @@
                     question: "Fair split",
                     answer: (
                         <>
-                            <p>If your minimum is at or below the company's budget, we:</p>
+                            <p>If your minimum (CMin) is less than or equal to the company's maximum (CMax), we:</p>
                             <ul>
-                                <li>• Compute the surplus: Company Budget − Your Minimum</li>
-                                <li>• Split it evenly: Final Offer = Your Minimum + Surplus / 2</li>
+                                <li>• Compute the surplus: CMax − CMin</li>
+                                <li>• Split it evenly: Final Offer = CMin + (CMax − CMin) / 2</li>
                                 <li>• Round the result to the nearest $1,000 for privacy</li>
                             </ul>
-                            <p>This guarantees you don't go below your minimum, and the company doesn't go above their budget.</p>
+                            <p>This guarantees you don't go below your minimum, and the company doesn't go above its maximum.</p>
                         </>
                     )
                 },
@@ -1144,9 +1482,9 @@
                     question: "No overlap",
                     answer: (
                         <>
-                            <p>If your minimum is above the company's budget, there are two cases:</p>
+                            <p>If your minimum is above the company's maximum, there are two cases:</p>
                             <ul>
-                                <li><strong>Bridge zone (close):</strong> If the gap is small (within 10% of their budget), we flag that a human conversation might bridge it.</li>
+                                <li><strong>Bridge zone (close):</strong> If the gap is small (within 10% of their maximum), we flag that a human conversation might bridge it.</li>
                                 <li><strong>No deal:</strong> If the gap is larger than 10%, we show that the ranges are too far apart for this mechanism to close a deal.</li>
                             </ul>
                             <p>In both cases, your number stays private. The company never sees what you entered.</p>
@@ -1172,7 +1510,7 @@
                 {
                     id: "fair-split",
                     question: "Fair split",
-                    answer: <p>If your budget meets their minimum, we split the overlap 50/50.</p>
+                    answer: <p>If your CMax meets their CMin, we split the overlap 50/50.</p>
                 },
                 {
                     id: "no-overlap",
@@ -1188,59 +1526,31 @@
 
             return (
                 <div className="how-it-works-card">
-                    <h3>How this works</h3>
+                    <h3>How it works</h3>
                     
-                    {/* Three-step visual layout - different content for company vs candidate */}
+                    {/* Three-step visual layout */}
                     <div className="how-it-works-steps">
-                        {isCandidate ? (
-                            <>
-                                <div className="step-item">
-                                    <div className="step-number">1</div>
-                                    <div className="step-content">
-                                        <h4>You set your minimum</h4>
-                                        <p>You choose the lowest total compensation that would make this feel fair to you.</p>
-                                    </div>
-                                </div>
-                                <div className="step-item">
-                                    <div className="step-number">2</div>
-                                    <div className="step-content">
-                                        <h4>The company has already set their maximum</h4>
-                                        <p>They've defined the highest value they're prepared to offer for this role.</p>
-                                    </div>
-                                </div>
-                                <div className="step-item">
-                                    <div className="step-number">3</div>
-                                    <div className="step-content">
-                                        <h4>We check if there's a fair middle</h4>
-                                        <p>If there's overlap, the mechanism proposes a fair number. If not, you'll see whether you're close or too far apart.</p>
-                                    </div>
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                <div className="step-item">
-                                    <div className="step-number">1</div>
-                                    <div className="step-content">
-                                        <h4>You set your max offer</h4>
-                                        <p>You define the maximum compensation you're comfortable offering for this role. We keep this hidden.</p>
-                                    </div>
-                                </div>
-                                <div className="step-item">
-                                    <div className="step-number">2</div>
-                                    <div className="step-content">
-                                        <h4>The candidate sets their minimum</h4>
-                                        <p>They privately share the minimum that would make this a yes for them.</p>
-                                    </div>
-                                </div>
-                                <div className="step-item">
-                                    <div className="step-number">3</div>
-                                    <div className="step-content">
-                                        <h4>We check for a fair overlap</h4>
-                                        <p>If there's room for a fair deal, the mechanism proposes a final number. If not, it tells you whether you're close or too far apart.</p>
-                                    </div>
-                                </div>
-                            </>
-                        )}
+                        <div className="step-item">
+                            <div className="step-number">1</div>
+                            <div className="step-content">
+                                <h4>You set a minimum</h4>
+                                <p>You choose the lowest total you'd accept.</p>
+                            </div>
+                        </div>
+                        <div className="step-item">
+                            <div className="step-number">2</div>
+                            <div className="step-content">
+                                <h4>Company sets a maximum</h4>
+                                <p>They add the most they're willing to pay.</p>
+                            </div>
+                        </div>
+                        <div className="step-item">
+                            <div className="step-number">3</div>
+                            <div className="step-content">
+                                <h4>We find a fair split</h4>
+                                <p>If amounts overlap, we split the difference.</p>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Privacy note */}
@@ -1290,6 +1600,7 @@
             const [ledFlicker, setLedFlicker] = useState(false);
             const [cardSink, setCardSink] = useState(false);
             const [securitySeal, setSecuritySeal] = useState(false);
+            const [isSliderDragging, setIsSliderDragging] = useState(false);
             const cardRef = useRef(null);
 
             const BASE_MIN = 50000;
@@ -1448,7 +1759,7 @@
                             Offer Link Created
                         </h1>
                         <p className="text-lg text-[#666666] mb-10 leading-relaxed">
-                            Your compensation envelope is locked and ready to share.
+                            Your maximum is locked and ready for the candidate.
                         </p>
 
                         {/* 3-Step Instructions */}
@@ -1466,13 +1777,13 @@
                                 <li className="flex items-start gap-3">
                                     <span className="flex-shrink-0 w-6 h-6 bg-[#00C4CC] text-white rounded-full flex items-center justify-center text-xs font-bold">2</span>
                                     <div className="text-sm text-[#666666]">
-                                        <span className="font-semibold text-[#1C1C1E]">They privately share the minimum they'd be happy with.</span> Once submitted, the mechanism runs automatically.
+                                        <span className="font-semibold text-[#1C1C1E]">They enter their minimum.</span> Once submitted, the mechanism runs automatically.
                                     </div>
                                 </li>
                                 <li className="flex items-start gap-3">
                                     <span className="flex-shrink-0 w-6 h-6 bg-[#00C4CC] text-white rounded-full flex items-center justify-center text-xs font-bold">3</span>
                                     <div className="text-sm text-[#666666]">
-                                        <span className="font-semibold text-[#1C1C1E]">The mechanism checks whether there's a fair middle ground.</span> It returns one of three outcomes: Deal Closed, Close Gap, or No Deal.
+                                        <span className="font-semibold text-[#1C1C1E]">The mechanism checks for a fair middle ground.</span> It returns one of three outcomes: Deal Closed, Close Gap, or No Deal.
                                     </div>
                                 </li>
                             </ol>
@@ -1531,7 +1842,7 @@
                             The Closing Table
                         </h1>
                         <p className="hero-subtitle">
-                            Set your compensation envelope. We'll check if a fair deal exists inside it.
+                            Set your maximum. We'll find a fair match with the candidate.
                         </p>
                     </div>
 
@@ -1547,207 +1858,196 @@
                                 {/* Card heading */}
                                 <div className="mb-6">
                                     <h2 className="section-heading mb-2">
-                                        {equityEnabled ? "Total compensation budget" : "Total maximum salary"}
+                                        What's the highest total you'd offer?
                                     </h2>
                                     <p className="helper-text">
-                                        {equityEnabled 
-                                            ? "The maximum total (base + equity) you're prepared to offer."
-                                            : "The highest salary you're comfortable offering for this role."}
+                                        Use the slider to set your maximum.
                                     </p>
                                 </div>
 
-                                {/* Equity Toggle */}
-                                <div className="mb-8 p-3 bg-[#EFF3F6] rounded-xl shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff]">
-                                    <label className="flex items-center justify-between cursor-pointer">
-                                        <div>
-                                            <p className="text-sm font-semibold text-[#1C1C1E]">Include equity in this offer</p>
-                                        </div>
-                                        <div className="relative">
-                                            <input
-                                                type="checkbox"
-                                                checked={equityEnabled}
-                                                onChange={(e) => setEquityEnabled(e.target.checked)}
-                                                className="sr-only"
-                                            />
-                                            <div
-                                                className={`w-14 h-8 rounded-full transition-colors duration-200 ${
-                                                    equityEnabled ? 'bg-[#00C4CC]' : 'bg-[#E0E0E0]'
-                                                }`}
-                                            >
-                                                <div
-                                                    className={`w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-200 mt-1 ${
-                                                        equityEnabled ? 'translate-x-7' : 'translate-x-1'
-                                                    }`}
-                                                ></div>
+                                {/* Animated Compensation Input Block */}
+                                <CompensationInputBlock
+                                    equityEnabled={equityEnabled}
+                                    onEquityToggle={setEquityEnabled}
+                                    isSliderDragging={isSliderDragging}
+                                    setIsSliderDragging={setIsSliderDragging}
+                                >
+                                    {/* Equity Toggle */}
+                                    <div className="mb-6 p-4 bg-white/60 rounded-xl shadow-[inset_2px_2px_4px_rgba(0,0,0,0.03),inset_-2px_-2px_4px_rgba(255,255,255,0.8)]">
+                                        <label className="flex items-center justify-between cursor-pointer">
+                                            <div>
+                                                <p className="text-sm font-semibold text-[#1C1C1E]">Include equity in this offer</p>
+                                                <p className="text-xs text-[#666666]">Toggle to add equity component</p>
                                             </div>
-                                        </div>
-                                    </label>
-                                </div>
+                                            <motion.div 
+                                                className="relative"
+                                                whileTap={{ scale: 0.95 }}
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    checked={equityEnabled}
+                                                    onChange={(e) => setEquityEnabled(e.target.checked)}
+                                                    className="sr-only"
+                                                />
+                                                <motion.div
+                                                    className={`w-14 h-8 rounded-full cursor-pointer ${
+                                                        equityEnabled ? 'bg-[#00C4CC]' : 'bg-[#E0E0E0]'
+                                                    }`}
+                                                    onClick={() => setEquityEnabled(!equityEnabled)}
+                                                    animate={{
+                                                        backgroundColor: equityEnabled ? '#00C4CC' : '#E0E0E0'
+                                                    }}
+                                                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                                >
+                                                    <motion.div
+                                                        className="w-6 h-6 bg-white rounded-full shadow-md mt-1"
+                                                        animate={{
+                                                            x: equityEnabled ? 28 : 4
+                                                        }}
+                                                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                                                    />
+                                                </motion.div>
+                                            </motion.div>
+                                        </label>
+                                    </div>
 
-                                {/* Main Total Compensation Input (Primary) */}
-                                <div className="mb-8">
-                                    <div className="bg-[#E5F9F0] rounded-xl p-6 shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff]">
+                                    {/* Base Salary Slider */}
+                                    <div className="mb-6">
                                         <div className="mb-2">
-                                            <span className="small-label text-[#00C4CC]">
-                                                {equityEnabled ? "Total compensation budget" : "Total maximum salary"}
-                                            </span>
+                                            <span className="small-label">Base Salary Maximum</span>
                                         </div>
                                         <div className="flex items-baseline justify-start mb-4">
-                                            <span className="text-[#666666] text-3xl font-medium mr-2">$</span>
-                                            <input
-                                                type="text"
-                                                value={totalComp.toLocaleString()}
-                                                onChange={(e) => {
-                                                    const raw = e.target.value.replace(/[^0-9]/g, '');
-                                                    const value = parseInt(raw, 10);
-                                                    if (!isNaN(value) && value > 0) {
-                                                        if (equityEnabled) {
-                                                            // Keep current ratio between base and equity
-                                                            const currentRatio = baseMax / (baseMax + equityMax) || 0.7;
-                                                            const newBase = Math.round(value * currentRatio);
-                                                            const newEquity = value - newBase;
-                                                            setBaseMax(Math.max(BASE_MIN, Math.min(BASE_MAX, newBase)));
-                                                            setEquityMax(Math.max(EQUITY_MIN, Math.min(EQUITY_MAX, newEquity)));
-                                                        } else {
-                                                            setBaseMax(Math.max(BASE_MIN, Math.min(BASE_MAX, value)));
-                                                        }
-                                                        setBaseAnimating(true);
-                                                        setLedFlicker(true);
-                                                        setTimeout(() => {
-                                                            setBaseAnimating(false);
-                                                            setLedFlicker(false);
-                                                        }, 200);
-                                                    }
-                                                }}
+                                            <span className="text-[#666666] text-2xl font-medium mr-2">$</span>
+                                            <span
                                                 className={
-                                                    "text-6xl font-medium text-[#1C1C1E] tracking-tight financial-number bg-transparent border-none outline-none w-full " +
-                                                    ((baseAnimating || equityAnimating) ? "jackpot-active" : "") +
+                                                    "text-5xl font-medium text-[#1C1C1E] tracking-tight financial-number " +
+                                                    (baseAnimating ? "jackpot-active" : "") +
                                                     (ledFlicker ? " led-flicker" : "")
                                                 }
-                                                style={{ transform: `scale(${totalScale})` }}
+                                            >
+                                                {baseMax.toLocaleString()}
+                                            </span>
+                                        </div>
+                                        <div className="px-4 mt-6">
+                                            <Slider
+                                                min={BASE_MIN}
+                                                max={BASE_MAX}
+                                                step={5000}
+                                                value={baseMax}
+                                                onChange={handleBaseChange}
+                                                onDragStart={() => setIsSliderDragging(true)}
+                                                onDragEnd={() => setIsSliderDragging(false)}
                                             />
                                         </div>
-                                        <p className="text-xs text-[#666666]">
-                                            Your absolute limit for this offer.
-                                        </p>
-                                    </div>
-                                    {/* Slider for total (secondary) */}
-                                    <div className="px-4 mt-6">
-                                        <Slider
-                                            min={equityEnabled ? BASE_MIN : BASE_MIN}
-                                            max={equityEnabled ? BASE_MAX + EQUITY_MAX : BASE_MAX}
-                                            step={1000}
-                                            value={totalComp}
-                                            onChange={(e) => {
-                                                const value = parseInt(e.target.value, 10);
-                                                if (!isNaN(value)) {
-                                                    if (equityEnabled) {
-                                                        const currentRatio = baseMax / (baseMax + equityMax) || 0.7;
-                                                        const newBase = Math.round(value * currentRatio);
-                                                        const newEquity = value - newBase;
-                                                        setBaseMax(Math.max(BASE_MIN, Math.min(BASE_MAX, newBase)));
-                                                        setEquityMax(Math.max(EQUITY_MIN, Math.min(EQUITY_MAX, newEquity)));
-                                                    } else {
-                                                        setBaseMax(Math.max(BASE_MIN, Math.min(BASE_MAX, value)));
-                                                    }
-                                                    setBaseAnimating(true);
-                                                    setLedFlicker(true);
-                                                    setTimeout(() => {
-                                                        setBaseAnimating(false);
-                                                        setLedFlicker(false);
-                                                    }, 200);
-                                                }
-                                            }}
-                                            onDragStart={() => {}}
-                                            onDragEnd={() => {}}
-                                        />
-                                    </div>
-                                    <div className="flex justify-between mt-2 px-4">
-                                        <span className="text-xs text-[#666666]">${(BASE_MIN / 1000)}k</span>
-                                        <span className="text-xs text-[#666666]">${((equityEnabled ? BASE_MAX + EQUITY_MAX : BASE_MAX) / 1000)}k</span>
-                                    </div>
-                                    <p className="text-xs text-[#666666] mt-2 px-4">
-                                        Use the field or slider to set your maximum.
-                                    </p>
-                                </div>
-
-                                {/* Base & Equity Breakdown (when equity is ON) */}
-                                {equityEnabled && (
-                                    <div className="mb-8 pt-6 border-t border-[#E0E0E0]">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            {/* Base Portion */}
-                                            <div className="bg-[#EFF3F6] rounded-xl p-4 shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff]">
-                                                <div className="mb-2">
-                                                    <span className="text-xs font-medium text-[#666666] uppercase tracking-wide">Base portion</span>
-                                                </div>
-                                                <div className="flex items-baseline">
-                                                    <span className="text-[#666666] text-lg font-medium mr-1">$</span>
-                                                    <input
-                                                        type="text"
-                                                        value={baseMax.toLocaleString()}
-                                                        onChange={(e) => {
-                                                            const raw = e.target.value.replace(/[^0-9]/g, '');
-                                                            const value = parseInt(raw, 10);
-                                                            if (!isNaN(value)) {
-                                                                setBaseMax(Math.max(BASE_MIN, Math.min(BASE_MAX, value)));
-                                                                setBaseAnimating(true);
-                                                                setLedFlicker(true);
-                                                                setTimeout(() => {
-                                                                    setBaseAnimating(false);
-                                                                    setLedFlicker(false);
-                                                                }, 200);
-                                                            }
-                                                        }}
-                                                        className={
-                                                            "text-2xl font-medium text-[#1C1C1E] tracking-tight financial-number bg-transparent border-none outline-none w-full " +
-                                                            (baseAnimating ? "jackpot-active" : "")
-                                                        }
-                                                    />
-                                                </div>
-                                                <p className="text-xs text-[#999999] mt-1">Base salary portion</p>
-                                            </div>
-                                            {/* Equity Portion */}
-                                            <div className="bg-[#EFF3F6] rounded-xl p-4 shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff]">
-                                                <div className="mb-2">
-                                                    <span className="text-xs font-medium text-[#666666] uppercase tracking-wide">Equity portion</span>
-                                                </div>
-                                                <div className="flex items-baseline">
-                                                    <span className="text-[#666666] text-lg font-medium mr-1">$</span>
-                                                    <input
-                                                        type="text"
-                                                        value={equityMax.toLocaleString()}
-                                                        onChange={(e) => {
-                                                            const raw = e.target.value.replace(/[^0-9]/g, '');
-                                                            const value = parseInt(raw, 10);
-                                                            if (!isNaN(value)) {
-                                                                setEquityMax(Math.max(EQUITY_MIN, Math.min(EQUITY_MAX, value)));
-                                                                setEquityAnimating(true);
-                                                                setLedFlicker(true);
-                                                                setTimeout(() => {
-                                                                    setEquityAnimating(false);
-                                                                    setLedFlicker(false);
-                                                                }, 200);
-                                                            }
-                                                        }}
-                                                        className={
-                                                            "text-2xl font-medium text-[#1C1C1E] tracking-tight financial-number bg-transparent border-none outline-none w-full " +
-                                                            (equityAnimating ? "jackpot-active" : "")
-                                                        }
-                                                    />
-                                                </div>
-                                                <p className="text-xs text-[#999999] mt-1">Equity value portion</p>
-                                            </div>
+                                        <div className="flex justify-between mt-2 px-4">
+                                            <span className="text-xs text-[#666666]">${(BASE_MIN / 1000)}k</span>
+                                            <span className="text-xs text-[#666666]">${(BASE_MAX / 1000)}k</span>
                                         </div>
-                                        <p className="text-xs text-[#666666] mt-3 text-center">
-                                            Editing base or equity auto-updates the total above.
-                                        </p>
                                     </div>
-                                )}
+
+                                    {/* Equity Slider (conditional) */}
+                                    <AnimatePresence mode="wait">
+                                        {equityEnabled && (
+                                            <motion.div 
+                                                className="mb-6 pt-6 border-t border-[#00C4CC]/20"
+                                                initial={{ opacity: 0, height: 0 }}
+                                                animate={{ opacity: 1, height: "auto" }}
+                                                exit={{ opacity: 0, height: 0 }}
+                                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                            >
+                                                <div className="mb-2">
+                                                    <span className="small-label text-teal-600">Equity Value Maximum</span>
+                                                </div>
+                                                <div className="flex items-baseline justify-start mb-4">
+                                                    <span className="text-teal-600 text-2xl font-medium mr-2">$</span>
+                                                    <span
+                                                        className={
+                                                            "text-5xl font-medium text-[#1C1C1E] tracking-tight financial-number " +
+                                                            (equityAnimating ? "jackpot-active" : "") +
+                                                            (ledFlicker ? " led-flicker" : "")
+                                                        }
+                                                    >
+                                                        {equityMax.toLocaleString()}
+                                                    </span>
+                                                </div>
+                                                <div className="px-4 mt-6">
+                                                    <Slider
+                                                        min={EQUITY_MIN}
+                                                        max={EQUITY_MAX}
+                                                        step={5000}
+                                                        value={equityMax}
+                                                        onChange={handleEquityChange}
+                                                        onDragStart={() => setIsSliderDragging(true)}
+                                                        onDragEnd={() => setIsSliderDragging(false)}
+                                                    />
+                                                </div>
+                                                <div className="flex justify-between mt-2 px-4">
+                                                    <span className="text-xs text-[#666666]">${(EQUITY_MIN / 1000)}k</span>
+                                                    <span className="text-xs text-[#666666]">${(EQUITY_MAX / 1000)}k</span>
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+
+                                    {/* Total Compensation Display */}
+                                    <div className="pt-6 border-t border-[#E0E0E0]/50">
+                                        <motion.div 
+                                            className="rounded-xl p-6"
+                                            animate={{
+                                                backgroundColor: equityEnabled 
+                                                    ? 'rgba(204, 251, 241, 0.5)' 
+                                                    : 'rgba(229, 249, 240, 1)',
+                                                boxShadow: equityEnabled
+                                                    ? 'inset 3px 3px 6px rgba(0,100,100,0.08), inset -3px -3px 6px rgba(255,255,255,0.9)'
+                                                    : 'inset 3px 3px 6px #d1d9e6, inset -3px -3px 6px #ffffff'
+                                            }}
+                                            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                                        >
+                                            <div className="mb-2">
+                                                <span className="small-label text-[#00C4CC]">Your total maximum (Cmax)</span>
+                                            </div>
+                                            <div className="flex items-baseline justify-start">
+                                                <span className="text-[#666666] text-3xl font-medium mr-2">$</span>
+                                                <motion.span
+                                                    className={
+                                                        "text-6xl font-medium text-[#1C1C1E] tracking-tight financial-number " +
+                                                        ((baseAnimating || equityAnimating) ? "jackpot-active" : "") +
+                                                        (ledFlicker ? " led-flicker" : "")
+                                                    }
+                                                    animate={{ scale: totalScale }}
+                                                    transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                                                >
+                                                    {totalComp.toLocaleString()}
+                                                </motion.span>
+                                            </div>
+                                            <AnimatePresence mode="wait">
+                                                {equityEnabled && (
+                                                    <motion.div 
+                                                        className="mt-4 pt-4 border-t border-[#00C4CC]/20 text-sm text-[#666666] space-y-1"
+                                                        initial={{ opacity: 0, y: -10 }}
+                                                        animate={{ opacity: 1, y: 0 }}
+                                                        exit={{ opacity: 0, y: -10 }}
+                                                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                                    >
+                                                        <div className="flex justify-between">
+                                                            <span>Base:</span>
+                                                            <span className="font-semibold">${baseMax.toLocaleString()}</span>
+                                                        </div>
+                                                        <div className="flex justify-between">
+                                                            <span>Equity:</span>
+                                                            <span className="font-semibold text-teal-600">${equityMax.toLocaleString()}</span>
+                                                        </div>
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+                                        </motion.div>
+                                    </div>
+                                </CompensationInputBlock>
 
                                 <div className="space-y-6 pt-6 border-t border-[#E0E0E0]">
                                     <div>
                                         <label className="block text-sm font-medium text-[#1C1C1E] mb-2">
-                                            Your email
+                                            Email (to send the link)
                                         </label>
                                         <div className="relative">
                                             <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#666666]" />
@@ -1772,19 +2072,16 @@
                                         </div>
                                     )}
 
-                                    <button 
-                                        onClick={handleGenerateLink} 
+                                    <AnimatedSubmitButton
+                                        onClick={handleGenerateLink}
                                         disabled={!email || loading}
-                                        className="w-full bg-[#00C4CC] text-white font-semibold py-4 rounded-full shadow-[0_4px_14px_rgba(0,196,204,0.35)] hover:bg-[#00B0B8] hover:shadow-[0_6px_20px_rgba(0,196,204,0.45)] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        <Icons.Lock className="w-5 h-5" />
-                                        {loading ? 'Creating Link...' : 'Create candidate link'}
-                                    </button>
+                                        buttonText={loading ? 'Creating Link...' : 'Lock it in & Get Link'}
+                                    />
 
                                     <div className="flex items-start gap-2">
                                         <Icons.Lock className="w-3.5 h-3.5 text-[#666666] flex-shrink-0 mt-0.5" />
                                         <p className="text-xs text-[#666666]">
-                                            We only store whether a deal is possible and the final compensation we compute.
+                                            We only store whether a deal is possible and the final salary we compute.
                                         </p>
                                     </div>
                                 </div>
@@ -1816,6 +2113,7 @@
             const [equityAnimating, setEquityAnimating] = useState(false);
             const [ledFlicker, setLedFlicker] = useState(false);
             const [greenFlash, setGreenFlash] = useState(false);
+            const [isSliderDragging, setIsSliderDragging] = useState(false);
             const emailInputRef = useRef(null);
 
             const BASE_MIN = 80000;
@@ -2020,7 +2318,7 @@
                         logEvent('submit_rejected', { offerId, status: data.status });
                         return;
                     } else if (data.status === 'expired') {
-                        setError('This offer has expired. Please request a new link from the company.');
+                        setError('This offer expired. Ask for a new link.');
                         setStep('input');
                         logEvent('submit_rejected', { offerId, status: data.status });
                         return;
@@ -2041,7 +2339,7 @@
                         emailProvided: !!email,
                     });
                 } catch (err) {
-                    setError('Failed to submit your response. Please check your connection and try again.');
+                    setError("Couldn't submit. Check your connection and try again.");
                     setStep('input');
                     logEvent('submit_error', { offerId, error: err.message });
                 }
@@ -2050,7 +2348,7 @@
             if (step === 'loading') {
                 return (
                     <div className="max-w-xl mx-auto animate-enter text-center">
-                        <div className="text-[#666666]">Loading offer...</div>
+                        <div className="text-[#666666]">Loading...</div>
                     </div>
                 );
             }
@@ -2101,7 +2399,7 @@
                                 The Closing Table
                             </h1>
                             <p className="hero-subtitle">
-                                Set the minimum that would make this a yes. We'll compare it to the company's budget.
+                                Set your minimum. We'll find a fair match with the company.
                             </p>
                         </div>
 
@@ -2111,7 +2409,7 @@
                                 <div className="flex items-start gap-3">
                                     <Icons.AlertTriangle className="w-5 h-5 text-[#FF3B30] flex-shrink-0 mt-0.5" />
                                     <div>
-                                        <p className="text-[#FF3B30] font-semibold mb-1">We couldn't submit your number</p>
+                                        <p className="text-[#FF3B30] font-semibold mb-1">Unable to Submit</p>
                                         <p className="text-[#FF3B30] text-sm">{error}</p>
                                     </div>
                                 </div>
@@ -2127,211 +2425,159 @@
                                     {/* Card heading */}
                                     <div className="mb-6">
                                         <h2 className="section-heading mb-2">
-                                            {equityEnabled ? "Minimum total compensation" : "Minimum base salary"}
+                                            What's the lowest total you'd accept?
                                         </h2>
                                         <p className="helper-text">
-                                            {equityEnabled 
-                                                ? "The minimum total (base + equity) you'd be happy accepting."
-                                                : "The lowest salary you'd be comfortable accepting."}
+                                            Use the slider to set your minimum.
                                         </p>
                                     </div>
 
-                                    {/* Equity Toggle */}
-                                    {offerStatus?.equityEnabled && (
-                                        <div className="mb-8 p-3 bg-[#EFF3F6] rounded-xl shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff]">
-                                            <label className="flex items-center justify-between cursor-pointer">
-                                                <div>
-                                                    <p className="text-sm font-semibold text-[#1C1C1E]">Include equity in this minimum</p>
-                                                </div>
-                                                <div className="relative">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={equityEnabled}
-                                                        onChange={(e) => setEquityEnabled(e.target.checked)}
-                                                        className="sr-only"
-                                                    />
-                                                    <div
-                                                        className={`w-14 h-8 rounded-full transition-colors duration-200 ${
-                                                            equityEnabled ? 'bg-[#00C4CC]' : 'bg-[#E0E0E0]'
-                                                        }`}
-                                                    >
-                                                        <div
-                                                            className={`w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-200 mt-1 ${
-                                                                equityEnabled ? 'translate-x-7' : 'translate-x-1'
-                                                            }`}
-                                                        ></div>
-                                                    </div>
-                                                </div>
-                                            </label>
-                                        </div>
-                                    )}
-
-                                    {/* Main Total Compensation Input (Primary) */}
-                                    <div className="mb-8">
-                                        <div className="bg-[#E5F9F0] rounded-xl p-6 shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff]">
+                                    {/* Animated Compensation Input Block */}
+                                    <CompensationInputBlock
+                                        equityEnabled={equityEnabled}
+                                        onEquityToggle={setEquityEnabled}
+                                        isSliderDragging={isSliderDragging}
+                                        setIsSliderDragging={setIsSliderDragging}
+                                    >
+                                        {/* Base Salary Slider */}
+                                        <div className="mb-6">
                                             <div className="mb-2">
-                                                <span className="small-label text-[#00C4CC]">
-                                                    {equityEnabled ? "Minimum total compensation" : "Minimum base salary"}
-                                                </span>
+                                                <span className="small-label">Base Salary Minimum</span>
                                             </div>
                                             <div className="flex items-baseline justify-start mb-4">
-                                                <span className="text-[#666666] text-3xl font-medium mr-2">$</span>
-                                                <input
-                                                    type="text"
-                                                    value={totalMin.toLocaleString()}
-                                                    onChange={(e) => {
-                                                        const raw = e.target.value.replace(/[^0-9]/g, '');
-                                                        const value = parseInt(raw, 10);
-                                                        if (!isNaN(value) && value > 0) {
-                                                            if (equityEnabled) {
-                                                                // Keep current ratio between base and equity
-                                                                const currentRatio = baseMin / (baseMin + equityMin) || 0.8;
-                                                                const newBase = Math.round(value * currentRatio);
-                                                                const newEquity = value - newBase;
-                                                                setBaseMin(Math.max(BASE_MIN, Math.min(BASE_MAX, newBase)));
-                                                                setEquityMin(Math.max(EQUITY_MIN, Math.min(EQUITY_MAX, newEquity)));
-                                                            } else {
-                                                                setBaseMin(Math.max(BASE_MIN, Math.min(BASE_MAX, value)));
-                                                            }
-                                                            setBaseAnimating(true);
-                                                            setLedFlicker(true);
-                                                            setTimeout(() => {
-                                                                setBaseAnimating(false);
-                                                                setLedFlicker(false);
-                                                            }, 200);
-                                                        }
-                                                    }}
+                                                <span className="text-[#666666] text-2xl font-medium mr-2">$</span>
+                                                <span
                                                     className={
-                                                        "text-6xl font-medium text-[#1C1C1E] tracking-tight financial-number bg-transparent border-none outline-none w-full " +
-                                                        ((baseAnimating || equityAnimating) ? "jackpot-active" : "") +
-                                                        (ledFlicker ? " led-flicker" : "") +
-                                                        (greenFlash ? " candidate-confirm-flash" : "")
+                                                        "text-5xl font-medium text-[#1C1C1E] tracking-tight financial-number " +
+                                                        (baseAnimating ? "jackpot-active" : "") +
+                                                        (ledFlicker ? " led-flicker" : "")
                                                     }
-                                                    style={{ transform: `scale(${totalScale})` }}
+                                                >
+                                                    {baseMin.toLocaleString()}
+                                                </span>
+                                            </div>
+                                            <div className="px-4 mt-6">
+                                                <Slider
+                                                    min={BASE_MIN}
+                                                    max={BASE_MAX}
+                                                    step={1000}
+                                                    value={baseMin}
+                                                    onChange={handleBaseChange}
+                                                    onDragStart={() => setIsSliderDragging(true)}
+                                                    onDragEnd={() => { setIsSliderDragging(false); handleSliderRelease(); }}
                                                 />
                                             </div>
-                                            <p className="text-xs text-[#666666]">
-                                                Your walk-away number – the minimum you'd accept.
-                                            </p>
-                                        </div>
-                                        {/* Slider for total (secondary) */}
-                                        <div className="px-4 mt-6">
-                                            <Slider
-                                                min={equityEnabled ? BASE_MIN : BASE_MIN}
-                                                max={equityEnabled ? BASE_MAX + EQUITY_MAX : BASE_MAX}
-                                                step={1000}
-                                                value={totalMin}
-                                                onChange={(e) => {
-                                                    const value = parseInt(e.target.value, 10);
-                                                    if (!isNaN(value)) {
-                                                        if (equityEnabled) {
-                                                            const currentRatio = baseMin / (baseMin + equityMin) || 0.8;
-                                                            const newBase = Math.round(value * currentRatio);
-                                                            const newEquity = value - newBase;
-                                                            setBaseMin(Math.max(BASE_MIN, Math.min(BASE_MAX, newBase)));
-                                                            setEquityMin(Math.max(EQUITY_MIN, Math.min(EQUITY_MAX, newEquity)));
-                                                        } else {
-                                                            setBaseMin(Math.max(BASE_MIN, Math.min(BASE_MAX, value)));
-                                                        }
-                                                        setBaseAnimating(true);
-                                                        setLedFlicker(true);
-                                                        setTimeout(() => {
-                                                            setBaseAnimating(false);
-                                                            setLedFlicker(false);
-                                                        }, 200);
-                                                    }
-                                                }}
-                                                onDragStart={() => {}}
-                                                onDragEnd={handleSliderRelease}
-                                            />
-                                        </div>
-                                        <div className="flex justify-between mt-2 px-4">
-                                            <span className="text-xs text-[#666666]">${(BASE_MIN / 1000)}k</span>
-                                            <span className="text-xs text-[#666666]">${((equityEnabled ? BASE_MAX + EQUITY_MAX : BASE_MAX) / 1000)}k</span>
-                                        </div>
-                                        <p className="text-xs text-[#666666] mt-2 px-4">
-                                            Use the field or slider to set your minimum.
-                                        </p>
-                                    </div>
-
-                                    {/* Base & Equity Breakdown (when equity is ON) */}
-                                    {equityEnabled && (
-                                        <div className="mb-8 pt-6 border-t border-[#E0E0E0]">
-                                            <div className="grid grid-cols-2 gap-4">
-                                                {/* Base Portion */}
-                                                <div className="bg-[#EFF3F6] rounded-xl p-4 shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff]">
-                                                    <div className="mb-2">
-                                                        <span className="text-xs font-medium text-[#666666] uppercase tracking-wide">Base portion</span>
-                                                    </div>
-                                                    <div className="flex items-baseline">
-                                                        <span className="text-[#666666] text-lg font-medium mr-1">$</span>
-                                                        <input
-                                                            type="text"
-                                                            value={baseMin.toLocaleString()}
-                                                            onChange={(e) => {
-                                                                const raw = e.target.value.replace(/[^0-9]/g, '');
-                                                                const value = parseInt(raw, 10);
-                                                                if (!isNaN(value)) {
-                                                                    setBaseMin(Math.max(BASE_MIN, Math.min(BASE_MAX, value)));
-                                                                    setBaseAnimating(true);
-                                                                    setLedFlicker(true);
-                                                                    setTimeout(() => {
-                                                                        setBaseAnimating(false);
-                                                                        setLedFlicker(false);
-                                                                    }, 200);
-                                                                }
-                                                            }}
-                                                            className={
-                                                                "text-2xl font-medium text-[#1C1C1E] tracking-tight financial-number bg-transparent border-none outline-none w-full " +
-                                                                (baseAnimating ? "jackpot-active" : "")
-                                                            }
-                                                        />
-                                                    </div>
-                                                    <p className="text-xs text-[#999999] mt-1">Base salary portion</p>
-                                                </div>
-                                                {/* Equity Portion */}
-                                                <div className="bg-[#EFF3F6] rounded-xl p-4 shadow-[inset_2px_2px_4px_#d1d9e6,inset_-2px_-2px_4px_#ffffff]">
-                                                    <div className="mb-2">
-                                                        <span className="text-xs font-medium text-[#666666] uppercase tracking-wide">Equity portion</span>
-                                                    </div>
-                                                    <div className="flex items-baseline">
-                                                        <span className="text-[#666666] text-lg font-medium mr-1">$</span>
-                                                        <input
-                                                            type="text"
-                                                            value={equityMin.toLocaleString()}
-                                                            onChange={(e) => {
-                                                                const raw = e.target.value.replace(/[^0-9]/g, '');
-                                                                const value = parseInt(raw, 10);
-                                                                if (!isNaN(value)) {
-                                                                    setEquityMin(Math.max(EQUITY_MIN, Math.min(EQUITY_MAX, value)));
-                                                                    setEquityAnimating(true);
-                                                                    setLedFlicker(true);
-                                                                    setTimeout(() => {
-                                                                        setEquityAnimating(false);
-                                                                        setLedFlicker(false);
-                                                                    }, 200);
-                                                                }
-                                                            }}
-                                                            className={
-                                                                "text-2xl font-medium text-[#1C1C1E] tracking-tight financial-number bg-transparent border-none outline-none w-full " +
-                                                                (equityAnimating ? "jackpot-active" : "")
-                                                            }
-                                                        />
-                                                    </div>
-                                                    <p className="text-xs text-[#999999] mt-1">Equity value portion</p>
-                                                </div>
+                                            <div className="flex justify-between mt-2 px-4">
+                                                <span className="text-xs text-[#666666]">${(BASE_MIN / 1000)}k</span>
+                                                <span className="text-xs text-[#666666]">${(BASE_MAX / 1000)}k</span>
                                             </div>
-                                            <p className="text-xs text-[#666666] mt-3 text-center">
-                                                Editing base or equity auto-updates the total above.
-                                            </p>
                                         </div>
-                                    )}
+
+                                        {/* Equity Slider (conditional) */}
+                                        <AnimatePresence mode="wait">
+                                            {equityEnabled && (
+                                                <motion.div 
+                                                    className="mb-6 pt-6 border-t border-[#00C4CC]/20"
+                                                    initial={{ opacity: 0, height: 0 }}
+                                                    animate={{ opacity: 1, height: "auto" }}
+                                                    exit={{ opacity: 0, height: 0 }}
+                                                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                                >
+                                                    <div className="mb-2">
+                                                        <span className="small-label text-teal-600">Equity Value Minimum</span>
+                                                    </div>
+                                                    <div className="flex items-baseline justify-start mb-4">
+                                                        <span className="text-teal-600 text-2xl font-medium mr-2">$</span>
+                                                        <span
+                                                            className={
+                                                                "text-5xl font-medium text-[#1C1C1E] tracking-tight financial-number " +
+                                                                (equityAnimating ? "jackpot-active" : "") +
+                                                                (ledFlicker ? " led-flicker" : "")
+                                                            }
+                                                        >
+                                                            {equityMin.toLocaleString()}
+                                                        </span>
+                                                    </div>
+                                                    <div className="px-4 mt-6">
+                                                        <Slider
+                                                            min={EQUITY_MIN}
+                                                            max={EQUITY_MAX}
+                                                            step={1000}
+                                                            value={equityMin}
+                                                            onChange={handleEquityChange}
+                                                            onDragStart={() => setIsSliderDragging(true)}
+                                                            onDragEnd={() => { setIsSliderDragging(false); handleSliderRelease(); }}
+                                                        />
+                                                    </div>
+                                                    <div className="flex justify-between mt-2 px-4">
+                                                        <span className="text-xs text-[#666666]">${(EQUITY_MIN / 1000)}k</span>
+                                                        <span className="text-xs text-[#666666]">${(EQUITY_MAX / 1000)}k</span>
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+
+                                        {/* Total Compensation Display */}
+                                        <div className="pt-6 border-t border-[#E0E0E0]/50">
+                                            <motion.div 
+                                                className="rounded-xl p-6"
+                                                animate={{
+                                                    backgroundColor: equityEnabled 
+                                                        ? 'rgba(204, 251, 241, 0.5)' 
+                                                        : 'rgba(229, 249, 240, 1)',
+                                                    boxShadow: equityEnabled
+                                                        ? 'inset 3px 3px 6px rgba(0,100,100,0.08), inset -3px -3px 6px rgba(255,255,255,0.9)'
+                                                        : 'inset 3px 3px 6px #d1d9e6, inset -3px -3px 6px #ffffff'
+                                                }}
+                                                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                                            >
+                                                <div className="mb-2">
+                                                    <span className="small-label text-[#00C4CC]">Your total minimum (Cmin)</span>
+                                                </div>
+                                                <div className="flex items-baseline justify-start">
+                                                    <span className="text-[#666666] text-3xl font-medium mr-2">$</span>
+                                                    <motion.span
+                                                        className={
+                                                            "text-6xl font-medium text-[#1C1C1E] tracking-tight financial-number " +
+                                                            ((baseAnimating || equityAnimating) ? "jackpot-active" : "") +
+                                                            (ledFlicker ? " led-flicker" : "") +
+                                                            (greenFlash ? " candidate-confirm-flash" : "")
+                                                        }
+                                                        animate={{ scale: totalScale }}
+                                                        transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                                                    >
+                                                        {totalMin.toLocaleString()}
+                                                    </motion.span>
+                                                </div>
+                                                <AnimatePresence mode="wait">
+                                                    {equityEnabled && (
+                                                        <motion.div 
+                                                            className="mt-4 pt-4 border-t border-[#00C4CC]/20 text-sm text-[#666666] space-y-1"
+                                                            initial={{ opacity: 0, y: -10 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            exit={{ opacity: 0, y: -10 }}
+                                                            transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                                        >
+                                                            <div className="flex justify-between">
+                                                                <span>Base:</span>
+                                                                <span className="font-semibold">${baseMin.toLocaleString()}</span>
+                                                            </div>
+                                                            <div className="flex justify-between">
+                                                                <span>Equity:</span>
+                                                                <span className="font-semibold text-teal-600">${equityMin.toLocaleString()}</span>
+                                                            </div>
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
+                                            </motion.div>
+                                        </div>
+                                    </CompensationInputBlock>
 
                                     {/* Email Input */}
                                     <div className="space-y-6 pt-6 border-t border-[#E0E0E0]">
                                         <div>
                                             <label className="block text-sm font-medium text-[#1C1C1E] mb-2">
-                                                Your email
+                                                Email (to send your result)
                                             </label>
                                             <div className="relative">
                                                 <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#666666]" />
@@ -2361,23 +2607,19 @@
                                             </p>
                                         </div>
 
-                                        <button 
+                                        <AnimatedSubmitButton
                                             onClick={() => {
                                                 if (validateForm()) {
-                                                    playMagneticLatchSound();
                                                     submit();
                                                 }
-                                            }} 
-                                            className="w-full bg-[#00C4CC] text-white font-semibold py-4 rounded-full shadow-[0_4px_14px_rgba(0,196,204,0.35)] hover:bg-[#00B0B8] hover:shadow-[0_6px_20px_rgba(0,196,204,0.45)] transition-all flex items-center justify-center gap-3"
-                                        >
-                                            <Icons.Lock className="w-5 h-5" />
-                                            See if there's a deal
-                                        </button>
+                                            }}
+                                            buttonText="Lock it in & Get Link"
+                                        />
 
                                         <div className="flex items-start gap-2">
                                             <Icons.Lock className="w-3.5 h-3.5 text-[#666666] flex-shrink-0 mt-0.5" />
                                             <p className="text-xs text-[#666666]">
-                                                We only store whether a deal is possible and the final compensation we compute.
+                                                We only store whether a deal is possible and the final salary we compute.
                                             </p>
                                         </div>
                                     </div>
@@ -2444,7 +2686,7 @@
                                                 <strong className="text-[#34C759]">✓ Deal reached</strong>
                                             </p>
                                             <p className="text-xs text-[#666666]">
-                                                The mechanism found a fair overlap between your minimum and the company's budget and split the gap. This number is the fair middle.
+                                                The mechanism split the difference between your minimum and the company's number to land on this figure.
                                             </p>
                                         </div>
                                     </GlassCard>
@@ -2460,7 +2702,7 @@
                                                 </li>
                                                 <li className="flex items-start gap-2">
                                                     <Icons.Check className="w-4 h-4 text-[#34C759] mt-0.5 flex-shrink-0" />
-                                                    <span>The mechanism split the gap evenly</span>
+                                                    <span>The mechanism split the difference 50/50</span>
                                                 </li>
                                                 <li className="flex items-start gap-2">
                                                     <Icons.Lock className="w-4 h-4 text-[#34C759] mt-0.5 flex-shrink-0" />
@@ -2501,7 +2743,7 @@
                                                         Copy Result Link
                                                     </Button>
                                                     <p className="text-xs text-[#666666]">
-                                                        This link only shows the outcome (deal / close / no deal) and the final compensation. It never shows what either side originally entered.
+                                                        This link only shows the final outcome of the mechanism (deal/no deal/close) and the final compensation — not anyone's original inputs.
                                                     </p>
                                                 </>
                                             )}
@@ -2536,7 +2778,7 @@
                                             </p>
                                             <p className="text-sm text-[#666666]">
                                                 {result.status === 'close' 
-                                                    ? 'Your number and the company\'s budget are within the "close enough" range, but not overlapping. This is a strong starting point for a conversation, not an automatic deal.'
+                                                    ? 'The mechanism found you\'re within a reasonable range but not enough for an automatic match; this is a good starting number for a conversation.'
                                                     : 'The mechanism determined you\'re too far apart for a fair middle ground.'}
                                             </p>
                                         </div>
@@ -2615,7 +2857,7 @@
                                                 Copy Result Link
                                             </Button>
                                             <p className="text-xs text-[#666666]">
-                                                This link only shows the outcome (deal / close / no deal) and the final compensation. It never shows what either side originally entered.
+                                                This link only shows the final outcome of the mechanism (deal/no deal/close) and the final compensation — not anyone's original inputs.
                                             </p>
                                         </div>
                                     )}
@@ -2667,7 +2909,7 @@
             if (step === 'loading') {
                 return (
                     <div className="max-w-xl mx-auto animate-enter text-center">
-                        <div className="text-[#666666]">Loading result…</div>
+                        <div className="text-[#666666]">Loading...</div>
                     </div>
                 );
             }
@@ -2679,7 +2921,7 @@
                             <div className="w-24 h-24 mx-auto rounded-full bg-[#FFEBEB] shadow-[10px_10px_20px_#d9d9d9,-10px_-10px_20px_#ffffff] flex items-center justify-center mb-8">
                                 <Icons.Lock className="w-12 h-12 text-[#FF3B30]" />
                             </div>
-                            <h2 className="text-3xl font-bold text-[#1C1C1E] mb-4">Result not found</h2>
+                            <h2 className="text-3xl font-bold text-[#1C1C1E] mb-4">Not Available</h2>
                             <p className="text-[#666666] mb-6">{error}</p>
                             <Button
                                 variant="outline"
@@ -2722,7 +2964,7 @@
                             </p>
                             <div className="bg-[#E5F9F0] rounded-xl p-5 text-center">
                                 <p className="text-sm text-[#666666]">
-                                    This is the fair split computed by the mechanism. Both sides' ranges overlapped, and the gap between them was split evenly.
+                                    This is the fair split computed by the mechanism. Both sides' ranges overlapped, and the difference was split 50/50.
                                 </p>
                             </div>
                         </GlassCard>
@@ -2740,7 +2982,7 @@
                                 🔒 Privacy Protected
                             </h3>
                             <p className="text-xs text-[#666666]">
-                                This link only shows the outcome (success / close / no deal) and the final compensation. It never shows what either side originally entered.
+                                This link shows only the final outcome (success/close/fail) and the final compensation—not anyone's original inputs. The mechanism kept both parties' numbers private.
                             </p>
                         </GlassCard>
 
@@ -2767,7 +3009,7 @@
                             Close — Let's Talk 🤝
                         </h2>
                         <p className="text-lg text-[#666666] mb-10 leading-relaxed">
-                            The ranges were within 10% — close enough that a short conversation could close the gap.
+                            The ranges were within 10% — worth a conversation!
                         </p>
 
                         <GlassCard className="border-l-4 border-[#FF9500] mb-6">
@@ -2797,7 +3039,7 @@
                                 Outcome-Only Display
                             </h3>
                             <p className="text-xs text-[#666666]">
-                                This link only shows the outcome (success / close / no deal) and the final compensation. It never shows what either side originally entered.
+                                This link shows only the final outcome (success/close/fail), not the original inputs from either party.
                             </p>
                         </GlassCard>
 
@@ -2821,10 +3063,10 @@
                     </div>
 
                     <h2 className="text-4xl md:text-5xl font-extrabold text-[#1C1C1E] mb-6">
-                        No automatic deal 💭
+                        No Auto-Deal 💭
                     </h2>
                     <p className="text-lg text-[#666666] mb-10 leading-relaxed">
-                        The ranges were too far apart for an automatic agreement.
+                        The ranges were too far apart—conversation needed.
                     </p>
 
                     <GlassCard className="border-l-4 border-[#FF3B30] mb-6">
@@ -2833,7 +3075,7 @@
                                 📊 Gap too large
                             </p>
                             <p className="text-[#666666] text-sm mb-3">
-                                The mechanism found the two sides more than 10% apart, so it couldn't suggest a fair middle.
+                                The mechanism found the two sides more than 10% apart. It couldn't auto-propose a fair split.
                             </p>
                             <p className="text-[#666666] font-semibold text-sm">
                                 🗣️ Both parties should talk to see if there's a path forward.
