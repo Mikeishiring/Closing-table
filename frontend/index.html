@@ -2051,6 +2051,38 @@
                                         </p>
                                     </div>
 
+                                    {/* Equity Toggle */}
+                                    {offerStatus?.equityEnabled && (
+                                        <div className="mb-8 p-4 bg-[#EFF3F6] rounded-xl shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff]">
+                                            <label className="flex items-center justify-between cursor-pointer">
+                                                <div>
+                                                    <p className="text-sm font-semibold text-[#1C1C1E]">Include equity in your minimum</p>
+                                                    <p className="text-xs text-[#666666]">Toggle to add equity component</p>
+                                                </div>
+                                                <div className="relative">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={equityEnabled}
+                                                        onChange={(e) => setEquityEnabled(e.target.checked)}
+                                                        className="sr-only"
+                                                    />
+                                                    <div
+                                                        className={`w-14 h-8 rounded-full transition-colors duration-200 ${
+                                                            equityEnabled ? 'bg-[#00C4CC]' : 'bg-[#E0E0E0]'
+                                                        }`}
+                                                        onClick={() => setEquityEnabled(!equityEnabled)}
+                                                    >
+                                                        <div
+                                                            className={`w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-200 mt-1 ${
+                                                                equityEnabled ? 'translate-x-7' : 'translate-x-1'
+                                                            }`}
+                                                        ></div>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    )}
+
                                     {/* Base Salary Slider */}
                                     <div className="mb-8">
                                         <div className="mb-2">
