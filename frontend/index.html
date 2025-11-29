@@ -1420,7 +1420,7 @@
                             Offer Link Created
                         </h1>
                         <p className="text-lg text-[#666666] mb-10 leading-relaxed">
-                            Your maximum is locked and ready for the candidate.
+                            Your compensation envelope is locked and ready to share.
                         </p>
 
                         {/* 3-Step Instructions */}
@@ -1438,13 +1438,13 @@
                                 <li className="flex items-start gap-3">
                                     <span className="flex-shrink-0 w-6 h-6 bg-[#00C4CC] text-white rounded-full flex items-center justify-center text-xs font-bold">2</span>
                                     <div className="text-sm text-[#666666]">
-                                        <span className="font-semibold text-[#1C1C1E]">They enter their minimum.</span> Once submitted, the mechanism runs automatically.
+                                        <span className="font-semibold text-[#1C1C1E]">They privately share the minimum they'd be happy with.</span> Once submitted, the mechanism runs automatically.
                                     </div>
                                 </li>
                                 <li className="flex items-start gap-3">
                                     <span className="flex-shrink-0 w-6 h-6 bg-[#00C4CC] text-white rounded-full flex items-center justify-center text-xs font-bold">3</span>
                                     <div className="text-sm text-[#666666]">
-                                        <span className="font-semibold text-[#1C1C1E]">The mechanism checks for a fair middle ground.</span> It returns one of three outcomes: Deal Closed, Close Gap, or No Deal.
+                                        <span className="font-semibold text-[#1C1C1E]">The mechanism checks whether there's a fair middle ground.</span> It returns one of three outcomes: Deal Closed, Close Gap, or No Deal.
                                     </div>
                                 </li>
                             </ol>
@@ -1503,7 +1503,7 @@
                             The Closing Table
                         </h1>
                         <p className="hero-subtitle">
-                            Set your maximum. We'll find a fair match with the candidate.
+                            Set your compensation envelope. We'll check if a fair deal exists inside it.
                         </p>
                     </div>
 
@@ -1559,7 +1559,7 @@
                                 {/* Base Salary Slider */}
                                 <div className="mb-8">
                                     <div className="mb-2">
-                                        <span className="small-label">Base Salary Maximum</span>
+                                        <span className="small-label">Maximum base salary</span>
                                     </div>
                                     <div className="flex items-baseline justify-start mb-4">
                                         <span className="text-[#666666] text-2xl font-medium mr-2">$</span>
@@ -1594,7 +1594,7 @@
                                 {equityEnabled && (
                                     <div className="mb-8 pt-6 border-t border-[#E0E0E0]">
                                         <div className="mb-2">
-                                            <span className="small-label">Equity Value Maximum</span>
+                                            <span className="small-label">Maximum equity value</span>
                                         </div>
                                         <div className="flex items-baseline justify-start mb-4">
                                             <span className="text-[#666666] text-2xl font-medium mr-2">$</span>
@@ -1630,7 +1630,7 @@
                                 <div className="mb-8 pt-6 border-t border-[#E0E0E0]">
                                     <div className="bg-[#E5F9F0] rounded-xl p-6 shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff]">
                                         <div className="mb-2">
-                                            <span className="small-label text-[#00C4CC]">Your total maximum (Cmax)</span>
+                                            <span className="small-label text-[#00C4CC]">Your total compensation ceiling</span>
                                         </div>
                                         <div className="flex items-baseline justify-start">
                                             <span className="text-[#666666] text-3xl font-medium mr-2">$</span>
@@ -1663,7 +1663,7 @@
                                 <div className="space-y-6 pt-6 border-t border-[#E0E0E0]">
                                     <div>
                                         <label className="block text-sm font-medium text-[#1C1C1E] mb-2">
-                                            Email (to send the link)
+                                            Your email
                                         </label>
                                         <div className="relative">
                                             <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#666666]" />
@@ -1700,7 +1700,7 @@
                                     <div className="flex items-start gap-2">
                                         <Icons.Lock className="w-3.5 h-3.5 text-[#666666] flex-shrink-0 mt-0.5" />
                                         <p className="text-xs text-[#666666]">
-                                            We only store whether a deal is possible and the final salary we compute.
+                                            We only store whether a deal is possible and the final compensation we compute.
                                         </p>
                                     </div>
                                 </div>
@@ -2017,7 +2017,7 @@
                                 The Closing Table
                             </h1>
                             <p className="hero-subtitle">
-                                Set your minimum. We'll find a fair match with the company.
+                                Set the minimum that would make this a yes. We'll compare it to the company's budget.
                             </p>
                         </div>
 
@@ -2027,7 +2027,7 @@
                                 <div className="flex items-start gap-3">
                                     <Icons.AlertTriangle className="w-5 h-5 text-[#FF3B30] flex-shrink-0 mt-0.5" />
                                     <div>
-                                        <p className="text-[#FF3B30] font-semibold mb-1">Unable to Submit</p>
+                                        <p className="text-[#FF3B30] font-semibold mb-1">We couldn't submit your number</p>
                                         <p className="text-[#FF3B30] text-sm">{error}</p>
                                     </div>
                                 </div>
@@ -2055,7 +2055,7 @@
                                         <div className="mb-8 p-3 bg-[#EFF3F6] rounded-xl shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff]">
                                             <label className="flex items-center justify-between cursor-pointer">
                                                 <div>
-                                                    <p className="text-sm font-semibold text-[#1C1C1E]">Include equity in your minimum</p>
+                                                    <p className="text-sm font-semibold text-[#1C1C1E]">Include equity in this minimum</p>
                                                 </div>
                                                 <div className="relative">
                                                     <input
@@ -2155,7 +2155,7 @@
                                     <div className="mb-8 pt-6 border-t border-[#E0E0E0]">
                                         <div className="bg-[#E5F9F0] rounded-xl p-6 shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff]">
                                             <div className="mb-2">
-                                                <span className="small-label text-[#00C4CC]">Your total minimum (Cmin)</span>
+                                                <span className="small-label text-[#00C4CC]">Your total compensation floor</span>
                                             </div>
                                             <div className="flex items-baseline justify-start">
                                                 <span className="text-[#666666] text-3xl font-medium mr-2">$</span>
@@ -2190,7 +2190,7 @@
                                     <div className="space-y-6 pt-6 border-t border-[#E0E0E0]">
                                         <div>
                                             <label className="block text-sm font-medium text-[#1C1C1E] mb-2">
-                                                Email (to send your result)
+                                                Your email
                                             </label>
                                             <div className="relative">
                                                 <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#666666]" />
@@ -2236,7 +2236,7 @@
                                         <div className="flex items-start gap-2">
                                             <Icons.Lock className="w-3.5 h-3.5 text-[#666666] flex-shrink-0 mt-0.5" />
                                             <p className="text-xs text-[#666666]">
-                                                We only store whether a deal is possible and the final salary we compute.
+                                                We only store whether a deal is possible and the final compensation we compute.
                                             </p>
                                         </div>
                                     </div>
@@ -2303,7 +2303,7 @@
                                                 <strong className="text-[#34C759]">✓ Deal reached</strong>
                                             </p>
                                             <p className="text-xs text-[#666666]">
-                                                The mechanism split the difference between your minimum and the company's number to land on this figure.
+                                                The mechanism found a fair overlap between your minimum and the company's budget and split the gap. This number is the fair middle.
                                             </p>
                                         </div>
                                     </GlassCard>
@@ -2319,7 +2319,7 @@
                                                 </li>
                                                 <li className="flex items-start gap-2">
                                                     <Icons.Check className="w-4 h-4 text-[#34C759] mt-0.5 flex-shrink-0" />
-                                                    <span>The mechanism split the difference 50/50</span>
+                                                    <span>The mechanism split the gap evenly</span>
                                                 </li>
                                                 <li className="flex items-start gap-2">
                                                     <Icons.Lock className="w-4 h-4 text-[#34C759] mt-0.5 flex-shrink-0" />
@@ -2360,7 +2360,7 @@
                                                         Copy Result Link
                                                     </Button>
                                                     <p className="text-xs text-[#666666]">
-                                                        This link only shows the final outcome of the mechanism (deal/no deal/close) and the final compensation — not anyone's original inputs.
+                                                        This link only shows the outcome (deal / close / no deal) and the final compensation. It never shows what either side originally entered.
                                                     </p>
                                                 </>
                                             )}
@@ -2395,7 +2395,7 @@
                                             </p>
                                             <p className="text-sm text-[#666666]">
                                                 {result.status === 'close' 
-                                                    ? 'The mechanism found you\'re within a reasonable range but not enough for an automatic match; this is a good starting number for a conversation.'
+                                                    ? 'Your number and the company\'s budget are within the "close enough" range, but not overlapping. This is a strong starting point for a conversation, not an automatic deal.'
                                                     : 'The mechanism determined you\'re too far apart for a fair middle ground.'}
                                             </p>
                                         </div>
@@ -2474,7 +2474,7 @@
                                                 Copy Result Link
                                             </Button>
                                             <p className="text-xs text-[#666666]">
-                                                This link only shows the final outcome of the mechanism (deal/no deal/close) and the final compensation — not anyone's original inputs.
+                                                This link only shows the outcome (deal / close / no deal) and the final compensation. It never shows what either side originally entered.
                                             </p>
                                         </div>
                                     )}
@@ -2538,7 +2538,7 @@
                             <div className="w-24 h-24 mx-auto rounded-full bg-[#FFEBEB] shadow-[10px_10px_20px_#d9d9d9,-10px_-10px_20px_#ffffff] flex items-center justify-center mb-8">
                                 <Icons.Lock className="w-12 h-12 text-[#FF3B30]" />
                             </div>
-                            <h2 className="text-3xl font-bold text-[#1C1C1E] mb-4">Not Available</h2>
+                            <h2 className="text-3xl font-bold text-[#1C1C1E] mb-4">Result not found</h2>
                             <p className="text-[#666666] mb-6">{error}</p>
                             <Button
                                 variant="outline"
@@ -2581,7 +2581,7 @@
                             </p>
                             <div className="bg-[#E5F9F0] rounded-xl p-5 text-center">
                                 <p className="text-sm text-[#666666]">
-                                    This is the fair split computed by the mechanism. Both sides' ranges overlapped, and the difference was split 50/50.
+                                    This is the fair split computed by the mechanism. Both sides' ranges overlapped, and the gap between them was split evenly.
                                 </p>
                             </div>
                         </GlassCard>
@@ -2599,7 +2599,7 @@
                                 🔒 Privacy Protected
                             </h3>
                             <p className="text-xs text-[#666666]">
-                                This link shows only the final outcome (success/close/fail) and the final compensation—not anyone's original inputs. The mechanism kept both parties' numbers private.
+                                This link only shows the outcome (success / close / no deal) and the final compensation. It never shows what either side originally entered.
                             </p>
                         </GlassCard>
 
@@ -2626,7 +2626,7 @@
                             Close — Let's Talk 🤝
                         </h2>
                         <p className="text-lg text-[#666666] mb-10 leading-relaxed">
-                            The ranges were within 10% — worth a conversation!
+                            The ranges were within 10% — close enough that a short conversation could close the gap.
                         </p>
 
                         <GlassCard className="border-l-4 border-[#FF9500] mb-6">
@@ -2656,7 +2656,7 @@
                                 Outcome-Only Display
                             </h3>
                             <p className="text-xs text-[#666666]">
-                                This link shows only the final outcome (success/close/fail), not the original inputs from either party.
+                                This link only shows the outcome (success / close / no deal) and the final compensation. It never shows what either side originally entered.
                             </p>
                         </GlassCard>
 
@@ -2680,10 +2680,10 @@
                     </div>
 
                     <h2 className="text-4xl md:text-5xl font-extrabold text-[#1C1C1E] mb-6">
-                        No Auto-Deal 💭
+                        No automatic deal 💭
                     </h2>
                     <p className="text-lg text-[#666666] mb-10 leading-relaxed">
-                        The ranges were too far apart—conversation needed.
+                        The ranges were too far apart for an automatic agreement.
                     </p>
 
                     <GlassCard className="border-l-4 border-[#FF3B30] mb-6">
@@ -2692,7 +2692,7 @@
                                 📊 Gap too large
                             </p>
                             <p className="text-[#666666] text-sm mb-3">
-                                The mechanism found the two sides more than 10% apart. It couldn't auto-propose a fair split.
+                                The mechanism found the two sides more than 10% apart, so it couldn't suggest a fair middle.
                             </p>
                             <p className="text-[#666666] font-semibold text-sm">
                                 🗣️ Both parties should talk to see if there's a path forward.
