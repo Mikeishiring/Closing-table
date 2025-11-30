@@ -1,0 +1,171 @@
+/* === ANIMATIONS === */
+
+/* --- Core Animations --- */
+@keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-enter {
+    animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes subtle-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
+}
+
+.gold-pulse {
+    animation: subtle-pulse 2s ease-in-out infinite;
+}
+
+/* --- Status Badge Animations --- */
+@keyframes status-badge-bounce {
+    0% { transform: scale(0.8); opacity: 0; }
+    60% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes status-glow-fade {
+    0% { box-shadow: 0 4px 20px rgba(0, 196, 204, 0.8), 0 0 40px rgba(0, 196, 204, 0.6); opacity: 1; }
+    100% { box-shadow: 0 4px 20px rgba(0, 196, 204, 0.4), 0 0 0 rgba(0, 196, 204, 0); opacity: 1; }
+}
+
+/* --- Jackpot Number Animation --- */
+.jackpot-number {
+    display: inline-block;
+    transform-origin: center;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.jackpot-number.jackpot-active {
+    animation: jackpot-rise 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes jackpot-rise {
+    0% { transform: translateY(8px) scale(1.02); opacity: 0.5; }
+    50% { transform: translateY(-3px) scale(1.08); opacity: 1; }
+    100% { transform: translateY(0) scale(1.04); opacity: 1; }
+}
+
+/* --- Candidate Confirmation --- */
+@keyframes candidate-confirm-flash {
+    0% { color: var(--text-primary); }
+    30% { color: var(--accent-primary); }
+    100% { color: var(--text-primary); }
+}
+
+.candidate-confirm-flash {
+    animation: candidate-confirm-flash 0.6s ease-out;
+}
+
+/* --- LED Flicker --- */
+.led-flicker {
+    animation: led-flicker 0.12s ease-out;
+}
+
+@keyframes led-flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* --- Card Sink --- */
+.card-sink {
+    animation: card-sink 0.15s ease-out;
+}
+
+@keyframes card-sink {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(1px); }
+    100% { transform: translateY(0); }
+}
+
+/* --- Vault & Scale Icons --- */
+.vault-icon { animation: vault-lock 0.8s ease-in-out; }
+.scale-icon { animation: scale-balance 2s ease-in-out infinite; }
+.commitment-text { animation: text-flash 1.2s ease-in-out; }
+
+@keyframes vault-lock {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(3deg) scale(1.05); }
+    100% { transform: rotate(0deg) scale(1); }
+}
+
+@keyframes scale-balance {
+    0%, 100% { transform: translateX(0) rotate(0deg); }
+    25% { transform: translateX(-6px) rotate(-1deg); }
+    75% { transform: translateX(6px) rotate(1deg); }
+}
+
+@keyframes text-flash {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+}
+
+/* --- URL Copy Animation --- */
+.url-flip-active { animation: url-flip 0.5s ease; }
+.url-checkmark { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; }
+.url-flip-active .url-checkmark { opacity: 1; animation: checkmark-fade 0.5s ease-out; }
+
+@keyframes url-flip {
+    0% { transform: scale(1); background: var(--bg-input); }
+    50% { transform: scale(0.98); background: var(--hover-highlight); }
+    100% { transform: scale(1); background: var(--bg-input); }
+}
+
+@keyframes checkmark-fade {
+    0%, 100% { opacity: 0; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* --- Toast Animations --- */
+@keyframes toast-slide-in {
+    0% { transform: translateX(-50%) translateY(10px); opacity: 0; }
+    100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+}
+
+@keyframes toast-fade-out {
+    0% { transform: translateX(-50%) translateY(0); opacity: 1; }
+    100% { transform: translateX(-50%) translateY(-10px); opacity: 0; }
+}
+
+/* --- Link Shimmer --- */
+@keyframes link-shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* --- Paper Settle --- */
+@keyframes paperSettle {
+    0% {
+        transform: translateY(16px) scale(0.96);
+    }
+    100% {
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* --- Skeleton Loading --- */
+@keyframes skeleton-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* --- Checklist Item Animation --- */
+.checklist-item {
+    opacity: 0;
+    transform: translateY(10px);
+    animation: checklist-item-enter 0.4s ease forwards;
+}
+
+.checklist-item:nth-child(1) { animation-delay: 0.1s; }
+.checklist-item:nth-child(2) { animation-delay: 0.2s; }
+.checklist-item:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes checklist-item-enter {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+

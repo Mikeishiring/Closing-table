@@ -152,6 +152,10 @@ function calculateDeal(cMax, cMin) {
 // Note: Email functionality removed. No email addresses are collected or stored.
 // If email notifications are needed in the future, implement here with clear privacy documentation.
 
+// --- SERVE STATIC FILES ---
+// Serve frontend static files (js, css, images) from the frontend directory
+app.use(express.static(path.join(__dirname, 'frontend')));
+
 // --- SERVE FRONTEND ---
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'frontend', 'index.html'));

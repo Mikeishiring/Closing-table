@@ -33,17 +33,6 @@
     <script src="https://unpkg.com/framer-motion@11/dist/framer-motion.js"></script>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com" defer></script>
-    
-    <!-- 
-    JS Modules available for future use:
-    - js/config.js - Application configuration
-    - js/utils.js - Utility functions  
-    - js/audio.js - Audio manager
-    - js/icons.js - SVG icon components
-    These are currently disabled to avoid conflicts with inline code.
-    Enable when migrating to a build system (Vite, etc).
-    -->
-    
     <style>
         /* === iPhone Sleek Design System === */
         
@@ -4282,26 +4271,26 @@
                                 </div>
                             </GlassCard>
 
-                            <GlassCard className="bg-[#EFF3F6]">
-                                <h3 className="text-xs text-[#1C1C1E] mb-2 font-bold uppercase tracking-wide">
-                                    🔒 Privacy Protected
-                                </h3>
-                                <p className="text-xs text-[#666666]">
+                        <GlassCard className="bg-[#EFF3F6]">
+                            <h3 className="text-xs text-[#1C1C1E] mb-2 font-bold uppercase tracking-wide">
+                                🔒 Privacy Protected
+                            </h3>
+                            <p className="text-xs text-[#666666]">
                                 This link shows only the final outcome (success/close/fail) and the final total compensation — not anyone's original inputs. The mechanism kept both parties' numbers private.
-                                </p>
-                            </GlassCard>
+                            </p>
+                        </GlassCard>
 
-                            <Button variant="secondary" onClick={() => window.location.reload()} className="mt-6 w-full">
-                                Start New Offer
-                            </Button>
+                        <Button variant="secondary" onClick={() => window.location.reload()} className="mt-6 w-full">
+                            Start New Offer
+                        </Button>
 
-                            <p className="text-[#666666] text-xs text-center mt-6">
+                        <p className="text-[#666666] text-xs text-center mt-6">
                             Result available for 7 days; no original inputs are stored.
                         </p>
                         <p className="text-[#999999] text-xs text-center mt-1">
-                                Created {new Date(data.createdAt).toLocaleDateString()}
-                            </p>
-                        </div>
+                            Created {new Date(data.createdAt).toLocaleDateString()}
+                        </p>
+                    </div>
                     </div>
                 );
             }
@@ -4358,8 +4347,8 @@
                                         <div className="hero-number-container bg-gradient-to-br from-orange-100 to-amber-100">
                                             <p className="text-5xl font-bold text-[#FF9500] tracking-tight financial-number">
                                                 ${data.suggested.toLocaleString()}
-                                    </p>
-                                </div>
+                                            </p>
+                                        </div>
                                         <p className="text-xs text-[#666666] mt-3 italic">
                                             This is a non-binding suggestion for human negotiation, not an auto-deal.
                                         </p>

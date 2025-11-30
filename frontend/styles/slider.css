@@ -1,0 +1,144 @@
+/* === SLIDER STYLES === */
+
+/* --- Signature Slider --- */
+.signature-slider {
+    position: relative;
+    padding: 0.5rem 0;
+}
+
+.signature-slider--company [data-radix-slider-range] {
+    background-color: var(--accent-primary) !important;
+}
+
+.signature-slider--candidate [data-radix-slider-range] {
+    background-color: var(--accent-primary) !important;
+}
+
+.signature-slider__labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    padding: 0 1rem;
+}
+
+.signature-slider__label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+/* --- Ink Dot Animation --- */
+.signature-slider__ink-dot {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-primary);
+    opacity: 0;
+    transform: scale(0);
+    pointer-events: none;
+    transition: none;
+}
+
+.signature-slider__ink-dot--active {
+    animation: inkDotPulse 0.4s ease-out forwards;
+}
+
+@keyframes inkDotPulse {
+    0% {
+        opacity: 0.8;
+        transform: scale(0);
+    }
+    50% {
+        opacity: 0.6;
+        transform: scale(1.5);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(2);
+    }
+}
+
+/* --- Outcome Bars --- */
+.outcome-bar-container {
+    position: relative;
+    width: 100%;
+    height: 12px;
+    background: #E0E0E0;
+    border-radius: 6px;
+    overflow: visible;
+    margin: 20px 0;
+    box-shadow: inset 2px 2px 4px rgba(0,0,0,0.08);
+}
+
+.outcome-bar-fair-split {
+    background: linear-gradient(to right, var(--accent-primary) 0%, var(--accent-primary) 50%, var(--success-color) 50%, var(--success-color) 100%);
+    height: 100%;
+    border-radius: 6px;
+}
+
+.outcome-bar-bridge {
+    background: linear-gradient(to right, var(--accent-primary) 0%, var(--accent-primary) 45%, var(--warning-color) 45%, var(--warning-color) 55%, #FFD60A 55%, #FFD60A 100%);
+    height: 100%;
+    border-radius: 6px;
+}
+
+.outcome-bar-no-deal {
+    background: linear-gradient(to right, var(--accent-primary) 0%, var(--accent-primary) 40%, var(--error-color) 40%, var(--error-color) 100%);
+    height: 100%;
+    border-radius: 6px;
+}
+
+.outcome-bar-label {
+    position: absolute;
+    top: -18px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.outcome-bar-split-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--text-primary);
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 700;
+    color: white;
+    white-space: nowrap;
+}
+
+/* --- Calculation Bar --- */
+.calculation-bar-container {
+    position: relative;
+    width: 100%;
+    height: 10px;
+    background: #E0E0E0;
+    border-radius: 5px;
+    overflow: visible;
+    box-shadow: inset 2px 2px 4px rgba(0,0,0,0.08);
+}
+
+.calculation-bar-range {
+    position: absolute;
+    height: 100%;
+    background: linear-gradient(to right, var(--accent-primary), var(--success-color));
+    border-radius: 5px;
+}
+
+.calculation-bar-label {
+    position: absolute;
+    top: -20px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.calculation-bar-label.left { left: 0; color: var(--accent-primary); }
+.calculation-bar-label.right { right: 0; color: var(--success-color); }
+.calculation-bar-label.center { left: 50%; transform: translateX(-50%); color: var(--text-primary); }
+

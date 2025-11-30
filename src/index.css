@@ -1,0 +1,78 @@
+/* Base styles */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS Variables */
+:root {
+  --bg-page: #F8F8F8;
+  --bg-card: #FFFFFF;
+  --text-primary: #1C1C1E;
+  --text-secondary: #666666;
+  --accent-primary: #00C4CC;
+  --accent-hover: #00B0B8;
+  --success-color: #34C759;
+  --error-color: #FF3B30;
+}
+
+body {
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Signature Slider Styles */
+.signature-slider {
+  --accent-color: #00C4CC;
+  position: relative;
+  padding: 1.3rem 0; /* increased by 30% from 1rem */
+}
+
+.signature-slider--company {
+  --accent-color: #00C4CC;
+}
+
+.signature-slider--candidate {
+  --accent-color: #6366F1;
+}
+
+.signature-slider__labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.65rem; /* increased by 30% from 0.5rem */
+  padding: 0 1.3rem; /* increased by 30% from 1rem */
+}
+
+.signature-slider__label {
+  font-size: 0.975rem; /* increased by 30% from 0.75rem */
+  color: var(--text-secondary);
+}
+
+/* Ink dot animation */
+@keyframes ink-dot {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
+  }
+}
+
+.signature-slider__ink-dot {
+  position: absolute;
+  width: 10.4px; /* increased by 30% from 8px */
+  height: 10.4px;
+  border-radius: 50%;
+  background: var(--accent-color);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.signature-slider__ink-dot--active {
+  animation: ink-dot 0.3s ease-out forwards;
+}
+
