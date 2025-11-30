@@ -1,15 +1,18 @@
 # The Closing Table
 
-The Closing Table is a web application that implements a **single-shot salary negotiation mechanism**. It's designed to simplify negotiations by having both parties submit their numbers once, then automatically computing a fair outcome if ranges overlap.
+The Closing Table is a web application that implements a **single-shot compensation negotiation mechanism**. It's designed to simplify negotiations by having both parties submit their numbers once, then automatically computing a fair outcome if ranges overlap.
 
 ## What This Project Is About
 
-The Closing Table addresses a fundamental problem in salary negotiations: **back-and-forth haggling and negotiation fatigue**. Traditional negotiations often involve multiple rounds where neither party reveals their true limits, leading to inefficient outcomes and potential deal failures.
+The Closing Table addresses a fundamental problem in compensation negotiations: **back-and-forth haggling and negotiation fatigue**. Traditional negotiations often involve multiple rounds where neither party reveals their true limits, leading to inefficient outcomes and potential deal failures.
 
 **The core idea:**
-> Company sets its maximum salary. Candidate sets their minimum.  
+> Company sets its maximum **total compensation** (base + optional equity, entered as a single yearly number).  
+> Candidate sets their minimum **total compensation** (base + optional equity, entered as a single yearly number).  
 > If the ranges overlap, the app instantly closes a fair deal by splitting the difference 50/50.  
 > If they don't overlap, the app clearly signals whether a human conversation could bridge the gap.
+
+**Note on total compensation:** Both parties enter base salary and equity (if applicable) separately, but the mechanism runs on the **combined total**. This ensures the deal is evaluated on the complete compensation package, not just base salary.
 
 This is a **prototype** to explore fair, transparent negotiation mechanisms — not a production compensation tool.
 
@@ -22,8 +25,12 @@ The mechanism operates on a simple mathematical principle: when two parties' acc
 ### The Mechanism (Mathematical Definition)
 
 **Inputs:**
-- `CMax`: Company's true maximum salary (private, submitted first)
-- `CMin`: Candidate's true minimum salary (private, submitted second)
+- `CMax`: Company's true maximum **total compensation** (base + equity combined, private, submitted first)
+- `CMin`: Candidate's true minimum **total compensation** (base + equity combined, private, submitted second)
+
+**How total compensation is calculated:** Both base salary and equity are entered separately in the UI, but the mechanism adds them together and operates on the combined total. This means:
+- Company enters: Base Max ($X) + Equity Max ($Y) → Total CMax = X + Y
+- Candidate enters: Base Min ($A) + Equity Min ($B) → Total CMin = A + B
 
 **Calculation:**
 1. **FAIR_SPLIT (Overlap Case):** If `CMin ≤ CMax`
@@ -35,6 +42,7 @@ The mechanism operates on a simple mathematical principle: when two parties' acc
 2. **BRIDGE_ZONE (Close Gap):** If `CMin > CMax` and `(CMin - CMax) / CMax ≤ 0.10`
    - Gap = `CMin - CMax`
    - Gap is within 10% of company's maximum
+   - Suggested starting point = `(CMax + CMin) / 2` (midpoint, for human negotiation)
    - Status: `close` (suggests human conversation)
 
 3. **NO_DEAL (Large Gap):** If `CMin > CMax` and `(CMin - CMax) / CMax > 0.10`
@@ -43,34 +51,38 @@ The mechanism operates on a simple mathematical principle: when two parties' acc
    - Status: `fail` (deal cannot be closed)
 
 **Key Properties:**
-- **Single-shot submission:** Each party inputs a single number
-- **Single-use:** Each offer can only be submitted once
+- **Total compensation:** The mechanism evaluates the complete package (base + equity), not just base salary
+- **Single-shot submission:** Each party inputs their total compensation as a single combined number
+- **Single-use:** Each offer can only be submitted once, then immediately deleted from memory
 - **Fair split:** When overlap exists, surplus is divided exactly 50/50
 - **Outcome-only display:** Only the final outcome (deal/no deal/close) and final number are shown
 - **Rounding:** Final offers are rounded to nearest $1,000 for simplicity
+- **Privacy:** No email addresses are collected; offers are deleted immediately after use
 
 ---
 
 ## What It's Good For
 
 ✅ **Single-shot negotiations** — When both parties want to make one final offer and close the deal quickly  
+✅ **Total compensation clarity** — Evaluates the complete package (base + equity), not just base salary  
 ✅ **Transparency and fairness** — The mechanism is simple and predictable; both parties know how it works  
 ✅ **Time-sensitive situations** — Fast resolution when there's urgency to close  
 ✅ **Reducing negotiation fatigue** — No back-and-forth; submit numbers once and get an answer  
 ✅ **Outcome-only display** — The app only displays the final outcome and number, not the original inputs  
 ✅ **Clear boundaries** — Explicitly shows when a deal is possible vs. when ranges are too far apart  
-✅ **Fair surplus distribution** — When ranges overlap, the surplus is split 50/50, ensuring both parties benefit equally
+✅ **Fair surplus distribution** — When ranges overlap, the surplus is split 50/50, ensuring both parties benefit equally  
+✅ **Privacy-first** — No email addresses collected; offers deleted immediately after mechanism runs
 
 ---
 
 ## What It's NOT Good For
 
-❌ **Multi-round negotiations** — This is a **single-use mechanism**. Each offer can only be submitted once. Once used, the offer is marked as "used" and cannot be resubmitted.  
-❌ **Complex compensation packages** — Only handles base salary. Does not account for equity, bonuses, benefits, or other compensation components  
+❌ **Multi-round negotiations** — This is a **single-use mechanism**. Each offer can only be submitted once. Once used, the offer is immediately deleted from memory.  
+❌ **Non-monetizable benefits** — Only handles base salary and equity as dollar amounts. Does not account for signing bonuses, benefits, PTO, or other non-standard components  
 ❌ **Situations requiring human judgment** — The 10% "bridge zone" is flagged for human conversation, but the mechanism itself is purely algorithmic  
 ❌ **Long-term relationship building** — This is transactional, not relational. No negotiation history or relationship context  
 ❌ **Production use cases** — This is a prototype. No permanent data storage, no email integration, no audit trails  
-❌ **High-stakes executive negotiations** — Designed for standard salary negotiations, not complex C-suite packages  
+❌ **High-stakes executive negotiations** — Designed for standard compensation negotiations, not complex C-suite packages  
 ❌ **Situations where flexibility matters** — The mechanism is rigid: overlap = deal, no overlap = no deal (or bridge zone flag)
 
 ### Key Limitation: Single-Use Mechanism
@@ -138,35 +150,35 @@ The test suite includes:
 
 **Phase 1: Commitment Panel (INPUT)**
 - **Company View:** 
-  - Company enters their maximum budget (CMax) and email
-  - Clicks "🔒 Lock Budget & Create Link"
-  - Receives a shareable link
+  - Company enters their maximum total compensation (base + optional equity)
+  - Clicks "Lock it in & Get Link"
+  - Receives a shareable link (works once, expires in 24 hours)
   
 - **Candidate View:**
   - Candidate opens the company's link
   - Views landing page explaining the mechanism
-  - Enters their walk-away number (CMin) and email
-  - Clicks "🔒 Commit & See Your Result"
+  - Enters their minimum total compensation (base + optional equity)
+  - Clicks "Lock it in & Get Link"
 
 **Phase 2: Mechanism Processing (LOADING)**
 - Brief animation showing commitment confirmation
-- "CMin Locked. Waiting for CMax... Running Double-Blind Mechanism... Calculating Fair Split..."
+- "Number locked. Calculating..."
 
 **Phase 3: Result Panel (RESULT)**
-- Single dynamic visualization showing:
-  - **FAIR_SPLIT (Green):** Revealed CMax and CMin, visual bar with "Shared Surplus (50/50)", final offer, and benefit gained
-  - **BRIDGE_ZONE (Yellow):** Gap visualization with "10% Bridge Window", suggests human conversation
-  - **NO_DEAL (Red):** Large gap visualization, suggests restarting search
-- Closing Table Signature for successful deals with shareable confirmation link
+- Outcome-only display showing:
+  - **FAIR_SPLIT (Green):** Final total compensation number with explanation that the mechanism split the difference
+  - **BRIDGE_ZONE (Yellow):** "Close Gap" status with a suggested starting point for human negotiation
+  - **NO_DEAL (Red):** "No Deal" status explaining the ranges were too far apart
 
 **Key features:**
+- **Total compensation:** Base and equity are entered separately but mechanism runs on combined total
 - **Single-flow UI:** Commitment Panel → Loading → Result Panel (no redundant graphics)
-- **Single-use constraint:** Each offer can only be submitted once (enforced with 403 error on re-submission)
-- **Time-limited storage:** Offers expire after 24 hours, results after 7 days
+- **Single-use, immediate deletion:** Each offer is deleted immediately after the mechanism runs
+- **Time-limited storage:** Offers expire after 24 hours if unused, results after 7 days
 - **In-memory only:** All data is ephemeral (lost on server restart)
-- **No permanent storage:** Matches the "no recording" ethos
+- **Outcome-only results:** Only status and final number are stored; no original inputs
+- **No email collection:** Privacy-first design; no email addresses are collected or stored
 - **Pure calculation:** Core mechanism logic is isolated in `calculateDeal(CMax, CMin)` function
-- **No email integration:** Prototype only (stub implementation)
 - **No negotiation history:** Single-shot, no audit trails
 
 ---
@@ -208,10 +220,12 @@ The application consists of:
 
 ## Privacy & Security Model
 
-- **No permanent storage** — All data is in-memory and lost on server restart
-- **Time-limited** — Offers expire after 24 hours, results after 7 days
-- **Single-use** — Each offer can only be submitted once
-- **Outcome-only display** — The app only displays the final outcome and number, not the original inputs from either party
+- **No email collection** — No email addresses are collected or stored at any point
+- **Immediate deletion** — Offers are deleted immediately after the mechanism runs (not just marked as used)
+- **Outcome-only storage** — Results store only: status (success/close/fail), final number, suggested (for close), and timestamp
+- **No input retention** — Company max, candidate min, base/equity breakdowns are never stored in results
+- **Time-limited** — Offers expire after 24 hours if unused, results after 7 days
+- **In-memory only** — All data is ephemeral (lost on server restart)
 - **No negotiation thread** — No history, no audit trail, no records
 
-This prototype prioritizes simplicity and transparency over persistence.
+This prototype prioritizes privacy and transparency over persistence.

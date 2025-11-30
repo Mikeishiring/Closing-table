@@ -50,10 +50,31 @@ const BRIDGE_ZONE_PCT = 0.10;                   // 10% bridge zone
 const ROUNDING_GRANULARITY = 1000;              // $1,000 rounding
 
 // --- IN-MEMORY STORES ---
-// offerId -> { max, email, createdAt, expiresAt, used, equityEnabled, companyBaseMax, companyEquityMax }
+/**
+ * OFFERS MAP - Ephemeral, single-use storage
+ * 
+ * Retention policy:
+ * - Offers are IMMEDIATELY DELETED after first use (success, close, or fail)
+ * - Offers are also automatically deleted after OFFER_TTL_MS (24 hours) expires
+ * - No sensitive data (max, base/equity breakdown) is retained after mechanism runs
+ * - This ensures "single-use, outcome-only" behavior
+ * 
+ * Keys: offerId -> { max, createdAt, expiresAt, equityEnabled }
+ * Note: We only store the minimum needed to run the mechanism once
+ */
 const offers = new Map();
 
-// resultId -> { status, final, createdAt } (no input values stored)
+/**
+ * RESULTS MAP - Outcome-only storage
+ * 
+ * Retention policy:
+ * - Results store ONLY the outcome: status, final number, suggested (for close), and timestamp
+ * - NO original inputs (company max, candidate min, base/equity, emails) are ever stored here
+ * - Results are automatically deleted after RESULT_TTL_MS (7 days)
+ * - This ensures privacy: only "did it work?" and "what's the number?" are retained
+ * 
+ * Keys: resultId -> { status, final, suggested, createdAt }
+ */
 const results = new Map();
 
 // --- HELPERS ---
@@ -73,9 +94,9 @@ function roundToGranularity(value) {
 // --- PURE MECHANISM CALCULATION ---
 /**
  * Pure function to calculate deal outcome from CMax and CMin
- * @param {number} cMax - Company's maximum offer
- * @param {number} cMin - Candidate's minimum requirement
- * @returns {Object} Result object with status, final, surplus/gap
+ * @param {number} cMax - Company's maximum offer (total compensation)
+ * @param {number} cMin - Candidate's minimum requirement (total compensation)
+ * @returns {Object} Result object with status, final, surplus/gap, and suggested (for close state)
  */
 function calculateDeal(cMax, cMin) {
   if (typeof cMax !== 'number' || !Number.isFinite(cMax) || cMax <= 0) {
@@ -85,7 +106,7 @@ function calculateDeal(cMax, cMin) {
     throw new Error('Invalid cMin: must be a positive finite number');
   }
 
-  // FAIR_SPLIT: Overlap case
+  // FAIR_SPLIT: Overlap case (cMin <= cMax)
   if (cMin <= cMax) {
     const surplus = cMax - cMin;
     const rawFinal = cMin + surplus / 2;
@@ -95,6 +116,7 @@ function calculateDeal(cMax, cMin) {
       final,
       surplus,
       gap: null,
+      suggested: null,
     };
   }
 
@@ -104,11 +126,17 @@ function calculateDeal(cMax, cMin) {
   const withinBridge = gapPercent <= (BRIDGE_ZONE_PCT * 100);
 
   if (withinBridge) {
+    // BRIDGE_ZONE: Close enough for human negotiation
+    // Compute a suggested starting point as the midpoint between cMax and cMin
+    const rawSuggested = cMax + gap / 2; // Same as (cMax + cMin) / 2
+    const suggested = roundToGranularity(rawSuggested);
+    
     return {
       status: 'close', // BRIDGE_ZONE
       final: null,
       surplus: null,
       gap,
+      suggested, // Non-binding starting point for human negotiation
     };
   }
 
@@ -117,21 +145,12 @@ function calculateDeal(cMax, cMin) {
     final: null,
     surplus: null,
     gap,
+    suggested: null,
   };
 }
 
-async function sendResultEmail(email, revealLink, final) {
-  const frontendBase = process.env.FRONTEND_BASE || 'https://closing-table.pages.dev';
-
-  if (!email) {
-    console.log(`[email stub] No email provided. Result link: ${revealLink} (final: ${final})`);
-    return;
-  }
-
-  console.log(
-    `[email stub] Would send email to ${email} with final ${final} and link: ${revealLink} (frontend: ${frontendBase})`
-  );
-}
+// Note: Email functionality removed. No email addresses are collected or stored.
+// If email notifications are needed in the future, implement here with clear privacy documentation.
 
 // --- SERVE FRONTEND ---
 app.get('/', (req, res) => {
@@ -144,8 +163,19 @@ app.get('/health', (req, res) => {
 });
 
 // --- CREATE OFFER ---
+/**
+ * Creates a new offer with the company's maximum total compensation.
+ * 
+ * Privacy note: We do NOT collect or store email addresses.
+ * The offer stores only the minimum data needed to run the mechanism once:
+ * - max: total compensation (base + equity)
+ * - createdAt/expiresAt: for TTL enforcement
+ * - equityEnabled: to inform candidate UI
+ * 
+ * The offer is DELETED immediately after the mechanism runs.
+ */
 app.post('/api/offers', (req, res) => {
-  const { max, email, equityEnabled, companyBaseMax, companyEquityMax } = req.body || {};
+  const { max, equityEnabled, companyBaseMax, companyEquityMax } = req.body || {};
 
   // Support both old (single max) and new (base+equity) formats
   let baseMax, equityMax, equity;
@@ -172,33 +202,24 @@ app.post('/api/offers', (req, res) => {
     equity = false;
   }
 
-  if (!email || typeof email !== 'string') {
-    return res.status(400).json({ error: 'Email is required' });
-  }
-
   const totalMax = baseMax + equityMax;
   const createdAt = Date.now();
   const expiresAt = createdAt + OFFER_TTL_MS;
   const offerId = generateId('o');
 
+  // Store only the minimum data needed for single-use mechanism
+  // Note: No email, no base/equity breakdown stored (only total max)
   offers.set(offerId, {
-    max: totalMax, // Store total for backward compatibility with mechanism
-    email,
+    max: totalMax, // Total compensation for mechanism
     createdAt,
     expiresAt,
-    used: false,
     equityEnabled: equity,
-    companyBaseMax: baseMax,
-    companyEquityMax: equityMax,
   });
 
   console.log('[offer_created]', { 
     offerId, 
     max: totalMax, 
-    baseMax, 
-    equityMax, 
     equityEnabled: equity, 
-    email, 
     createdAt 
   });
 
@@ -210,17 +231,15 @@ app.get('/api/offers/:offerId', (req, res) => {
   const { offerId } = req.params;
   const offer = offers.get(offerId);
 
+  // Offer not found = either invalid or already used (deleted after use)
   if (!offer) {
     return res.json({ status: 'invalid' });
   }
 
+  // Check TTL expiration
   if (isExpired(offer.createdAt, OFFER_TTL_MS)) {
     offers.delete(offerId);
     return res.json({ status: 'expired' });
-  }
-
-  if (offer.used) {
-    return res.json({ status: 'used' });
   }
 
   // Include equity information for candidate
@@ -231,9 +250,18 @@ app.get('/api/offers/:offerId', (req, res) => {
 });
 
 // --- SUBMIT CANDIDATE MIN & RUN MECHANISM ---
+/**
+ * Submits the candidate's minimum total compensation and runs the mechanism.
+ * 
+ * Privacy note: We do NOT collect or store email addresses.
+ * The mechanism runs once, stores only the outcome, then IMMEDIATELY DELETES
+ * the offer (including company max, base/equity breakdown).
+ * 
+ * Result storage: Only status, final number, suggested (for close), and timestamp.
+ */
 app.post('/api/offers/:offerId/submit', async (req, res) => {
   const { offerId } = req.params;
-  const { min, email, candidateBaseMin, candidateEquityMin } = req.body || {};
+  const { min, candidateBaseMin, candidateEquityMin } = req.body || {};
 
   // Support both old (single min) and new (base+equity) formats
   let totalMin;
@@ -259,79 +287,71 @@ app.post('/api/offers/:offerId/submit', async (req, res) => {
     totalMin = min;
   }
 
-  if (!email || typeof email !== 'string') {
-    return res.status(400).json({ error: 'Email is required' });
-  }
-
   const offer = offers.get(offerId);
 
+  // Offer not found = either invalid or already used (deleted after use)
   if (!offer) {
     return res.json({ status: 'invalid' });
   }
 
+  // Check TTL expiration
   if (isExpired(offer.createdAt, OFFER_TTL_MS)) {
     offers.delete(offerId);
     return res.json({ status: 'expired' });
   }
 
-  if (offer.used) {
-    return res.status(403).json({ 
-      status: 'used',
-      error: 'This offer has already been used. The mechanism only runs once per offer.' 
-    });
-  }
-
   const cMax = offer.max;
   const cMin = totalMin;
 
-  // Use pure calculateDeal function
+  // Run the mechanism (pure function)
   const dealResult = calculateDeal(cMax, cMin);
-  const { status, final, surplus, gap } = dealResult;
-  let resultId = null;
+  const { status, final, suggested } = dealResult;
 
   // Store result snapshot for ALL outcomes (success, close, fail)
+  // Note: We store ONLY outcome data, never original inputs
   const createdAt = Date.now();
-  resultId = generateId('r');
+  const resultId = generateId('r');
 
   results.set(resultId, {
     status,
     final: status === 'success' ? final : null,
+    suggested: status === 'close' ? suggested : null, // Starting point for close state
     createdAt,
   });
 
-  // Send email only for successful deals
-  if (status === 'success') {
-    const frontendBase = process.env.FRONTEND_BASE || 'https://closing-table.pages.dev';
-    const base = frontendBase.replace(/\/+$/, '');
-    const revealLink = `${base}/#result=${encodeURIComponent(resultId)}`;
-
-    try {
-      await sendResultEmail(email, revealLink, final);
-    } catch (err) {
-      console.error('[sendResultEmail error]', err);
-    }
-  }
-
-  // Single-use constraint: mark offer as used immediately after mechanism runs
-  // This prevents any possibility of re-submission
-  offer.used = true;
+  // IMMEDIATELY DELETE the offer after mechanism runs
+  // This ensures no sensitive data (max, base/equity) is retained
+  offers.delete(offerId);
 
   console.log('[offer_submitted]', {
     offerId,
-    email,
     status,
     resultId,
+    offerDeleted: true,
   });
 
+  // Return result to candidate
   return res.json({
     status,
-    final: status === 'success' || status === 'close' ? final : null,
+    final: status === 'success' ? final : null,
+    suggested: status === 'close' ? suggested : null,
     resultId,
     createdAt,
   });
 });
 
 // --- REVEAL RESULT ---
+/**
+ * Returns the outcome of a completed mechanism run.
+ * 
+ * Response contains ONLY:
+ * - status: "success" | "close" | "fail"
+ * - final: number (for success) or null
+ * - suggested: number (for close) or null - non-binding starting point
+ * - createdAt: timestamp
+ * 
+ * NO original inputs (company max, candidate min, base/equity, emails) are returned.
+ */
 app.get('/api/results/:resultId', (req, res) => {
   const { resultId } = req.params;
   const result = results.get(resultId);
@@ -345,9 +365,11 @@ app.get('/api/results/:resultId', (req, res) => {
     return res.json({ status: 'expired' });
   }
 
+  // Return outcome-only data
   return res.json({
     status: result.status,
-    final: result.final,
+    final: result.final || null,
+    suggested: result.suggested || null,
     createdAt: result.createdAt,
   });
 });

@@ -697,6 +697,296 @@
 
         .accordion-content-inner {
             font-size: 0.75rem;
+        }
+
+        /* === PROGRESS BAR HEADER === */
+        .progress-header {
+            background: white;
+            padding: 1.5rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+        }
+
+        .progress-steps {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .progress-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .progress-circle.active {
+            background: var(--accent-primary);
+            color: white;
+            box-shadow: 0 0 20px rgba(0, 196, 204, 0.4);
+        }
+
+        .progress-circle.completed {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .progress-circle.inactive {
+            background: #E5E5E7;
+            color: var(--text-secondary);
+        }
+
+        .progress-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .progress-label.active {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .progress-divider {
+            flex: 1;
+            height: 2px;
+            background: #E5E5E7;
+            max-width: 60px;
+        }
+
+        .progress-divider.completed {
+            background: var(--success-color);
+        }
+
+        /* === STATUS BADGE WITH MOTION === */
+        @keyframes status-badge-bounce {
+            0% { transform: scale(0.8); opacity: 0; }
+            60% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes status-glow-fade {
+            0% { box-shadow: 0 4px 20px rgba(0, 196, 204, 0.8), 0 0 40px rgba(0, 196, 204, 0.6); opacity: 1; }
+            100% { box-shadow: 0 4px 20px rgba(0, 196, 204, 0.4), 0 0 0 rgba(0, 196, 204, 0); opacity: 1; }
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            animation: status-badge-bounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), status-glow-fade 1s ease-out 0.6s forwards;
+        }
+
+        .status-badge.success {
+            background: var(--success-color);
+            box-shadow: 0 4px 20px rgba(52, 199, 89, 0.8);
+        }
+
+        .status-badge.warning {
+            background: var(--warning-color);
+            box-shadow: 0 4px 20px rgba(255, 149, 0, 0.8);
+        }
+
+        .status-badge.error {
+            background: var(--error-color);
+            box-shadow: 0 4px 20px rgba(255, 59, 48, 0.8);
+        }
+
+        .status-badge.teal {
+            background: var(--accent-primary);
+            box-shadow: 0 4px 20px rgba(0, 196, 204, 0.8);
+        }
+
+        /* === LINK SHIMMER === */
+        @keyframes link-shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .link-shimmer-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .link-shimmer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.6) 50%, transparent 100%);
+            animation: link-shimmer 2s ease-in-out;
+            pointer-events: none;
+        }
+
+        /* === COPY TOAST === */
+        @keyframes toast-slide-in {
+            0% { transform: translateY(10px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes toast-fade-out {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-10px); opacity: 0; }
+        }
+
+        .copy-toast {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(52, 199, 89, 0.4);
+            animation: toast-slide-in 0.3s ease, toast-fade-out 0.3s ease 2s forwards;
+            z-index: 100;
+        }
+
+        /* === HERO NUMBER TREATMENT === */
+        .hero-number-container {
+            background: linear-gradient(135deg, rgba(0, 196, 204, 0.1) 0%, rgba(52, 199, 89, 0.1) 100%);
+            padding: 2rem 3rem;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 196, 204, 0.15);
+            border: 2px solid rgba(0, 196, 204, 0.2);
+        }
+
+        /* === SPOTLIGHT GRADIENT === */
+        .spotlight-container {
+            position: relative;
+        }
+
+        .spotlight-container::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 196, 204, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .spotlight-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* === LOADING SKELETON === */
+        @keyframes skeleton-pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #E5E5E7 0%, #F0F0F2 50%, #E5E5E7 100%);
+            background-size: 200% 100%;
+            animation: skeleton-pulse 2s ease-in-out infinite;
+            border-radius: 12px;
+        }
+
+        /* === ANIMATED CHECKLIST === */
+        @keyframes checklist-item-enter {
+            0% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .checklist-item {
+            animation: checklist-item-enter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+
+        .checklist-item:nth-child(1) { animation-delay: 0s; }
+        .checklist-item:nth-child(2) { animation-delay: 0.1s; }
+        .checklist-item:nth-child(3) { animation-delay: 0.2s; }
+
+        .checklist-number {
+            transition: all 0.3s ease;
+        }
+
+        .checklist-number:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(0, 196, 204, 0.4);
+        }
+
+        .checklist-number:hover::after {
+            content: '✓';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: white;
+        }
+
+        /* === MODAL OVERLAY === */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modal-slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modal-slide-up {
+            0% {
+                opacity: 0;
+                transform: translateY(40px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .accordion-content-inner {
             line-height: 1.6;
             color: var(--text-secondary);
         }
@@ -717,6 +1007,72 @@
         .accordion-content-inner strong {
             color: var(--text-primary);
             font-weight: 600;
+        }
+
+        /* === RADIX SLIDER STYLES (Tailwind-based) === */
+        /* Radix slider root styles */
+        [data-radix-slider-root] {
+            position: relative;
+            display: flex;
+            width: 100%;
+            align-items: center;
+        }
+
+        /* Radix slider track */
+        [data-radix-slider-track] {
+            position: relative;
+            flex: 1;
+            height: 3px;
+            border-radius: 9999px;
+            background-color: #dedede;
+            margin: 0 1rem;
+        }
+
+        /* Radix slider range */
+        [data-radix-slider-range] {
+            position: absolute;
+            height: 100%;
+            border-radius: 9999px;
+            background-color: #dedede;
+        }
+
+        /* Radix slider thumb - perfect centering */
+        [data-radix-slider-thumb] {
+            position: absolute;
+            top: 50%;
+            display: flex;
+            height: 2rem;
+            width: 2rem;
+            transform: translateY(-50%);
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px;
+            border: 2px solid #00C7CF;
+            background-color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            cursor: grab;
+            transition: all 0.15s ease;
+        }
+
+        [data-radix-slider-thumb]:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        [data-radix-slider-thumb]:active {
+            cursor: grabbing;
+            transform: translateY(-50%) scale(1.08);
+        }
+
+        [data-radix-slider-thumb]:focus {
+            outline: none;
+        }
+
+        /* Pen emoji centering inside thumb */
+        .slider-thumb-emoji {
+            font-size: 14px;
+            line-height: 0;
+            transform: rotate(-25deg) translateY(1px);
+            user-select: none;
         }
 
         /* === SIGNATURE SLIDER STYLES === */
@@ -842,13 +1198,20 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
             z-index: 5;
         }
 
         .signature-slider__thumb--active {
             transform: translateX(-50%) scale(1.08);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Pen emoji - perfectly centered with baseline fix */
+        .signature-slider__thumb-emoji {
+            font-size: 18px;
+            line-height: 0;
+            transform: translateY(1px);
+            user-select: none;
         }
 
         /* Ink dot animation on release */
@@ -951,8 +1314,39 @@
     <div id="root"></div>
 
     <script type="text/babel">
+        /* eslint-disable */
+        // @ts-nocheck
+        
+        /*
+         * ============================================
+         * THE CLOSING TABLE - STANDALONE APP
+         * ============================================
+         * 
+         * COMPONENT INDEX:
+         * - Configuration & Constants
+         * - Icon Library
+         * - Core UI Components
+         * - Layout Components  
+         * - Main Views (Company, Candidate, Result)
+         * - Root App
+         * 
+         * NEW FEATURES (Nov 30, 2025):
+         * - ProgressHeader (3-step bar)
+         * - StatusBadge with bounce animations
+         * - AnimatedChecklist with stagger
+         * - Hero number treatment
+         * - Spotlight gradients
+         * - Skeleton loading states
+         * - Enhanced microcopy
+         * ============================================
+         */
+
         const { useState, useEffect, useRef } = React;
         const { motion, AnimatePresence } = window.Motion;
+
+        // ============================================
+        // CONFIGURATION & CONSTANTS
+        // ============================================
 
         // --- API CONFIGURATION ---
         const API_BASE = window.location.hostname === 'localhost' 
@@ -1180,6 +1574,10 @@
         }
 
         // --- ICONS ---
+        // ============================================
+        // ICON LIBRARY
+        // ============================================
+
         const Icons = {
             Lock: ({ className }) => (
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
@@ -1287,7 +1685,30 @@
                     <line x1="12" y1="8" x2="12.01" y2="8"></line>
                 </svg>
             ),
+            Clock: ({ className }) => (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" strokeWidth="2"
+                     strokeLinecap="round" strokeLinejoin="round"
+                     className={className}>
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+            ),
+            AlertTriangle: ({ className }) => (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" strokeWidth="2"
+                     strokeLinecap="round" strokeLinejoin="round"
+                     className={className}>
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+            ),
         };
+
+        // ============================================
+        // CORE UI COMPONENTS
+        // ============================================
 
         // --- COMPONENTS ---
 
@@ -1404,7 +1825,24 @@
             );
         };
 
-        // --- SIGNATURE SLIDER COMPONENT ---
+        // --- SALARY SLIDER THUMB COMPONENT (Reusable) ---
+        // This component can be reused across any slider
+        const SalarySliderThumb = () => (
+            <span 
+                className="slider-thumb-emoji"
+                style={{
+                    fontSize: '14px',
+                    lineHeight: 0,
+                    transform: 'rotate(-25deg) translateY(1px)',
+                    userSelect: 'none',
+                    display: 'inline-block'
+                }}
+            >
+                ✒️
+            </span>
+        );
+
+        // --- SIGNATURE SLIDER COMPONENT (Radix-style with perfect centering) ---
         const SignatureSlider = ({ 
             value, 
             min, 
@@ -1418,6 +1856,7 @@
             const [showInkDot, setShowInkDot] = useState(false);
             const [inkDotPosition, setInkDotPosition] = useState(0);
             const lastValueRef = useRef(value);
+            const sliderRef = useRef(null);
 
             const percent = Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100));
 
@@ -1454,18 +1893,50 @@
                 }
             }, [value, isDragging]);
 
+            // Radix-style slider structure with perfect vertical centering
             return (
                 <div className={`signature-slider signature-slider--${variant}`}>
-                    {/* Slider track with pen emoji thumb */}
+                    {/* Slider Root - relative container */}
                     <div 
-                        className="signature-slider__track-container"
+                        ref={sliderRef}
                         onMouseUp={handlePointerUp}
                         onTouchEnd={handlePointerUp}
                         onMouseLeave={handlePointerUp}
+                        style={{
+                            position: 'relative',
+                            display: 'flex',
+                            width: '100%',
+                            alignItems: 'center',
+                            height: '44px'
+                        }}
                     >
+                        {/* Track - with horizontal padding */}
+                        <div 
+                            style={{
+                                position: 'relative',
+                                flex: 1,
+                                height: '3px',
+                                borderRadius: '9999px',
+                                backgroundColor: '#dedede',
+                                marginLeft: '1rem',
+                                marginRight: '1rem'
+                            }}
+                        >
+                            {/* Range - visual only */}
+                            <div 
+                                style={{
+                                    position: 'absolute',
+                                    height: '100%',
+                                    borderRadius: '9999px',
+                                    backgroundColor: '#dedede',
+                                    width: `${percent}%`
+                                }}
+                            />
+                        </div>
+
+                        {/* Native range input - invisible but functional */}
                         <input
                             type="range"
-                            className="signature-slider__input"
                             min={min}
                             max={max}
                             step={step}
@@ -1474,20 +1945,56 @@
                             onMouseDown={() => setIsDragging(true)}
                             onTouchStart={() => setIsDragging(true)}
                             aria-label={label || `Slider value: $${value.toLocaleString()}`}
+                            style={{
+                                position: 'absolute',
+                                width: 'calc(100% - 2rem)',
+                                left: '1rem',
+                                height: '44px',
+                                opacity: 0,
+                                cursor: isDragging ? 'grabbing' : 'grab',
+                                zIndex: 10
+                            }}
                         />
-                        
-                        {/* Custom thumb with pen emoji */}
+
+                        {/* Thumb - absolutely positioned with perfect Y centering */}
+                        {/* Key: top: 50% + translateY(-50%) keeps thumb vertically centered */}
+                        {/* Radix handles X position; we only control Y */}
+                        {/* Calculates position accounting for track margin */}
                         <div 
-                            className={`signature-slider__thumb ${isDragging ? 'signature-slider__thumb--active' : ''}`}
-                            style={{ left: `${percent}%` }}
+                            style={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: `${percent}%`,
+                                display: 'flex',
+                                height: '2rem',
+                                width: '2rem',
+                                transform: `translate(-50%, -50%) ${isDragging ? 'scale(1.08)' : 'scale(1)'}`,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                borderRadius: '9999px',
+                                border: '2px solid #00C7CF',
+                                backgroundColor: 'white',
+                                boxShadow: isDragging 
+                                    ? '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+                                    : '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                                pointerEvents: 'none',
+                                transition: 'all 0.15s ease',
+                                zIndex: 5
+                            }}
                         >
-                            🖊️
+                            {/* Emoji with optical centering */}
+                            <SalarySliderThumb />
                         </div>
 
                         {/* Ink dot animation on release */}
                         <div 
                             className={`signature-slider__ink-dot ${showInkDot ? 'signature-slider__ink-dot--active' : ''}`}
-                            style={{ left: `${inkDotPosition}%`, top: '50%', transform: 'translate(-50%, -50%)' }}
+                            style={{ 
+                                left: `${inkDotPosition}%`, 
+                                top: '50%', 
+                                transform: 'translate(-50%, -50%)',
+                                position: 'absolute'
+                            }}
                         />
                     </div>
 
@@ -1796,6 +2303,10 @@
             );
         };
 
+        // ============================================
+        // LAYOUT COMPONENTS
+        // ============================================
+
         const Button = ({ children, onClick, disabled, variant = 'primary', className = '' }) => {
             const baseStyle =
                 "btn relative transform transition-all duration-200 " +
@@ -2044,6 +2555,10 @@
             );
         };
 
+        // ============================================
+        // MAIN VIEWS
+        // ============================================
+
         // --- COMPANY VIEW ---
 
         const CompanyView = () => {
@@ -2052,6 +2567,7 @@
             const [totalBudget, setTotalBudget] = useState(130000);
             const [equityEnabled, setEquityEnabled] = useState(false);
             const [email, setEmail] = useState('');
+            const [showCopyToast, setShowCopyToast] = useState(false);
             const [link, setLink] = useState(null);
             const [loading, setLoading] = useState(false);
             const [error, setError] = useState(null);
@@ -2100,7 +2616,6 @@
                             equityEnabled,
                             companyBaseMax: baseMax,
                             companyEquityMax: equityEnabled ? equityMax : 0,
-                            email 
                         }),
                     });
 
@@ -2129,7 +2644,6 @@
                         equityMax: equityEnabled ? equityMax : 0,
                         totalComp,
                         equityEnabled,
-                        email,
                         offerId,
                     });
                 } catch (err) {
@@ -2339,47 +2853,73 @@
 
             if (link) {
                 return (
-                    <div className="max-w-2xl mx-auto animate-enter text-center">
-                        <div className="mb-8 inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#00C4CC] shadow-[0_4px_20px_rgba(0,196,204,0.4)] mx-auto">
-                            <Icons.Lock className="w-10 h-10 text-white" />
+                    <div className="spotlight-container">
+                        {/* Progress Header */}
+                        <div className="progress-header spotlight-content">
+                            <div className="progress-steps">
+                                <div className="progress-step">
+                                    <div className="progress-circle completed">✓</div>
+                                    <span className="progress-label">Set Max</span>
+                                </div>
+                                <div className="progress-divider completed"></div>
+                                <div className="progress-step">
+                                    <div className="progress-circle active">2</div>
+                                    <span className="progress-label active">Send Link</span>
+                                </div>
+                                <div className="progress-divider"></div>
+                                <div className="progress-step">
+                                    <div className="progress-circle inactive">3</div>
+                                    <span className="progress-label">See Result</span>
+                                </div>
+                            </div>
                         </div>
-                        <h1 className="text-4xl md:text-5xl font-extrabold mb-6 text-[#1C1C1E]">
-                            Offer Link Created
-                        </h1>
-                        <p className="text-lg text-[#666666] mb-10 leading-relaxed">
-                            Your maximum is locked and ready for the candidate.
-                        </p>
 
-                        {/* 3-Step Instructions */}
-                        <GlassCard className="mb-6 border-l-4 border-[#00C4CC]">
-                            <h2 className="text-sm font-bold text-[#00C4CC] tracking-wide uppercase mb-4">
-                                What Happens Next
-                            </h2>
-                            <ol className="space-y-3 text-left">
-                                <li className="flex items-start gap-3">
-                                    <span className="flex-shrink-0 w-6 h-6 bg-[#00C4CC] text-white rounded-full flex items-center justify-center text-xs font-bold">1</span>
-                                    <div className="text-sm text-[#666666]">
-                                        <span className="font-semibold text-[#1C1C1E]">Send this link to the candidate.</span> They'll be prompted to enter their minimum total compensation.
+                        <div className="max-w-2xl mx-auto animate-enter text-center spotlight-content">
+                            {/* Animated Status Badge */}
+                            <div className="mb-8 flex justify-center">
+                                <div className="status-badge teal">
+                                    <Icons.Lock className="w-12 h-12 text-white" />
+                                </div>
+                            </div>
+
+                            <h1 className="text-4xl md:text-5xl font-extrabold mb-4 text-[#1C1C1E]">
+                                Offer Link Created
+                            </h1>
+                            <p className="text-lg text-[#666666] mb-10 leading-relaxed">
+                                Your maximum is locked. Share the link so the mechanism can run.
+                            </p>
+
+                            {/* Animated Checklist */}
+                            <GlassCard className="mb-6 border-l-4 border-[#00C4CC] text-left">
+                                <h2 className="text-sm font-bold text-[#00C4CC] tracking-wide uppercase mb-5">
+                                    What Happens Next
+                                </h2>
+                                <div className="space-y-4">
+                                    <div className="checklist-item flex items-start gap-3">
+                                        <span className="checklist-number relative flex-shrink-0 w-8 h-8 bg-[#00C4CC] text-white rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                                        <div className="text-sm text-[#666666] pt-1">
+                                            <strong className="font-semibold text-[#1C1C1E]">Send the link.</strong> The candidate enters a minimum.
+                                        </div>
                                     </div>
-                                </li>
-                                <li className="flex items-start gap-3">
-                                    <span className="flex-shrink-0 w-6 h-6 bg-[#00C4CC] text-white rounded-full flex items-center justify-center text-xs font-bold">2</span>
-                                    <div className="text-sm text-[#666666]">
-                                        <span className="font-semibold text-[#1C1C1E]">They enter their minimum.</span> Once submitted, the mechanism runs automatically.
+                                    <div className="checklist-item flex items-start gap-3">
+                                        <span className="checklist-number relative flex-shrink-0 w-8 h-8 bg-[#00C4CC] text-white rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                                        <div className="text-sm text-[#666666] pt-1">
+                                            <strong className="font-semibold text-[#1C1C1E]">They enter their minimum.</strong> The mechanism runs automatically.
+                                        </div>
                                     </div>
-                                </li>
-                                <li className="flex items-start gap-3">
-                                    <span className="flex-shrink-0 w-6 h-6 bg-[#00C4CC] text-white rounded-full flex items-center justify-center text-xs font-bold">3</span>
-                                    <div className="text-sm text-[#666666]">
-                                        <span className="font-semibold text-[#1C1C1E]">The mechanism checks for a fair middle ground.</span> It returns one of three outcomes: Deal Closed, Close Gap, or No Deal.
+                                    <div className="checklist-item flex items-start gap-3">
+                                        <span className="checklist-number relative flex-shrink-0 w-8 h-8 bg-[#00C4CC] text-white rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                                        <div className="text-sm text-[#666666] pt-1">
+                                            <strong className="font-semibold text-[#1C1C1E]">The mechanism checks for a fair middle ground.</strong> Returns success, close, or no deal.
+                                        </div>
                                     </div>
-                                </li>
-                            </ol>
-                        </GlassCard>
+                                </div>
+                            </GlassCard>
 
                         <GlassCard className="mb-8">
-                            <div className="bg-[#EFF3F6] p-4 rounded-xl shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] flex items-center justify-between gap-4 mb-6 relative" id="url-container">
-                                <code className="text-[#00C4CC] truncate flex-1 text-left font-mono text-sm">
+                            <div className="link-shimmer-container bg-[#EFF3F6] p-4 rounded-xl shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] flex items-center justify-between gap-4 mb-4 relative" id="url-container">
+                                <div className="link-shimmer"></div>
+                                <code className="text-[#00C4CC] truncate flex-1 text-left font-mono text-sm relative z-10">
                                     {link}
                                 </code>
                                 <div className="url-checkmark">
@@ -2390,22 +2930,34 @@
                                 <button
                                     onClick={copyLink}
                                     aria-label="Copy link to clipboard"
-                                    className="p-2 hover:bg-[#E5F2F9] rounded-lg transition"
+                                    className="p-2 hover:bg-[#E5F2F9] rounded-lg transition relative z-10 hover:scale-110"
                                 >
                                     <Icons.Copy className="w-5 h-5 text-[#666666]" />
                                 </button>
                             </div>
+                            {/* TTL Notice */}
+                            <p className="text-xs text-[#666666] text-center mb-6 flex items-center justify-center gap-1">
+                                <Icons.Clock className="w-3.5 h-3.5" />
+                                This offer link works once and expires in 24 hours.
+                            </p>
                             <div className="grid gap-4">
-                                <Button onClick={() => {
-                                    copyLink();
-                                    const container = document.getElementById('url-container');
-                                    if (container) {
-                                        container.classList.add('url-flip-active');
-                                        setTimeout(() => container.classList.remove('url-flip-active'), 600);
-                                    }
-                                }} variant="gold">
-                                    Copy Link for Candidate
-                                </Button>
+                                <div className="relative">
+                                    {showCopyToast && (
+                                        <div className="copy-toast">Copied ✅</div>
+                                    )}
+                                    <Button onClick={() => {
+                                        copyLink();
+                                        setShowCopyToast(true);
+                                        setTimeout(() => setShowCopyToast(false), 2300);
+                                        const container = document.getElementById('url-container');
+                                        if (container) {
+                                            container.classList.add('url-flip-active');
+                                            setTimeout(() => container.classList.remove('url-flip-active'), 600);
+                                        }
+                                    }} variant="gold" className="hover:scale-105 transition-transform">
+                                        Copy Link for Candidate
+                                    </Button>
+                                </div>
                                 <Button
                                     variant="secondary"
                                     onClick={() => {
@@ -2418,6 +2970,7 @@
                                 </Button>
                             </div>
                         </GlassCard>
+                    </div>
                     </div>
                 );
             }
@@ -2616,13 +3169,11 @@
                                                             } else {
                                                                 setBaseError('');
                                                             }
+                                                            setFocusedInput(null);
                                                         }}
                                                         onFocus={() => {
                                                             setBaseError('');
                                                             setFocusedInput('total');
-                                                        }}
-                                                        onBlur={() => {
-                                                            setFocusedInput(null);
                                                         }}
                                                         className="text-5xl font-medium text-[#1C1C1E] tracking-tight financial-number bg-transparent border-none outline-none w-full max-w-md"
                                                     />
@@ -2746,13 +3297,11 @@
                                                             } else {
                                                                 setEquityError('');
                                                             }
+                                                            setFocusedInput(null);
                                                         }}
                                                         onFocus={() => {
                                                             setEquityError('');
                                                             setFocusedInput('equity');
-                                                        }}
-                                                        onBlur={() => {
-                                                            setFocusedInput(null);
                                                         }}
                                                         className="text-4xl font-medium text-[#1C1C1E] tracking-tight financial-number bg-transparent border-none outline-none w-full max-w-md"
                                                     />
@@ -2788,34 +3337,12 @@
                                     </AnimatePresence>
                                 </CompensationInputBlock>
 
-                                {/* Email + CTA - revealed after interaction */}
+                                {/* CTA - revealed after interaction */}
                                 <div 
                                     className={`after-interaction ${hasInteracted ? 'after-interaction--visible' : ''} ${justShown ? 'after-interaction--just-shown' : ''}`}
                                     aria-hidden={!hasInteracted}
                                 >
                                     <div className="space-y-6 pt-6 border-t border-[#E0E0E0]">
-                                        <div>
-                                            <label className="block text-sm font-medium text-[#1C1C1E] mb-2">
-                                                Email (to send the link)
-                                            </label>
-                                            <div className="relative">
-                                                <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#666666]" />
-                                                <input
-                                                    type="email"
-                                                    value={email}
-                                                    onChange={(e) => setEmail(e.target.value)}
-                                                    placeholder="you@company.com"
-                                                    aria-label="Company email address"
-                                                    autoComplete="email"
-                                                    tabIndex={hasInteracted ? 0 : -1}
-                                                    className="w-full bg-[#EFF3F6] border-none rounded-xl py-4 pl-12 pr-4 text-[#1C1C1E] placeholder-[#999999] focus:outline-none focus:ring-2 focus:ring-[#00C4CC]/50 shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] transition-all duration-200"
-                                                />
-                                            </div>
-                                            <p className="mt-2 helper-text">
-                                                Used only for this offer. Auto-deleted in 7 days.
-                                            </p>
-                                        </div>
-
                                         {error && (
                                             <div className="bg-[#FFEBEB] border border-[#FF3B30]/30 p-4 rounded-xl">
                                                 <p className="text-[#FF3B30] text-sm">{error}</p>
@@ -2824,14 +3351,14 @@
 
                                         <AnimatedSubmitButton
                                             onClick={handleGenerateLink}
-                                            disabled={!email || loading}
+                                            disabled={loading}
                                             buttonText={loading ? 'Creating Link...' : 'Lock it in & Get Link'}
                                         />
 
                                         <div className="flex items-start gap-2">
                                             <Icons.Lock className="w-3.5 h-3.5 text-[#666666] flex-shrink-0 mt-0.5" />
                                             <p className="text-xs text-[#666666]">
-                                                We only store whether a deal is possible and the final salary we compute.
+                                                We only store whether a deal is possible and the final total compensation we compute. No emails collected.
                                             </p>
                                         </div>
                                     </div>
@@ -2848,18 +3375,20 @@
             );
         };
 
+        // ============================================
+        // CANDIDATE VIEW
+        // ============================================
+
         // --- CANDIDATE VIEW ---
 
         const CandidateView = ({ offerId }) => {
             const [baseMin, setBaseMin] = useState(100000);
             const [equityMin, setEquityMin] = useState(20000);
             const [equityEnabled, setEquityEnabled] = useState(false);
-            const [email, setEmail] = useState('');
             const [step, setStep] = useState('loading');
             const [result, setResult] = useState(null);
             const [offerStatus, setOfferStatus] = useState(null);
             const [error, setError] = useState(null);
-            const [validationError, setValidationError] = useState('');
             const [baseAnimating, setBaseAnimating] = useState(false);
             const [equityAnimating, setEquityAnimating] = useState(false);
             const [ledFlicker, setLedFlicker] = useState(false);
@@ -2869,7 +3398,6 @@
             const [equityError, setEquityError] = useState('');
             const [hasInteracted, setHasInteracted] = useState(false);
             const [justShown, setJustShown] = useState(false);
-            const emailInputRef = useRef(null);
             const initialTotalRef = useRef(100000);
 
             const BASE_MIN = 80000;
@@ -3015,53 +3543,20 @@
                 }, 800);
             };
 
-            // Auto-focus email input when step changes to 'input'
-            useEffect(() => {
-                if (step === 'input' && emailInputRef.current && !email) {
-                    emailInputRef.current.focus();
-                }
-            }, [step, email]);
-
             // Client-side validation function
             const validateForm = () => {
-                setValidationError('');
-                
-                // Email validation
-                if (!email || email.trim() === '') {
-                    setValidationError('Please enter your email address.');
-                    return false;
-                }
-                
-                // Simple email regex - just check for basic format
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(email)) {
-                    setValidationError('Please enter a valid email address.');
-                    return false;
-                }
-                
                 // Validate ranges (should already be enforced by sliders, but check programmatically)
                 if (baseMin < BASE_MIN || baseMin > BASE_MAX) {
-                    setValidationError(`Base salary must be between $${BASE_MIN.toLocaleString()} and $${BASE_MAX.toLocaleString()}.`);
+                    setError(`Base salary must be between $${BASE_MIN.toLocaleString()} and $${BASE_MAX.toLocaleString()}.`);
                     return false;
                 }
                 
                 if (equityEnabled && (equityMin < EQUITY_MIN || equityMin > EQUITY_MAX)) {
-                    setValidationError(`Equity value must be between $${EQUITY_MIN.toLocaleString()} and $${EQUITY_MAX.toLocaleString()}.`);
+                    setError(`Equity value must be between $${EQUITY_MIN.toLocaleString()} and $${EQUITY_MAX.toLocaleString()}.`);
                     return false;
                 }
                 
                 return true;
-            };
-
-            // Handle Enter key in email field
-            const handleEmailKeyDown = (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    if (validateForm()) {
-                        playMagneticLatchSound();
-                        submit();
-                    }
-                }
             };
 
             const submit = async () => {
@@ -3077,8 +3572,7 @@
                     return;
                 }
 
-                // Clear validation error and backend error on submit
-                setValidationError('');
+                // Clear backend error on submit
                 setError(null);
 
                 setStep('submitting');
@@ -3089,7 +3583,6 @@
                         body: JSON.stringify({ 
                             candidateBaseMin: baseMin,
                             candidateEquityMin: equityEnabled ? equityMin : 0,
-                            email 
                         }),
                     });
 
@@ -3128,7 +3621,6 @@
                         offerId,
                         totalMin,
                         status: data.status,
-                        emailProvided: !!email,
                     });
                 } catch (err) {
                     setError("Couldn't submit. Check your connection and try again.");
@@ -3328,58 +3820,25 @@
                                         </div>
                                     </CompensationInputBlock>
 
-                                    {/* Email + CTA - revealed after interaction */}
+                                    {/* CTA - revealed after interaction */}
                                     <div 
                                         className={`after-interaction ${hasInteracted ? 'after-interaction--visible' : ''} ${justShown ? 'after-interaction--just-shown' : ''}`}
                                         aria-hidden={!hasInteracted}
                                     >
                                         <div className="space-y-6 pt-6 border-t border-[#E0E0E0]">
-                                            <div>
-                                                <label className="block text-sm font-medium text-[#1C1C1E] mb-2">
-                                                    Email (to send your result)
-                                                </label>
-                                                <div className="relative">
-                                                    <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#666666]" />
-                                                    <input
-                                                        ref={emailInputRef}
-                                                        type="email"
-                                                        value={email}
-                                                        onChange={(e) => {
-                                                            setEmail(e.target.value);
-                                                            if (validationError) setValidationError('');
-                                                        }}
-                                                        onKeyDown={handleEmailKeyDown}
-                                                        placeholder="you@email.com"
-                                                        aria-label="Candidate email address"
-                                                        autoComplete="email"
-                                                        tabIndex={hasInteracted ? 0 : -1}
-                                                        className="w-full bg-[#EFF3F6] border-none rounded-xl py-4 pl-12 pr-4 text-[#1C1C1E] placeholder-[#999999] focus:outline-none focus:ring-2 focus:ring-[#00C4CC]/50 shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] transition-all duration-200"
-                                                    />
-                                                </div>
-                                                {validationError && (
-                                                    <div className="mt-2 flex items-start gap-2">
-                                                        <Icons.AlertTriangle className="w-4 h-4 text-[#FF3B30] flex-shrink-0 mt-0.5" />
-                                                        <p className="text-[#FF3B30] text-sm">{validationError}</p>
-                                                    </div>
-                                                )}
-                                                <p className="mt-2 helper-text">
-                                                    Used only for this offer. Auto-deleted in 7 days.
-                                                </p>
-                                            </div>
-
                                             <AnimatedSubmitButton
                                                 onClick={() => {
                                                     if (validateForm()) {
                                                         submit();
                                                     }
                                                 }}
-                                                buttonText="Lock it in & Get Link"
+                                                buttonText="Lock it in & See Result"
                                             />
 
                                             <div className="flex items-start gap-2">
                                                 <Icons.Lock className="w-3.5 h-3.5 text-[#666666] flex-shrink-0 mt-0.5" />
                                                 <p className="text-xs text-[#666666]">
-                                                    We only store whether a deal is possible and the final salary we compute.
+                                                    We only store whether a deal is possible and the final total compensation we compute. No emails collected.
                                                 </p>
                                             </div>
                                         </div>
@@ -3522,12 +3981,15 @@
                                             : 'border-l-4 border-[#FF3B30]'
                                     }
                                 >
-                                    {/* Show final total for "close" status */}
-                                    {result.status === 'close' && result.final && (
+                                    {/* Show suggested starting point for "close" status */}
+                                    {result.status === 'close' && result.suggested && (
                                         <div className="mb-6">
                                             <p className="text-sm text-[#666666] mb-2 uppercase tracking-wide font-semibold">Proposed Starting Point</p>
                                             <p className="text-5xl font-bold text-[#FF9500] mb-4 tracking-tight financial-number">
-                                                ${result.final.toLocaleString()}
+                                                ${result.suggested.toLocaleString()}
+                                            </p>
+                                            <p className="text-xs text-[#666666] italic">
+                                                This is a non-binding suggestion for human negotiation, not an auto-deal.
                                             </p>
                                         </div>
                                     )}
@@ -3539,7 +4001,7 @@
                                             </p>
                                             <p className="text-sm text-[#666666]">
                                                 {result.status === 'close' 
-                                                    ? 'The mechanism found you\'re within a reasonable range but not enough for an automatic match; this is a good starting number for a conversation.'
+                                                    ? 'You\'re within 10% — the mechanism suggests starting a conversation from the proposed number above.'
                                                     : 'The mechanism determined you\'re too far apart for a fair middle ground.'}
                                             </p>
                                         </div>
@@ -3551,8 +4013,8 @@
                                                 ⚠ Next Step
                                             </p>
                                             <p className="text-[#666666] text-sm mb-4">
-                                                {result.final 
-                                                    ? `Use $${result.final.toLocaleString()} as the starting point for your conversation to close the gap.`
+                                                {result.suggested 
+                                                    ? `Use $${result.suggested.toLocaleString()} as a starting point for your conversation to close the gap.`
                                                     : 'The mechanism detected you\'re close. Consider a conversation to bridge the gap.'}
                                             </p>
                                             <Button
@@ -3634,6 +4096,10 @@
             }
         };
 
+        // ============================================
+        // RESULT VIEW (Enhanced with new features)
+        // ============================================
+
         // --- RESULT VIEW ---
 
         const ResultView = ({ resultId }) => {
@@ -3669,8 +4135,37 @@
 
             if (step === 'loading') {
                 return (
-                    <div className="max-w-xl mx-auto animate-enter text-center">
-                        <div className="text-[#666666]">Loading...</div>
+                    <div className="spotlight-container">
+                        {/* Progress Header */}
+                        <div className="progress-header spotlight-content">
+                            <div className="progress-steps">
+                                <div className="progress-step">
+                                    <div className="progress-circle completed">✓</div>
+                                    <span className="progress-label">Set Max</span>
+                                </div>
+                                <div className="progress-divider completed"></div>
+                                <div className="progress-step">
+                                    <div className="progress-circle completed">✓</div>
+                                    <span className="progress-label">Send Link</span>
+                                </div>
+                                <div className="progress-divider completed"></div>
+                                <div className="progress-step">
+                                    <div className="progress-circle active">3</div>
+                                    <span className="progress-label active">See Result</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="max-w-xl mx-auto animate-enter text-center spotlight-content">
+                            {/* Skeleton Loading State */}
+                            <div className="mb-8 mx-auto w-24 h-24 rounded-full skeleton"></div>
+                            <div className="skeleton h-12 w-64 mx-auto mb-4"></div>
+                            <div className="skeleton h-6 w-96 mx-auto mb-10"></div>
+                            <GlassCard className="mb-6">
+                                <div className="skeleton h-32"></div>
+                            </GlassCard>
+                            <p className="text-[#666666] text-sm animate-pulse">Checking the mechanism...</p>
+                        </div>
                     </div>
                 );
             }
@@ -3701,91 +4196,173 @@
             // Simplified view: Only show status, final, and celebration emojis
             if (data.status === 'success') {
                 return (
-                    <div className="max-w-xl mx-auto animate-enter text-center">
-                        {/* Party celebration for successful deal */}
-                        <div className="text-7xl mb-6 animate-enter" style={{ animation: 'fade-in-up 0.6s ease-out' }}>
-                            🎉
-                        </div>
-                        
-                        <div className="w-24 h-24 mx-auto rounded-full bg-[#34C759] shadow-[0_4px_20px_rgba(52,199,89,0.4)] flex items-center justify-center mb-8">
-                            <Icons.Handshake className="w-12 h-12 text-white" />
+                    <div className="spotlight-container">
+                        {/* Progress Header */}
+                        <div className="progress-header spotlight-content">
+                            <div className="progress-steps">
+                                <div className="progress-step">
+                                    <div className="progress-circle completed">✓</div>
+                                    <span className="progress-label">Set Max</span>
+                                </div>
+                                <div className="progress-divider completed"></div>
+                                <div className="progress-step">
+                                    <div className="progress-circle completed">✓</div>
+                                    <span className="progress-label">Sent Link</span>
+                                </div>
+                                <div className="progress-divider completed"></div>
+                                <div className="progress-step">
+                                    <div className="progress-circle completed">✓</div>
+                                    <span className="progress-label">Result</span>
+                                </div>
+                            </div>
                         </div>
 
-                        <h2 className="text-4xl md:text-5xl font-extrabold text-[#1C1C1E] mb-6">
-                            Deal Closed! 🎊
-                        </h2>
-                        <p className="text-lg text-[#666666] mb-10 leading-relaxed">
-                            The mechanism found a fair agreement.
-                        </p>
+                        <div className="max-w-xl mx-auto animate-enter text-center spotlight-content">
+                            {/* Animated Status Badge */}
+                            <div className="mb-8 flex justify-center">
+                                <div className="status-badge success">
+                                    <Icons.Handshake className="w-12 h-12 text-white" />
+                                </div>
+                            </div>
 
-                        <GlassCard className="border-l-4 border-[#34C759] mb-6">
-                            <p className="text-sm text-[#666666] mb-4">Final Annual Compensation</p>
-                            <p className="text-6xl font-bold text-[#1C1C1E] mb-6 tracking-tight financial-number">
-                                ${data.final.toLocaleString()}
+                            <h2 className="text-4xl md:text-5xl font-extrabold text-[#1C1C1E] mb-4">
+                                Deal Closed
+                            </h2>
+                            <p className="text-lg text-[#666666] mb-10 leading-relaxed">
+                                The mechanism found a fair midpoint.
                             </p>
-                            <div className="bg-[#E5F9F0] rounded-xl p-5 text-center">
-                                <p className="text-sm text-[#666666]">
-                                    This is the fair split computed by the mechanism. Both sides' ranges overlapped, and the difference was split 50/50.
-                                </p>
-                            </div>
-                        </GlassCard>
 
-                        <div className="text-center mb-6">
-                            <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-[#E5F9F0] border-2 border-[#34C759] shadow-[10px_10px_20px_#d9d9d9,-10px_-10px_20px_#ffffff]">
-                                <span className="text-2xl">✅</span>
-                                <span className="text-lg font-bold text-[#34C759] uppercase tracking-wider">Success</span>
-                                <span className="text-2xl">🎯</span>
-                            </div>
-                        </div>
+                            <GlassCard className="border-l-4 border-[#34C759] mb-6">
+                                <p className="text-sm text-[#666666] mb-4">Final Total Compensation</p>
+                                {/* Hero Number Treatment */}
+                                <div className="hero-number-container mb-6">
+                                    <p className="text-6xl font-bold text-[#1C1C1E] tracking-tight financial-number">
+                                        ${data.final.toLocaleString()}
+                                    </p>
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-sm text-[#666666] mb-2">
+                                        <strong className="text-[#34C759]">✓ Split halfway</strong>
+                                    </p>
+                                    <p className="text-xs text-[#666666]">
+                                        The mechanism split the difference between your max and their minimum.
+                                    </p>
+                                </div>
+                                </GlassCard>
+
+                            {/* What happens next - Animated */}
+                            <GlassCard className="bg-[#EFF3F6] text-left mb-6">
+                                <h3 className="text-sm font-bold text-[#1C1C1E] mb-4 uppercase tracking-wide">
+                                    What Happens Next
+                                </h3>
+                                <div className="space-y-3">
+                                    <div className="checklist-item flex items-start gap-3">
+                                        <span className="checklist-number relative flex-shrink-0 w-7 h-7 bg-[#34C759] text-white rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                                        <p className="text-sm text-[#666666] pt-0.5">
+                                            <strong className="text-[#1C1C1E]">Tell the candidate the final number.</strong>
+                                        </p>
+                                    </div>
+                                    <div className="checklist-item flex items-start gap-3">
+                                        <span className="checklist-number relative flex-shrink-0 w-7 h-7 bg-[#34C759] text-white rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                                        <p className="text-sm text-[#666666] pt-0.5">
+                                            <strong className="text-[#1C1C1E]">Move forward with the offer.</strong>
+                                        </p>
+                                    </div>
+                                </div>
+                            </GlassCard>
 
                         <GlassCard className="bg-[#EFF3F6]">
                             <h3 className="text-xs text-[#1C1C1E] mb-2 font-bold uppercase tracking-wide">
                                 🔒 Privacy Protected
                             </h3>
                             <p className="text-xs text-[#666666]">
-                                This link shows only the final outcome (success/close/fail) and the final compensation—not anyone's original inputs. The mechanism kept both parties' numbers private.
+                                This link shows only the final outcome (success/close/fail) and the final total compensation — not anyone's original inputs. The mechanism kept both parties' numbers private.
                             </p>
                         </GlassCard>
 
+                        <Button variant="secondary" onClick={() => window.location.reload()} className="mt-6 w-full">
+                            Start New Offer
+                        </Button>
+
                         <p className="text-[#666666] text-xs text-center mt-6">
+                            Result available for 7 days; no original inputs are stored.
+                        </p>
+                        <p className="text-[#999999] text-xs text-center mt-1">
                             Created {new Date(data.createdAt).toLocaleDateString()}
                         </p>
+                    </div>
                     </div>
                 );
             }
 
             if (data.status === 'close') {
                 return (
-                    <div className="max-w-xl mx-auto animate-enter text-center">
-                        {/* Conversation emoji for close cases */}
-                        <div className="text-7xl mb-6 animate-enter" style={{ animation: 'fade-in-up 0.6s ease-out' }}>
-                            💬
-                        </div>
-                        
-                        <div className="w-24 h-24 mx-auto rounded-full bg-[#FF9500] shadow-[0_4px_20px_rgba(255,149,0,0.4)] flex items-center justify-center mb-8">
-                            <Icons.Phone className="w-12 h-12 text-white" />
-                        </div>
-
-                        <h2 className="text-4xl md:text-5xl font-extrabold text-[#1C1C1E] mb-6">
-                            Close — Let's Talk 🤝
-                        </h2>
-                        <p className="text-lg text-[#666666] mb-10 leading-relaxed">
-                            The ranges were within 10% — worth a conversation!
-                        </p>
-
-                        <GlassCard className="border-l-4 border-[#FF9500] mb-6">
-                            <div className="bg-[#FFF5E6] border border-[#FF9500]/30 p-5 rounded-xl text-center">
-                                <p className="text-[#1C1C1E] font-bold text-lg mb-2">
-                                    🎯 Within the bridge zone
-                                </p>
-                                <p className="text-[#666666] text-sm mb-3">
-                                    The mechanism found the two sides close enough (within 10%) that a short conversation could bridge the gap.
-                                </p>
-                                <p className="text-[#FF9500] font-semibold text-sm">
-                                    💡 A brief follow-up chat might close this deal!
-                                </p>
+                    <div className="spotlight-container">
+                        {/* Progress Header */}
+                        <div className="progress-header spotlight-content">
+                            <div className="progress-steps">
+                                <div className="progress-step">
+                                    <div className="progress-circle completed">✓</div>
+                                    <span className="progress-label">Set Max</span>
+                                </div>
+                                <div className="progress-divider completed"></div>
+                                <div className="progress-step">
+                                    <div className="progress-circle completed">✓</div>
+                                    <span className="progress-label">Sent Link</span>
+                                </div>
+                                <div className="progress-divider completed"></div>
+                                <div className="progress-step">
+                                    <div className="progress-circle completed">✓</div>
+                                    <span className="progress-label">Result</span>
+                                </div>
                             </div>
-                        </GlassCard>
+                        </div>
+
+                        <div className="max-w-xl mx-auto animate-enter text-center spotlight-content">
+                            {/* Animated Status Badge */}
+                            <div className="mb-8 flex justify-center">
+                                <div className="status-badge warning">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-12 h-12 text-white">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <h2 className="text-4xl md:text-5xl font-extrabold text-[#1C1C1E] mb-4">
+                                Close Gap
+                            </h2>
+                            <p className="text-lg text-[#666666] mb-10 leading-relaxed">
+                                You're within 10% — a conversation could bridge this gap.
+                            </p>
+
+                            <GlassCard className="border-l-4 border-[#FF9500] mb-6">
+                                {/* Show suggested starting point if available */}
+                                {data.suggested && (
+                                    <div className="mb-6">
+                                        <p className="text-sm text-[#666666] mb-2 uppercase tracking-wide font-semibold">
+                                            Proposed Starting Point
+                                        </p>
+                                        <div className="hero-number-container bg-gradient-to-br from-orange-100 to-amber-100">
+                                            <p className="text-5xl font-bold text-[#FF9500] tracking-tight financial-number">
+                                                ${data.suggested.toLocaleString()}
+                                            </p>
+                                        </div>
+                                        <p className="text-xs text-[#666666] mt-3 italic">
+                                            This is a non-binding suggestion for human negotiation, not an auto-deal.
+                                        </p>
+                                    </div>
+                                )}
+                                <div className="text-center">
+                                    <p className="text-sm text-[#666666] mb-2">
+                                        <strong className="text-[#FF9500]">⚠️ Within bridge zone</strong>
+                                    </p>
+                                    <p className="text-xs text-[#666666]">
+                                        The mechanism found the two sides close enough (within 10%) that a conversation could bridge it.
+                                    </p>
+                                </div>
+                            </GlassCard>
 
                         <div className="text-center mb-6">
                             <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-[#FFF5E6] border-2 border-[#FF9500] shadow-[10px_10px_20px_#d9d9d9,-10px_-10px_20px_#ffffff]">
@@ -3797,16 +4374,20 @@
 
                         <GlassCard className="bg-[#EFF3F6]">
                             <h3 className="text-xs text-[#1C1C1E] mb-2 font-bold uppercase tracking-wide">
-                                Outcome-Only Display
+                                🔒 Outcome-Only Display
                             </h3>
                             <p className="text-xs text-[#666666]">
-                                This link shows only the final outcome (success/close/fail), not the original inputs from either party.
+                                This link shows only the final outcome (success/close/fail) and the suggested total compensation — not anyone's original inputs.
                             </p>
                         </GlassCard>
 
                         <p className="text-[#666666] text-xs text-center mt-6">
+                            Result available for 7 days; no original inputs are stored.
+                        </p>
+                        <p className="text-[#999999] text-xs text-center mt-1">
                             Created {new Date(data.createdAt).toLocaleDateString()}
                         </p>
+                    </div>
                     </div>
                 );
             }
@@ -3857,11 +4438,14 @@
                             🔒 Privacy Protected
                         </h3>
                         <p className="text-xs text-[#666666]">
-                            This link shows only the final outcome (success/close/fail)—not anyone's original numbers. The mechanism kept both parties' inputs private.
+                            This link shows only the final outcome (success/close/fail) — not anyone's original numbers. The mechanism kept both parties' inputs private.
                         </p>
                     </GlassCard>
 
                     <p className="text-[#666666] text-xs text-center mt-6">
+                        Result available for 7 days; no original inputs are stored.
+                    </p>
+                    <p className="text-[#999999] text-xs text-center mt-1">
                         Created {new Date(data.createdAt).toLocaleDateString()}
                     </p>
                 </div>
@@ -3870,6 +4454,10 @@
 
         // --- MECHANISM SPEC SECTION ---
 
+
+        // ============================================
+        // ROOT APP & ROUTING
+        // ============================================
 
         // --- ROOT APP ---
 

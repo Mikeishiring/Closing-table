@@ -14,6 +14,7 @@ describe('calculateDeal Function - Unit Tests', () => {
     expect(result.final).toBe(175000);
     expect(result.surplus).toBe(50000);
     expect(result.gap).toBeNull();
+    expect(result.suggested).toBeNull();
   });
 
   // Test 2: Fair Split - Edge Case (Exact Match)
@@ -32,6 +33,8 @@ describe('calculateDeal Function - Unit Tests', () => {
     expect(result.gap).toBe(10000);
     expect(result.final).toBeNull();
     expect(result.surplus).toBeNull();
+    // Should have a suggested starting point (midpoint: 105000)
+    expect(result.suggested).toBe(105000);
     
     // Verify it's exactly 10%: gap / cMax = 10000 / 100000 = 0.10 = 10%
     const gapPercent = (result.gap / 100000) * 100;
@@ -45,6 +48,7 @@ describe('calculateDeal Function - Unit Tests', () => {
     expect(result.gap).toBe(10001);
     expect(result.final).toBeNull();
     expect(result.surplus).toBeNull();
+    expect(result.suggested).toBeNull();
     
     // Verify it's over 10%: gap / cMax = 10001 / 100000 = 0.10001 = 10.001%
     const gapPercent = (result.gap / 100000) * 100;
@@ -94,6 +98,7 @@ describe('calculateDeal Function - Unit Tests', () => {
 // Integration tests require the server to be running
 // We'll create a separate test file for integration tests
 // For now, these are the core unit tests
+
 
 
 
