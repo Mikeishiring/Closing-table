@@ -1,63 +1,55 @@
 /**
  * ResultCard Component
- * Full-screen grand reveal for negotiation outcomes
- * Three outcomes: FAIR_SPLIT (success), BRIDGE_ZONE (close), NO_DEAL (fail)
+ * Full-screen grand reveal with 3-beat staged sequence
  */
 
 import React, { useState, useEffect } from 'react';
 import { formatCurrency } from '../lib/deal-math';
 import { generateResultLink, copyToClipboard } from '../lib/api';
 
-// Status configuration for each outcome type
+// Status configuration with personality for each outcome
 const STATUS_CONFIG = {
   success: {
-    title: 'Deal Closed',
-    subtitle: 'The mechanism found a fair middle ground and split the surplus 50/50.',
-    iconBg: 'bg-emerald-500',
-    iconColor: 'text-white',
-    glowColor: 'from-emerald-500/20',
-    icon: '✓',
-    heroLabel: 'Final Offer',
-    heroColor: 'text-slate-900',
+    title: "Deal Closed",
+    subtitle: "The mechanism found a fair middle ground and split the surplus 50/50.",
+    icon: "✓",
+    bg: "from-emerald-500/15",
+    iconBg: "bg-emerald-500",
+    textAccent: "text-emerald-600",
   },
   close: {
-    title: 'Close, But Not Quite',
+    title: "Close, But Not Quite",
     subtitle: "You're within the 10% bridge window. A human conversation could close the gap.",
-    iconBg: 'bg-amber-500',
-    iconColor: 'text-white',
-    glowColor: 'from-amber-500/20',
-    icon: '~',
-    heroLabel: 'Gap Size',
-    heroColor: 'text-slate-900',
+    icon: "~",
+    bg: "from-amber-500/15",
+    iconBg: "bg-amber-500",
+    textAccent: "text-amber-600",
   },
   fail: {
-    title: 'No Deal Under This Mechanism',
-    subtitle: 'The ranges are too far apart for a fair split within the rules you agreed to.',
-    iconBg: 'bg-rose-500',
-    iconColor: 'text-white',
-    glowColor: 'from-rose-500/20',
-    icon: '✕',
-    heroLabel: null,
-    heroColor: 'text-slate-900',
+    title: "No Deal Under This Mechanism",
+    subtitle: "The ranges are too far apart for a fair split within the rules you agreed to.",
+    icon: "✕",
+    bg: "from-rose-500/15",
+    iconBg: "bg-rose-500",
+    textAccent: "text-rose-600",
   },
 };
 
 /**
- * Counter animation for numbers
+ * Animated counter hook for number reveal
  */
-function useCountUp(target, duration = 800) {
+function useCountUp(target, duration = 600) {
   const [count, setCount] = useState(0);
   
   useEffect(() => {
-    if (!target) return;
+    if (!target || target === 0) return;
     
     const start = performance.now();
     const end = start + duration;
     
     const step = (timestamp) => {
       const progress = Math.min((timestamp - start) / duration, 1);
-      // Ease out cubic
-      const eased = 1 - Math.pow(1 - progress, 3);
+      const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
       setCount(Math.floor(target * eased));
       
       if (progress < 1) {
@@ -74,23 +66,23 @@ function useCountUp(target, duration = 800) {
 }
 
 /**
- * Compact Privacy Explainer
+ * Collapsible Privacy Explainer
  */
 function PrivacyExplainer() {
   const [expanded, setExpanded] = useState(false);
   
   return (
-    <div className="mt-6 text-sm">
+    <div className="mt-6 text-xs text-slate-500">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 rounded"
+        className="flex items-center gap-2 hover:text-slate-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 rounded"
       >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <span className="underline">How your numbers stayed private</span>
         <svg 
-          className={`w-4 h-4 transition-transform ${expanded ? 'rotate-180' : ''}`} 
+          className={`w-3.5 h-3.5 transition-transform ${expanded ? 'rotate-180' : ''}`} 
           fill="none" 
           viewBox="0 0 24 24" 
           stroke="currentColor"
@@ -100,7 +92,7 @@ function PrivacyExplainer() {
       </button>
       
       {expanded && (
-        <div className="mt-3 p-4 bg-slate-50 rounded-lg space-y-2 text-slate-700 animate-fadeIn">
+        <div className="mt-2 pl-6 space-y-1 text-slate-600 animate-in fade-in slide-in-from-top-1 duration-200">
           <p>• Each side's original number is never shown to the other.</p>
           <p>• Only this final outcome is visible via the link.</p>
           <p>• The mechanism is single-use and doesn't store negotiation history.</p>
@@ -111,19 +103,20 @@ function PrivacyExplainer() {
 }
 
 /**
- * Range Visualization Bar
+ * Range Visualization Bars
  */
-function RangeVisualization({ status, finalOffer, gapPercent }) {
+function RangeVisualization({ status }) {
+  const config = STATUS_CONFIG[status];
+  
   if (status === 'success') {
     return (
       <div className="space-y-2">
         <div className="relative h-2 rounded-full bg-slate-100">
-          {/* Shared surplus band */}
+          {/* Overlap band */}
           <div className="absolute left-1/4 right-1/4 h-full bg-emerald-200 rounded-full" />
           {/* Final offer dot */}
           <div 
-            className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-emerald-500 rounded-full shadow-sm"
-            style={{ left: '50%', transform: 'translate(-50%, -50%)' }}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-emerald-500 rounded-full shadow-sm animate-in zoom-in duration-300"
           />
         </div>
         <p className="text-xs text-slate-500 text-center">
@@ -136,16 +129,13 @@ function RangeVisualization({ status, finalOffer, gapPercent }) {
   if (status === 'close') {
     return (
       <div className="space-y-2">
-        <div className="relative h-2 rounded-full bg-slate-100 flex items-center justify-center gap-1 px-2">
-          {/* Left range (candidate) */}
+        <div className="relative h-2 rounded-full bg-slate-100 flex items-center gap-1 px-2">
           <div className="flex-1 h-full bg-amber-200 rounded-l-full" />
-          {/* Small gap */}
-          <div className="w-4 h-full bg-slate-300" />
-          {/* Right range (company) */}
+          <div className="w-3 h-full bg-slate-300" />
           <div className="flex-1 h-full bg-amber-200 rounded-r-full" />
         </div>
         <p className="text-xs text-slate-500 text-center">
-          The mechanism found you're close but not overlapping. A small gap remains that only a conversation can resolve.
+          Close but not overlapping. A small gap remains that a conversation can resolve.
         </p>
       </div>
     );
@@ -155,15 +145,12 @@ function RangeVisualization({ status, finalOffer, gapPercent }) {
     return (
       <div className="space-y-2">
         <div className="relative h-2 rounded-full bg-slate-100 flex items-center justify-between px-2">
-          {/* Left range (candidate) */}
           <div className="w-1/4 h-full bg-rose-200 rounded-l-full" />
-          {/* Wide gap */}
           <div className="flex-1 h-full bg-slate-300 mx-2" />
-          {/* Right range (company) */}
           <div className="w-1/4 h-full bg-rose-200 rounded-r-full" />
         </div>
         <p className="text-xs text-slate-500 text-center">
-          The gap between acceptable ranges is larger than 10%. The mechanism can't suggest a fair middle without asking one of you to cross your stated limits.
+          The gap is larger than 10%. The mechanism can't suggest a fair middle without asking someone to cross their limits.
         </p>
       </div>
     );
@@ -173,13 +160,13 @@ function RangeVisualization({ status, finalOffer, gapPercent }) {
 }
 
 /**
- * Info Box for BRIDGE_ZONE and NO_DEAL
+ * Info Box for guidance
  */
 function InfoBox({ status, suggested }) {
   if (status === 'close') {
     return (
-      <div className="mt-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
-        <h4 className="font-semibold text-slate-900 mb-2">Suggested next move</h4>
+      <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+        <h4 className="font-semibold text-slate-900 text-sm mb-2">Suggested next move</h4>
         <p className="text-sm text-slate-700 mb-2">
           A conversation could bridge this gap. The tool stops here to leave room for human judgment.
         </p>
@@ -194,8 +181,8 @@ function InfoBox({ status, suggested }) {
   
   if (status === 'fail') {
     return (
-      <div className="mt-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
-        <h4 className="font-semibold text-slate-900 mb-2">What this tells you</h4>
+      <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+        <h4 className="font-semibold text-slate-900 text-sm mb-2">What this tells you</h4>
         <p className="text-sm text-slate-700">
           The mechanism protected both sides from crossing their limits. A new offer with new numbers would be needed to try again.
         </p>
@@ -216,8 +203,10 @@ function Toast({ message, onClose }) {
   }, [onClose]);
   
   return (
-    <div className="fixed bottom-4 right-4 bg-slate-900 text-white px-4 py-3 rounded-lg shadow-lg animate-slideUp">
-      {message}
+    <div className="fixed bottom-4 inset-x-0 flex justify-center pointer-events-none z-50">
+      <div className="pointer-events-auto rounded-full bg-slate-900 text-white text-xs px-4 py-2 shadow-lg animate-in fade-in slide-in-from-bottom-2 duration-300">
+        {message}
+      </div>
     </div>
   );
 }
@@ -226,28 +215,24 @@ function Toast({ message, onClose }) {
  * Main ResultCard Component
  */
 export function ResultCard({ status, finalOffer, suggested, gapPercent, resultId }) {
-  const [phase, setPhase] = useState(1); // 1: Intro, 2: Headline, 3: Details
+  const [stage, setStage] = useState('locking'); // 'locking' | 'headline' | 'details'
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [copyLabel, setCopyLabel] = useState('Copy result link');
   
   const config = STATUS_CONFIG[status];
-  const countedValue = useCountUp(status === 'success' ? finalOffer : null, 1000);
+  const countedValue = useCountUp(status === 'success' ? finalOffer : null, 600);
   
-  // Phase transitions - reduced timing for faster reveal
+  // 3-beat reveal sequence
   useEffect(() => {
-    const timer1 = setTimeout(() => setPhase(2), 400);  // Reduced from 600ms
-    const timer2 = setTimeout(() => setPhase(3), 800);  // Reduced from 1200ms
+    const t1 = setTimeout(() => setStage('headline'), 500);
+    const t2 = setTimeout(() => setStage('details'), 900);
     
     return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
+      clearTimeout(t1);
+      clearTimeout(t2);
     };
   }, []);
-  
-  // Calculate gap percentage for display
-  const displayGap = gapPercent || (suggested && finalOffer ? 
-    (Math.abs(suggested - finalOffer) / finalOffer * 100).toFixed(1) : 
-    null);
   
   const handleCopy = async (type) => {
     let text;
@@ -255,7 +240,7 @@ export function ResultCard({ status, finalOffer, suggested, gapPercent, resultId
     if (type === 'result') {
       const link = generateResultLink(resultId);
       text = link;
-      setToastMessage('Link copied. Anyone with it can see this outcome only.');
+      setToastMessage('Link copied — only this outcome is visible.');
     } else if (type === 'summary') {
       text = `Negotiation outcome: ${config.title}\n\n${config.subtitle}`;
       if (status === 'close' && suggested) {
@@ -267,6 +252,8 @@ export function ResultCard({ status, finalOffer, suggested, gapPercent, resultId
     const result = await copyToClipboard(text);
     if (result.success) {
       setShowToast(true);
+      setCopyLabel('Copied ✓');
+      setTimeout(() => setCopyLabel(type === 'result' ? 'Copy result link' : 'Copy summary'), 2000);
     }
   };
   
@@ -275,117 +262,142 @@ export function ResultCard({ status, finalOffer, suggested, gapPercent, resultId
     window.location.reload();
   };
   
+  // Calculate display gap
+  const displayGap = gapPercent || (status === 'close' ? 8 : status === 'fail' ? 15 : null);
+  
   return (
-    <div className="fixed inset-0 bg-slate-900/70 flex items-center justify-center p-4 z-50 animate-fadeIn">
-      {/* Background glow */}
+    <div className="fixed inset-0 bg-slate-900/70 flex items-center justify-center p-4 z-50 animate-in fade-in duration-300">
+      {/* Status-specific halo */}
       <div 
-        className={`absolute inset-0 bg-gradient-to-br ${config.glowColor} to-transparent blur-3xl opacity-50`}
-        style={{ 
-          maskImage: 'radial-gradient(circle at center, black 20%, transparent 70%)',
-          WebkitMaskImage: 'radial-gradient(circle at center, black 20%, transparent 70%)'
-        }}
+        className={`pointer-events-none absolute inset-x-0 -top-24 h-40 bg-gradient-to-b ${config.bg} to-transparent blur-2xl`}
       />
       
       {/* Card */}
-      <div className="relative w-full max-w-xl mx-4 bg-white rounded-2xl shadow-2xl p-8 animate-scaleIn">
-        {/* Phase 1: Intro */}
-        {phase >= 1 && (
-          <div className={`text-center mb-6 transition-opacity duration-300 ${phase > 1 ? 'opacity-0' : 'opacity-100'}`}>
-            <div className="inline-block animate-spin-slow">
-              <svg className="w-12 h-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
+      <div className="relative w-full max-w-xl mx-4 bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl transition-transform hover:shadow-xl hover:-translate-y-0.5">
+        <div className="p-6 md:p-8">
+          
+          {/* Beat 1: Locking state */}
+          <div className={`transition-all duration-300 ${
+            stage === 'locking' ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 hidden'
+          }`}>
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-200 animate-pulse">
+                <svg className="w-5 h-5 text-slate-600 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm text-slate-600">Outcome locked in — running the mechanism…</p>
+              </div>
             </div>
-            <p className="text-slate-600 mt-2">Outcome locked in</p>
           </div>
-        )}
-        
-        {/* Phase 2: Headline */}
-        {phase >= 2 && (
-          <div className={`transition-opacity duration-500 ${phase < 2 ? 'opacity-0' : phase === 2 ? 'opacity-100' : 'opacity-100'}`}>
-            {/* Icon + Title Row */}
-            <div className="flex items-start gap-4 mb-6">
-              <div className={`flex-shrink-0 w-14 h-14 ${config.iconBg} ${config.iconColor} rounded-full flex items-center justify-center text-2xl font-bold shadow-lg`}>
+          
+          {/* Beat 2 & 3: Headline + Details */}
+          <div className={`transition-all duration-300 ${
+            stage === 'headline' || stage === 'details' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+          }`}>
+            
+            {/* Header row (icon + title) */}
+            <div className="flex items-start gap-3">
+              <div className={`flex h-11 w-11 items-center justify-center rounded-full ${config.iconBg} text-white text-xl font-bold shadow-lg ${
+                status === 'success' ? 'animate-in zoom-in duration-300' : 
+                status === 'close' ? 'animate-pulse' :
+                'animate-in zoom-in duration-300'
+              }`}>
                 {config.icon}
               </div>
-              <div className="flex-1 pt-1">
-                <h2 className="text-2xl font-bold text-slate-900 mb-1">{config.title}</h2>
-                <p className="text-sm text-slate-600">{config.subtitle}</p>
+              <div className="flex-1">
+                <h1 className="text-xl md:text-2xl font-semibold text-slate-900 relative">
+                  {config.title}
+                  {/* Animated underline */}
+                  <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-slate-300 to-transparent animate-in slide-in-from-left duration-500" />
+                </h1>
+                <p className="mt-1.5 text-sm md:text-base text-slate-600">{config.subtitle}</p>
               </div>
             </div>
             
-            {/* Phase 3: Details */}
-            {phase >= 3 && (
-              <div className="space-y-6 animate-slideUp">
-                {/* Hero Metric */}
-                <div className="text-center py-6">
-                  {status === 'success' && (
-                    <>
-                      <div className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">
-                        {config.heroLabel}
-                      </div>
-                      <div className={`text-4xl md:text-5xl font-semibold ${config.heroColor} mb-2`}>
-                        {formatCurrency(countedValue)}
-                      </div>
-                      <p className="text-sm text-slate-600">
-                        Locked in by the double-blind mechanism.
-                      </p>
-                    </>
-                  )}
-                  
-                  {status === 'close' && (
-                    <>
-                      <div className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">
-                        {config.heroLabel}
-                      </div>
-                      <div className={`text-4xl md:text-5xl font-semibold ${config.heroColor} mb-2`}>
-                        {displayGap}%
-                      </div>
-                      <p className="text-sm text-slate-600">
-                        A small gap that a conversation could resolve.
-                      </p>
-                    </>
-                  )}
-                  
-                  {status === 'fail' && (
-                    <p className="text-lg text-slate-700">
-                      The gap was too wide for the mechanism to propose a fair number.
+            {/* Beat 3: Details section */}
+            <div className={`transition-all duration-300 delay-200 ${
+              stage === 'details' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+            }`}>
+              
+              {/* Hero metric section */}
+              <div className={`mt-6 ${status === 'success' ? 'mb-8' : 'mb-6'}`}>
+                {status === 'success' && (
+                  <div className="text-center">
+                    <div className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">
+                      Final Offer
+                    </div>
+                    <div className="text-3xl md:text-4xl font-semibold text-slate-900 mb-2">
+                      {formatCurrency(countedValue)}
+                    </div>
+                    <p className="text-sm text-slate-600">
+                      Locked in by the double-blind mechanism.
                     </p>
-                  )}
-                </div>
+                  </div>
+                )}
+                
+                {status === 'close' && (
+                  <div className="text-center">
+                    <div className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">
+                      Gap Size
+                    </div>
+                    <div className="text-3xl md:text-4xl font-semibold text-slate-900 mb-2">
+                      {displayGap}%
+                    </div>
+                    <p className="text-sm text-slate-600">
+                      A small gap that a conversation could resolve.
+                    </p>
+                  </div>
+                )}
+                
+                {status === 'fail' && (
+                  <div className="text-center">
+                    <p className="text-sm font-medium text-rose-600">
+                      Gap &gt; 10% of company's maximum
+                    </p>
+                  </div>
+                )}
+              </div>
+              
+              {/* Layout: Grid for success/close on desktop, stack for fail */}
+              <div className={status !== 'fail' ? 'grid gap-6' : 'space-y-6'}>
                 
                 {/* Visualization */}
-                <RangeVisualization 
-                  status={status} 
-                  finalOffer={finalOffer}
-                  gapPercent={displayGap}
-                />
-                
-                {/* Info Box */}
-                <InfoBox status={status} suggested={suggested} />
-                
-                {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                  <button
-                    onClick={() => handleCopy(status === 'close' ? 'summary' : 'result')}
-                    className="flex-1 bg-slate-900 text-white py-3 px-6 rounded-lg font-medium hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
-                  >
-                    {status === 'close' ? 'Copy bridge-zone summary' : 'Copy result link'}
-                  </button>
-                  <button
-                    onClick={handleNewOffer}
-                    className="flex-1 bg-slate-100 text-slate-900 py-3 px-6 rounded-lg font-medium hover:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
-                  >
-                    Create another offer
-                  </button>
+                <div>
+                  <RangeVisualization status={status} />
                 </div>
                 
-                {/* Privacy Explainer */}
-                <PrivacyExplainer />
+                {/* Info box */}
+                <InfoBox status={status} suggested={suggested} />
+                
               </div>
-            )}
+              
+              {/* Action buttons */}
+              <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={() => handleCopy(status === 'close' ? 'summary' : 'result')}
+                  className="flex-1 w-full bg-slate-900 text-white text-sm font-medium py-3 px-6 rounded-full hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  {status === 'close' ? 'Copy summary' : copyLabel}
+                </button>
+                <button
+                  onClick={handleNewOffer}
+                  className="flex-1 w-full bg-white text-slate-900 text-sm font-medium py-3 px-6 rounded-full border border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  Create another offer
+                </button>
+              </div>
+              
+              {/* Privacy explainer */}
+              <PrivacyExplainer />
+              
+            </div>
+            
           </div>
-        )}
+          
+        </div>
       </div>
       
       {/* Toast */}
@@ -398,4 +410,3 @@ export function ResultCard({ status, finalOffer, suggested, gapPercent, resultId
     </div>
   );
 }
-
