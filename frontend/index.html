@@ -499,8 +499,11 @@
         .how-it-works-steps {
             display: flex;
             flex-direction: column;
-            gap: 1.25rem;
+            gap: 1.5rem;
             margin-bottom: 1.5rem;
+            list-style: none;
+            padding: 0;
+            margin-left: 0;
         }
 
         .step-item {
@@ -513,6 +516,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            min-width: 32px;
+            min-height: 32px;
             width: 2rem;
             height: 2rem;
             border-radius: 50%;
@@ -2672,57 +2677,57 @@
                     <h3>How it works</h3>
                     
                     {/* Three-step visual layout */}
-                    <div className="how-it-works-steps">
+                    <ol className="how-it-works-steps" aria-label="How The Closing Table works">
                         {isCandidate ? (
                             <>
-                                <div className="step-item">
-                                    <div className="step-number">1</div>
+                                <li className="step-item">
+                                    <div className="step-number" aria-hidden="true">1</div>
                                     <div className="step-content">
                                         <h4>You set your minimum.</h4>
                                         <p>You choose the lowest total compensation that would make this feel fair.</p>
                                     </div>
-                                </div>
-                                <div className="step-item">
-                                    <div className="step-number">2</div>
+                                </li>
+                                <li className="step-item">
+                                    <div className="step-number" aria-hidden="true">2</div>
                                     <div className="step-content">
                                         <h4>The company has already set their maximum.</h4>
                                         <p>They've defined the most they're willing to pay.</p>
                                     </div>
-                                </div>
-                                <div className="step-item">
-                                    <div className="step-number">3</div>
+                                </li>
+                                <li className="step-item">
+                                    <div className="step-number" aria-hidden="true">3</div>
                                     <div className="step-content">
                                         <h4>We check if there's a fair middle.</h4>
                                         <p>If your minimum and their maximum overlap, we propose a fair number between them.</p>
                                     </div>
-                                </div>
+                                </li>
                             </>
                         ) : (
                             <>
-                                <div className="step-item">
-                                    <div className="step-number">1</div>
+                                <li className="step-item">
+                                    <div className="step-number" aria-hidden="true">1</div>
                                     <div className="step-content">
                                         <h4>You set your max offer.</h4>
                                         <p>You define the highest total compensation you're willing to pay. We keep this hidden.</p>
                                     </div>
-                                </div>
-                                <div className="step-item">
-                                    <div className="step-number">2</div>
+                                </li>
+                                <li className="step-item">
+                                    <div className="step-number" aria-hidden="true">2</div>
                                     <div className="step-content">
                                         <h4>The candidate sets their minimum.</h4>
                                         <p>They privately share the minimum that would make this a yes for them.</p>
                                     </div>
-                                </div>
-                                <div className="step-item">
-                                    <div className="step-number">3</div>
+                                </li>
+                                <li className="step-item">
+                                    <div className="step-number" aria-hidden="true">3</div>
                                     <div className="step-content">
                                         <h4>We check for a fair overlap.</h4>
                                         <p>If there's room for a fair deal, the mechanism proposes a final number.</p>
                                     </div>
-                                </div>
+                                </li>
                             </>
                         )}
-                    </div>
+                    </ol>
 
                     {/* Privacy note */}
                     <div className="privacy-note">
@@ -3065,7 +3070,7 @@
                                 <div className="progress-divider completed"></div>
                                 <div className="progress-step">
                                     <div className="progress-circle active">2</div>
-                                    <span className="progress-label active">Send Link</span>
+                                    <span className="progress-label active">Get Link & Send</span>
                                 </div>
                                 <div className="progress-divider"></div>
                                 <div className="progress-step">
@@ -4347,7 +4352,7 @@
                                 <div className="progress-divider completed"></div>
                                 <div className="progress-step">
                                     <div className="progress-circle completed">✓</div>
-                                    <span className="progress-label">Send Link</span>
+                                    <span className="progress-label">Get Link & Send</span>
                                 </div>
                                 <div className="progress-divider completed"></div>
                                 <div className="progress-step">
@@ -4408,7 +4413,7 @@
                                 <div className="progress-divider completed"></div>
                                 <div className="progress-step">
                                     <div className="progress-circle completed">✓</div>
-                                    <span className="progress-label">Sent Link</span>
+                                    <span className="progress-label">Got Link & Sent</span>
                                 </div>
                                 <div className="progress-divider completed"></div>
                                 <div className="progress-step">
@@ -4509,7 +4514,7 @@
                                 <div className="progress-divider completed"></div>
                                 <div className="progress-step">
                                     <div className="progress-circle completed">✓</div>
-                                    <span className="progress-label">Sent Link</span>
+                                    <span className="progress-label">Got Link & Sent</span>
                                 </div>
                                 <div className="progress-divider completed"></div>
                                 <div className="progress-step">

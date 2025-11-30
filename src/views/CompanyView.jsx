@@ -112,10 +112,22 @@ export function CompanyView() {
 
   return (
     <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl animate-[cardIn_280ms_ease-out]">
+      <div className="inline-flex items-center justify-center px-3 py-1 mb-3 rounded-full bg-[#E6F9FA] text-xs font-medium text-[#007C80]">
+        Company view
+      </div>
       <h2 className="text-2xl font-semibold mb-2">Company View</h2>
-      <p className="text-slate-600 mb-6">
+      <p className="text-slate-600 mb-2">
         Set your maximum offer. The candidate will never see this number.
       </p>
+
+      {/* Privacy note */}
+      <div className="mb-6 inline-flex items-center gap-2 text-sm text-[#555]">
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        <span>We only show the final number, never your inputs.</span>
+      </div>
 
       <div className="space-y-6 mb-8">
         {/* Base Salary */}
@@ -192,11 +204,6 @@ export function CompanyView() {
         buttonText="Lock it in & Get Link"
         disabled={loading}
       />
-
-      <div className="mt-4 flex items-center justify-center gap-2 text-[11px] text-slate-500">
-        <span>🔒</span>
-        <span>Your numbers stay private. Only the final outcome will be shared.</span>
-      </div>
     </div>
   );
 }

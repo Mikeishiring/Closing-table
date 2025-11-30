@@ -154,10 +154,46 @@ export function CandidateView({ offerId }) {
 
   return (
     <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl animate-[cardIn_280ms_ease-out]">
+      <div className="inline-flex items-center justify-center px-3 py-1 mb-3 rounded-full bg-[#E6F9FA] text-xs font-medium text-[#007C80]">
+        Candidate view
+      </div>
       <h2 className="text-2xl font-semibold mb-2">Candidate View</h2>
-      <p className="text-slate-600 mb-6">
+      <p className="text-slate-600 mb-2">
         Enter your minimum acceptable offer. The company will never see this number.
       </p>
+
+      {/* Privacy note */}
+      <div className="mb-6 inline-flex items-center gap-2 text-sm text-[#555]">
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        <span>We only show the final number, never your inputs.</span>
+      </div>
+
+      {/* Progress header */}
+      <div className="mb-6 flex items-center justify-center gap-2 text-xs">
+        <div className="flex items-center gap-1">
+          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-white font-semibold">
+            ✓
+          </div>
+          <span className="font-medium text-emerald-600">Set Minimum</span>
+        </div>
+        <div className="h-px w-8 bg-emerald-500" />
+        <div className="flex items-center gap-1">
+          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-white font-semibold">
+            2
+          </div>
+          <span className="font-semibold text-slate-900">Submit</span>
+        </div>
+        <div className="h-px w-8 bg-slate-300" />
+        <div className="flex items-center gap-1">
+          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-200 text-slate-500 font-semibold">
+            3
+          </div>
+          <span className="text-slate-500">See Result</span>
+        </div>
+      </div>
 
       <div className="space-y-6 mb-8">
         {/* Base Salary */}
@@ -214,11 +250,6 @@ export function CandidateView({ offerId }) {
         buttonText="Lock it in & See Result"
         disabled={submitting}
       />
-
-      <div className="mt-4 flex items-center justify-center gap-2 text-[11px] text-slate-500">
-        <span>🔒</span>
-        <span>The mechanism checks if ranges overlap and splits the difference 50/50</span>
-      </div>
     </div>
   );
 }
