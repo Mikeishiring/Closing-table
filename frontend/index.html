@@ -718,6 +718,178 @@
             color: var(--text-primary);
             font-weight: 600;
         }
+
+        /* === SIGNATURE SLIDER STYLES === */
+        .signature-slider {
+            --accent-color: #00C4CC;
+            position: relative;
+            padding: 1rem 0;
+        }
+
+        .signature-slider--company {
+            --accent-color: #00C4CC;
+        }
+
+        .signature-slider--candidate {
+            --accent-color: #6366F1;
+        }
+
+        /* Slider track - neutral signature line */
+        .signature-slider__track-container {
+            position: relative;
+            width: 100%;
+            height: 44px;
+            display: flex;
+            align-items: center;
+        }
+
+        .signature-slider__input {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.08);
+            border-radius: 999px;
+            outline: none;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .signature-slider__input::-webkit-slider-runnable-track {
+            height: 4px;
+            background: rgba(0, 0, 0, 0.08);
+            border-radius: 999px;
+        }
+
+        .signature-slider__input::-moz-range-track {
+            height: 4px;
+            background: rgba(0, 0, 0, 0.08);
+            border-radius: 999px;
+            border: none;
+        }
+
+        /* Pen emoji thumb - WebKit/Blink */
+        .signature-slider__input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 32px;
+            width: 32px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            cursor: grab;
+            margin-top: -14px;
+            font-size: 16px;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .signature-slider__input::-webkit-slider-thumb:hover {
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .signature-slider__input::-webkit-slider-thumb:active {
+            cursor: grabbing;
+            transform: scale(1.08);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        .signature-slider__input:focus::-webkit-slider-thumb {
+            outline: 2px solid var(--accent-color);
+            outline-offset: 2px;
+        }
+
+        /* Pen emoji thumb - Firefox */
+        .signature-slider__input::-moz-range-thumb {
+            height: 32px;
+            width: 32px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            cursor: grab;
+            font-size: 16px;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .signature-slider__input::-moz-range-thumb:hover {
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .signature-slider__input::-moz-range-thumb:active {
+            cursor: grabbing;
+            transform: scale(1.08);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        .signature-slider__input:focus::-moz-range-thumb {
+            outline: 2px solid var(--accent-color);
+            outline-offset: 2px;
+        }
+
+        /* Custom thumb overlay with pen emoji */
+        .signature-slider__thumb {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            pointer-events: none;
+            transform: translateX(-50%);
+            transition: transform 0.1s ease, box-shadow 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            z-index: 5;
+        }
+
+        .signature-slider__thumb--active {
+            transform: translateX(-50%) scale(1.08);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Ink dot animation on release */
+        @keyframes ink-dot {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        .signature-slider__ink-dot {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .signature-slider__ink-dot--active {
+            animation: ink-dot 300ms ease-out forwards;
+        }
+
+        /* Slider labels */
+        .signature-slider__labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            padding: 0 4px;
+        }
+
+        .signature-slider__label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
     </style>
 </head>
 
@@ -830,6 +1002,59 @@
             if (navigator.vibrate) {
                 navigator.vibrate([50, 30, 50]);
             }
+        }
+
+        // --- CASH DROP SOUND (for envelope slider) ---
+        function playCashDropSound() {
+            initAudio();
+            if (!audioContext) return;
+
+            const now = audioContext.currentTime;
+
+            // Coin drop: short metallic ping
+            const coinOsc = audioContext.createOscillator();
+            const coinGain = audioContext.createGain();
+            coinOsc.connect(coinGain);
+            coinGain.connect(audioContext.destination);
+            
+            coinOsc.type = 'sine';
+            coinOsc.frequency.setValueAtTime(2200, now);
+            coinOsc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
+            coinGain.gain.setValueAtTime(0.15, now);
+            coinGain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+            
+            coinOsc.start(now);
+            coinOsc.stop(now + 0.12);
+
+            // Paper rustle: noise burst (simulated with fast oscillation)
+            const rustleOsc = audioContext.createOscillator();
+            const rustleGain = audioContext.createGain();
+            rustleOsc.connect(rustleGain);
+            rustleGain.connect(audioContext.destination);
+            
+            rustleOsc.type = 'sawtooth';
+            rustleOsc.frequency.setValueAtTime(150, now + 0.05);
+            rustleOsc.frequency.exponentialRampToValueAtTime(50, now + 0.15);
+            rustleGain.gain.setValueAtTime(0.03, now + 0.05);
+            rustleGain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+            
+            rustleOsc.start(now + 0.05);
+            rustleOsc.stop(now + 0.18);
+
+            // Light haptic
+            if (navigator.vibrate) {
+                navigator.vibrate(20);
+            }
+        }
+
+        // --- SOUND ENABLED STATE (persisted to localStorage) ---
+        function getSoundEnabled() {
+            const stored = localStorage.getItem('closing-table-sound-enabled');
+            return stored === null ? true : stored === 'true';
+        }
+
+        function setSoundEnabled(enabled) {
+            localStorage.setItem('closing-table-sound-enabled', enabled.toString());
         }
 
         // --- ANIMATED SUBMIT BUTTON SOUND EFFECTS ---
@@ -1121,6 +1346,102 @@
                             boxShadow: '0 2px 8px rgba(0, 196, 204, 0.4)'
                         }}
                     />
+                </div>
+            );
+        };
+
+        // --- SIGNATURE SLIDER COMPONENT ---
+        const SignatureSlider = ({ 
+            value, 
+            min, 
+            max, 
+            step = 1000, 
+            onChange, 
+            variant = 'company',
+            label
+        }) => {
+            const [isDragging, setIsDragging] = useState(false);
+            const [showInkDot, setShowInkDot] = useState(false);
+            const [inkDotPosition, setInkDotPosition] = useState(0);
+            const lastValueRef = useRef(value);
+
+            const percent = Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100));
+
+            const handleChange = (e) => {
+                const newValue = parseInt(e.target.value, 10);
+                if (isNaN(newValue)) return;
+                
+                if (!isDragging) {
+                    setIsDragging(true);
+                }
+                
+                onChange({ target: { value: newValue } });
+            };
+
+            const handlePointerUp = () => {
+                if (isDragging) {
+                    setIsDragging(false);
+                    
+                    // Show ink dot animation on release if value changed
+                    if (Math.abs(value - lastValueRef.current) > 0) {
+                        setInkDotPosition(percent);
+                        setShowInkDot(true);
+                        setTimeout(() => setShowInkDot(false), 300);
+                    }
+                    
+                    lastValueRef.current = value;
+                }
+            };
+
+            // Sync lastValueRef when value changes from outside
+            useEffect(() => {
+                if (!isDragging) {
+                    lastValueRef.current = value;
+                }
+            }, [value, isDragging]);
+
+            return (
+                <div className={`signature-slider signature-slider--${variant}`}>
+                    {/* Slider track with pen emoji thumb */}
+                    <div 
+                        className="signature-slider__track-container"
+                        onMouseUp={handlePointerUp}
+                        onTouchEnd={handlePointerUp}
+                        onMouseLeave={handlePointerUp}
+                    >
+                        <input
+                            type="range"
+                            className="signature-slider__input"
+                            min={min}
+                            max={max}
+                            step={step}
+                            value={value}
+                            onChange={handleChange}
+                            onMouseDown={() => setIsDragging(true)}
+                            onTouchStart={() => setIsDragging(true)}
+                            aria-label={label || `Slider value: $${value.toLocaleString()}`}
+                        />
+                        
+                        {/* Custom thumb with pen emoji */}
+                        <div 
+                            className={`signature-slider__thumb ${isDragging ? 'signature-slider__thumb--active' : ''}`}
+                            style={{ left: `${percent}%` }}
+                        >
+                            🖊️
+                        </div>
+
+                        {/* Ink dot animation on release */}
+                        <div 
+                            className={`signature-slider__ink-dot ${showInkDot ? 'signature-slider__ink-dot--active' : ''}`}
+                            style={{ left: `${inkDotPosition}%`, top: '50%', transform: 'translate(-50%, -50%)' }}
+                        />
+                    </div>
+
+                    {/* Min/Max labels */}
+                    <div className="signature-slider__labels">
+                        <span className="signature-slider__label">${(min / 1000)}k</span>
+                        <span className="signature-slider__label">${(max / 1000)}k</span>
+                    </div>
                 </div>
             );
         };
@@ -2163,21 +2484,15 @@
                                                         {baseError}
                                                     </motion.p>
                                                 )}
-                                                <div className="px-4 mt-6">
-                                                    <Slider
-                                                        min={TOTAL_MIN}
-                                                        max={TOTAL_MAX}
-                                                        step={5000}
-                                                        value={totalBudget}
-                                                        onChange={handleTotalBudgetChange}
-                                                        onDragStart={() => setIsSliderDragging(true)}
-                                                        onDragEnd={() => setIsSliderDragging(false)}
-                                                    />
-                                                </div>
-                                                <div className="flex justify-between mt-2 px-4">
-                                                    <span className="text-xs text-[#666666]">${(TOTAL_MIN / 1000)}k</span>
-                                                    <span className="text-xs text-[#666666]">${(TOTAL_MAX / 1000)}k</span>
-                                                </div>
+                                                {/* Signature Slider - Total Budget */}
+                                                <SignatureSlider
+                                                    value={totalBudget}
+                                                    min={TOTAL_MIN}
+                                                    max={TOTAL_MAX}
+                                                    step={5000}
+                                                    onChange={handleTotalBudgetChange}
+                                                    variant="company"
+                                                />
                                             </motion.div>
                                         ) : (
                                         <>
@@ -2247,21 +2562,15 @@
                                                 <div className="text-sm text-[#666666] mb-4">
                                                     Base <AnimatedNumber value={baseMax} /> · Equity <AnimatedNumber value={equityMax} />
                                                 </div>
-                                                <div className="px-4 mt-6">
-                                                    <Slider
-                                                        min={TOTAL_MIN}
-                                                        max={TOTAL_MAX}
-                                                        step={5000}
-                                                        value={totalComp}
-                                                        onChange={handleTotalBudgetChange}
-                                                        onDragStart={() => setIsSliderDragging(true)}
-                                                        onDragEnd={() => setIsSliderDragging(false)}
-                                                    />
-                                                </div>
-                                                <div className="flex justify-between mt-2 px-4">
-                                                    <span className="text-xs text-[#666666]">${(TOTAL_MIN / 1000)}k</span>
-                                                    <span className="text-xs text-[#666666]">${(TOTAL_MAX / 1000)}k</span>
-                                                </div>
+                                                {/* Signature Slider - Total Comp (Equity ON) */}
+                                                <SignatureSlider
+                                                    value={totalComp}
+                                                    min={TOTAL_MIN}
+                                                    max={TOTAL_MAX}
+                                                    step={5000}
+                                                    onChange={handleTotalBudgetChange}
+                                                    variant="company"
+                                                />
                                             </motion.div>
 
                                             {/* Base Portion Control */}
@@ -2869,42 +3178,36 @@
                                                     className="text-5xl font-medium text-[#1C1C1E] tracking-tight financial-number bg-transparent border-none outline-none w-full max-w-md"
                                                 />
                                             </div>
-                                            <div className="px-4 mt-6">
-                                                <Slider
-                                                    min={BASE_MIN}
-                                                    max={BASE_MAX + EQUITY_MAX}
-                                                    step={1000}
-                                                    value={totalMin}
-                                                    onChange={(e) => {
-                                                        const value = parseInt(e.target.value, 10);
-                                                        if (isNaN(value)) return;
-                                                        const clampedValue = Math.max(BASE_MIN, Math.min(BASE_MAX + EQUITY_MAX, value));
-                                                        if (equityEnabled) {
-                                                            if (clampedValue <= BASE_MAX) {
-                                                                setBaseMin(clampedValue);
-                                                                setEquityMin(0);
-                                                            } else {
-                                                                setBaseMin(BASE_MAX);
-                                                                setEquityMin(clampedValue - BASE_MAX);
-                                                            }
-                                                        } else {
+                                            {/* Signature Slider - Candidate Minimum */}
+                                            <SignatureSlider
+                                                value={totalMin}
+                                                min={BASE_MIN}
+                                                max={BASE_MAX + EQUITY_MAX}
+                                                step={1000}
+                                                onChange={(e) => {
+                                                    const value = parseInt(e.target.value, 10);
+                                                    if (isNaN(value)) return;
+                                                    const clampedValue = Math.max(BASE_MIN, Math.min(BASE_MAX + EQUITY_MAX, value));
+                                                    if (equityEnabled) {
+                                                        if (clampedValue <= BASE_MAX) {
                                                             setBaseMin(clampedValue);
+                                                            setEquityMin(0);
+                                                        } else {
+                                                            setBaseMin(BASE_MAX);
+                                                            setEquityMin(clampedValue - BASE_MAX);
                                                         }
-                                                        setBaseAnimating(true);
-                                                        setLedFlicker(true);
-                                                        setTimeout(() => {
-                                                            setBaseAnimating(false);
-                                                            setLedFlicker(false);
-                                                        }, 200);
-                                                    }}
-                                                    onDragStart={() => setIsSliderDragging(true)}
-                                                    onDragEnd={() => { setIsSliderDragging(false); handleSliderRelease(); }}
-                                                />
-                                            </div>
-                                            <div className="flex justify-between mt-2 px-4">
-                                                <span className="text-xs text-[#666666]">${(BASE_MIN / 1000)}k</span>
-                                                <span className="text-xs text-[#666666]">${((BASE_MAX + EQUITY_MAX) / 1000)}k</span>
-                                            </div>
+                                                    } else {
+                                                        setBaseMin(clampedValue);
+                                                    }
+                                                    setBaseAnimating(true);
+                                                    setLedFlicker(true);
+                                                    setTimeout(() => {
+                                                        setBaseAnimating(false);
+                                                        setLedFlicker(false);
+                                                    }, 200);
+                                                }}
+                                                variant="candidate"
+                                            />
                                         </div>
                                     </CompensationInputBlock>
 
