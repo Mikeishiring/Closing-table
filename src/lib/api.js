@@ -5,8 +5,11 @@
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
 
+// Add timeout support
+const DEFAULT_TIMEOUT = 10000; // 10 seconds
+
 /**
- * Generic API call wrapper with error handling
+ * Generic API call wrapper with error handling and timeout
  */
 async function api(path, options = {}) {
   const url = `${API_BASE}${path}`;
@@ -19,8 +22,14 @@ async function api(path, options = {}) {
     ...options,
   };
 
+  // Create timeout promise
+  const timeoutPromise = new Promise((_, reject) => {
+    setTimeout(() => reject(new Error('Request timeout')), DEFAULT_TIMEOUT);
+  });
+
   try {
-    const res = await fetch(url, config);
+    const fetchPromise = fetch(url, config);
+    const res = await Promise.race([fetchPromise, timeoutPromise]);
     let data;
 
     // Try to parse JSON response

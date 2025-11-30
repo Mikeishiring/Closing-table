@@ -233,10 +233,10 @@ export function ResultCard({ status, finalOffer, suggested, gapPercent, resultId
   const config = STATUS_CONFIG[status];
   const countedValue = useCountUp(status === 'success' ? finalOffer : null, 1000);
   
-  // Phase transitions
+  // Phase transitions - reduced timing for faster reveal
   useEffect(() => {
-    const timer1 = setTimeout(() => setPhase(2), 600);
-    const timer2 = setTimeout(() => setPhase(3), 1200);
+    const timer1 = setTimeout(() => setPhase(2), 400);  // Reduced from 600ms
+    const timer2 = setTimeout(() => setPhase(3), 800);  // Reduced from 1200ms
     
     return () => {
       clearTimeout(timer1);
