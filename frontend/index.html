@@ -2729,12 +2729,6 @@
                         )}
                     </ol>
 
-                    {/* Privacy note */}
-                    <div className="privacy-note">
-                        <Icons.Lock className="w-4 h-4 text-[#666666] flex-shrink-0 mt-0.5" />
-                        <p>We only show the final number, never your inputs.</p>
-                    </div>
-
                     {/* Compact details section */}
                     <div className="details-section">
                         <div className="details-links">
@@ -3185,12 +3179,20 @@
                 <div className="two-column-container animate-enter">
                     {/* Hero / Intro zone */}
                     <div className="text-center mb-12 page-container">
+                        <div className="inline-flex items-center justify-center px-3 py-1 mb-3 rounded-full bg-[#E6F9FA] text-xs font-medium text-[#007C80]">
+                            Company view
+                        </div>
                         <h1 className="hero-heading mb-3">
                             The Closing Table
                         </h1>
                         <p className="hero-subtitle">
                             Set your maximum. We'll check if there's a fair deal with the candidate.
                         </p>
+                        {/* Privacy note */}
+                        <div className="mt-4 inline-flex items-center gap-2 text-sm text-[#555]">
+                            <Icons.Lock className="w-4 h-4" />
+                            <span>We only show the final number, never your inputs.</span>
+                        </div>
                     </div>
 
                     {/* Two-column layout: Main card + How it works */}
@@ -3885,12 +3887,40 @@
                     <div className="two-column-container animate-enter">
                         {/* Hero / Intro zone */}
                         <div className="text-center mb-12 page-container">
+                            <div className="inline-flex items-center justify-center px-3 py-1 mb-3 rounded-full bg-[#E6F9FA] text-xs font-medium text-[#007C80]">
+                                Candidate view
+                            </div>
                             <h1 className="hero-heading mb-3">
                                 The Closing Table
                             </h1>
-                        <p className="hero-subtitle">
-                            Set your minimum. We'll check if there's a fair deal with the company.
-                        </p>
+                            <p className="hero-subtitle">
+                                Set your minimum. We'll check if there's a fair deal with the company.
+                            </p>
+                            {/* Privacy note */}
+                            <div className="mt-4 inline-flex items-center gap-2 text-sm text-[#555]">
+                                <Icons.Lock className="w-4 h-4" />
+                                <span>We only show the final number, never your inputs.</span>
+                            </div>
+                        </div>
+
+                        {/* Progress header */}
+                        <div className="progress-header spotlight-content mb-8">
+                            <div className="progress-steps">
+                                <div className="progress-step">
+                                    <div className="progress-circle completed">✓</div>
+                                    <span className="progress-label completed">Set Minimum</span>
+                                </div>
+                                <div className="progress-divider completed"></div>
+                                <div className="progress-step">
+                                    <div className="progress-circle active">2</div>
+                                    <span className="progress-label active">Submit</span>
+                                </div>
+                                <div className="progress-divider"></div>
+                                <div className="progress-step">
+                                    <div className="progress-circle inactive">3</div>
+                                    <span className="progress-label">See Result</span>
+                                </div>
+                            </div>
                         </div>
 
                         {/* Backend error banner at top */}
