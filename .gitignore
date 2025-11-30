@@ -36,7 +36,7 @@ yarn-error.log*
 .env.*.local
 
 # Build outputs (if you add a build step later)
-dist/
+# dist/ - now tracked for Cloudflare Pages deployment
 build/
 *.min.js
 *.min.css

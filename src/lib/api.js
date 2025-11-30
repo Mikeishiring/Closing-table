@@ -3,7 +3,10 @@
  * Centralized API calls with consistent error handling
  */
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
+const API_BASE = import.meta.env.VITE_API_BASE || 
+  (window.location.hostname === 'localhost' 
+    ? 'http://localhost:3000' 
+    : 'https://closing-table-backend.onrender.com');
 
 // Add timeout support
 const DEFAULT_TIMEOUT = 10000; // 10 seconds
