@@ -2108,17 +2108,16 @@
                                             <motion.div
                                                 key="total-simple"
                                                 initial={{ opacity: 0, y: -10 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, y: 10 }}
-                                                transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-                                                className="mb-6"
-                                                animate={{
+                                                animate={{ 
+                                                    opacity: 1, 
                                                     y: focusedInput === 'total' ? -2 : 0,
                                                     boxShadow: focusedInput === 'total' 
                                                         ? "0 8px 24px rgba(0, 196, 204, 0.15), 10px 10px 20px #d9d9d9, -10px -10px 20px #ffffff"
                                                         : "none"
                                                 }}
+                                                exit={{ opacity: 0, y: 10 }}
                                                 transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+                                                className="mb-6"
                                             >
                                                 <div className="flex items-baseline justify-start mb-4 relative">
                                                     <span className="text-[#666666] text-2xl font-medium mr-2">$</span>
