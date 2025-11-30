@@ -15,36 +15,47 @@ export default {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' },
         },
-        scaleIn: {
+        cardIn: {
           '0%': { 
-            opacity: '0',
             transform: 'scale(0.96)',
+            opacity: '0',
           },
           '100%': { 
-            opacity: '1',
             transform: 'scale(1)',
+            opacity: '1',
           },
         },
-        slideUp: {
+        emojiPop: {
           '0%': {
+            transform: 'scale(0.8)',
             opacity: '0',
-            transform: 'translateY(10px)',
           },
           '100%': {
+            transform: 'scale(1)',
             opacity: '1',
-            transform: 'translateY(0)',
           },
         },
-        'spin-slow': {
-          '0%': { transform: 'rotate(0deg)' },
-          '100%': { transform: 'rotate(360deg)' },
+        numberBreathe: {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.03)' },
+        },
+        slideDown: {
+          '0%': {
+            transform: 'translateY(-8px)',
+            opacity: '0',
+          },
+          '100%': {
+            transform: 'translateY(0)',
+            opacity: '1',
+          },
         },
       },
       animation: {
-        fadeIn: 'fadeIn 0.3s ease-out',
-        scaleIn: 'scaleIn 0.4s ease-out',
-        slideUp: 'slideUp 0.4s ease-out',
-        'spin-slow': 'spin-slow 2s linear infinite',
+        fadeIn: 'fadeIn 280ms ease-out',
+        cardIn: 'cardIn 280ms ease-out',
+        emojiPop: 'emojiPop 260ms ease-out',
+        numberBreathe: 'numberBreathe 400ms ease-in-out',
+        slideDown: 'slideDown 200ms ease-out',
       },
     },
   },

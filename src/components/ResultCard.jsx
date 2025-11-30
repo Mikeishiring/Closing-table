@@ -1,45 +1,57 @@
 /**
- * ResultCard Component
- * Full-screen grand reveal with 3-beat staged sequence
+ * ResultReveal Component
+ * Minimalist reveal with big emoji + big headline as visual anchor
  */
 
 import React, { useState, useEffect } from 'react';
-import { formatCurrency } from '../lib/deal-math';
 import { generateResultLink, copyToClipboard } from '../lib/api';
 
-// Status configuration with personality for each outcome
-const STATUS_CONFIG = {
+// Simple status configuration
+const RESULT_CONFIG = {
   success: {
+    emoji: "✅",
+    color: "text-emerald-600",
+    bgRing: "ring-emerald-100",
     title: "Deal Closed",
-    subtitle: "The mechanism found a fair middle ground and split the surplus 50/50.",
-    icon: "✓",
-    bg: "from-emerald-500/15",
-    iconBg: "bg-emerald-500",
-    textAccent: "text-emerald-600",
+    line: "The mechanism found a fair middle ground and split the surplus 50/50.",
+    actionIcon: "🔁",
   },
   close: {
+    emoji: "🤏",
+    color: "text-amber-600",
+    bgRing: "ring-amber-100",
     title: "Close, But Not Quite",
-    subtitle: "You're within the 10% bridge window. A human conversation could close the gap.",
-    icon: "~",
-    bg: "from-amber-500/15",
-    iconBg: "bg-amber-500",
-    textAccent: "text-amber-600",
+    line: "You're within the 10% bridge window. A human conversation could close the gap.",
+    actionIcon: "💬",
   },
   fail: {
+    emoji: "❌",
+    color: "text-rose-600",
+    bgRing: "ring-rose-100",
     title: "No Deal Under This Mechanism",
-    subtitle: "The ranges are too far apart for a fair split within the rules you agreed to.",
-    icon: "✕",
-    bg: "from-rose-500/15",
-    iconBg: "bg-rose-500",
-    textAccent: "text-rose-600",
+    line: "The ranges are too far apart for a fair split under the rules you agreed to.",
+    actionIcon: "🔍",
   },
 };
 
 /**
- * Animated counter hook for number reveal
+ * Format currency for display
  */
-function useCountUp(target, duration = 600) {
+function formatCurrency(value) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+/**
+ * Animated counter for number reveal
+ */
+function useCountUp(target, duration = 350) {
   const [count, setCount] = useState(0);
+  const [breathe, setBreathe] = useState(false);
   
   useEffect(() => {
     if (!target || target === 0) return;
@@ -49,211 +61,56 @@ function useCountUp(target, duration = 600) {
     
     const step = (timestamp) => {
       const progress = Math.min((timestamp - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
       setCount(Math.floor(target * eased));
       
       if (progress < 1) {
         requestAnimationFrame(step);
       } else {
         setCount(target);
+        // Trigger breathe animation after count-up
+        setTimeout(() => setBreathe(true), 100);
       }
     };
     
     requestAnimationFrame(step);
   }, [target, duration]);
   
-  return count;
+  return { count, breathe };
 }
 
 /**
- * Collapsible Privacy Explainer
- */
-function PrivacyExplainer() {
-  const [expanded, setExpanded] = useState(false);
-  
-  return (
-    <div className="mt-6 text-xs text-slate-500">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="flex items-center gap-2 hover:text-slate-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 rounded"
-      >
-        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <span className="underline">How your numbers stayed private</span>
-        <svg 
-          className={`w-3.5 h-3.5 transition-transform ${expanded ? 'rotate-180' : ''}`} 
-          fill="none" 
-          viewBox="0 0 24 24" 
-          stroke="currentColor"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-      
-      {expanded && (
-        <div className="mt-2 pl-6 space-y-1 text-slate-600 animate-in fade-in slide-in-from-top-1 duration-200">
-          <p>• Each side's original number is never shown to the other.</p>
-          <p>• Only this final outcome is visible via the link.</p>
-          <p>• The mechanism is single-use and doesn't store negotiation history.</p>
-        </div>
-      )}
-    </div>
-  );
-}
-
-/**
- * Range Visualization Bars
- */
-function RangeVisualization({ status }) {
-  const config = STATUS_CONFIG[status];
-  
-  if (status === 'success') {
-    return (
-      <div className="space-y-2">
-        <div className="relative h-2 rounded-full bg-slate-100">
-          {/* Overlap band */}
-          <div className="absolute left-1/4 right-1/4 h-full bg-emerald-200 rounded-full" />
-          {/* Final offer dot */}
-          <div 
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-emerald-500 rounded-full shadow-sm animate-in zoom-in duration-300"
-          />
-        </div>
-        <p className="text-xs text-slate-500 text-center">
-          The green band is the shared surplus. Endpoints remain private.
-        </p>
-      </div>
-    );
-  }
-  
-  if (status === 'close') {
-    return (
-      <div className="space-y-2">
-        <div className="relative h-2 rounded-full bg-slate-100 flex items-center gap-1 px-2">
-          <div className="flex-1 h-full bg-amber-200 rounded-l-full" />
-          <div className="w-3 h-full bg-slate-300" />
-          <div className="flex-1 h-full bg-amber-200 rounded-r-full" />
-        </div>
-        <p className="text-xs text-slate-500 text-center">
-          Close but not overlapping. A small gap remains that a conversation can resolve.
-        </p>
-      </div>
-    );
-  }
-  
-  if (status === 'fail') {
-    return (
-      <div className="space-y-2">
-        <div className="relative h-2 rounded-full bg-slate-100 flex items-center justify-between px-2">
-          <div className="w-1/4 h-full bg-rose-200 rounded-l-full" />
-          <div className="flex-1 h-full bg-slate-300 mx-2" />
-          <div className="w-1/4 h-full bg-rose-200 rounded-r-full" />
-        </div>
-        <p className="text-xs text-slate-500 text-center">
-          The gap is larger than 10%. The mechanism can't suggest a fair middle without asking someone to cross their limits.
-        </p>
-      </div>
-    );
-  }
-  
-  return null;
-}
-
-/**
- * Info Box for guidance
- */
-function InfoBox({ status, suggested }) {
-  if (status === 'close') {
-    return (
-      <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-        <h4 className="font-semibold text-slate-900 text-sm mb-2">Suggested next move</h4>
-        <p className="text-sm text-slate-700 mb-2">
-          A conversation could bridge this gap. The tool stops here to leave room for human judgment.
-        </p>
-        {suggested && (
-          <p className="text-sm text-slate-600">
-            Non-binding starting point: <span className="font-semibold">{formatCurrency(suggested)}</span>
-          </p>
-        )}
-      </div>
-    );
-  }
-  
-  if (status === 'fail') {
-    return (
-      <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-        <h4 className="font-semibold text-slate-900 text-sm mb-2">What this tells you</h4>
-        <p className="text-sm text-slate-700">
-          The mechanism protected both sides from crossing their limits. A new offer with new numbers would be needed to try again.
-        </p>
-      </div>
-    );
-  }
-  
-  return null;
-}
-
-/**
- * Toast Notification
- */
-function Toast({ message, onClose }) {
-  useEffect(() => {
-    const timer = setTimeout(onClose, 3000);
-    return () => clearTimeout(timer);
-  }, [onClose]);
-  
-  return (
-    <div className="fixed bottom-4 inset-x-0 flex justify-center pointer-events-none z-50">
-      <div className="pointer-events-auto rounded-full bg-slate-900 text-white text-xs px-4 py-2 shadow-lg animate-in fade-in slide-in-from-bottom-2 duration-300">
-        {message}
-      </div>
-    </div>
-  );
-}
-
-/**
- * Main ResultCard Component
+ * Main ResultReveal Component
  */
 export function ResultCard({ status, finalOffer, suggested, gapPercent, resultId }) {
-  const [stage, setStage] = useState('locking'); // 'locking' | 'headline' | 'details'
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
+  const [stage, setStage] = useState('emoji'); // 'emoji' | 'details'
   const [copyLabel, setCopyLabel] = useState('Copy result link');
+  const [showHint, setShowHint] = useState(false);
   
-  const config = STATUS_CONFIG[status];
-  const countedValue = useCountUp(status === 'success' ? finalOffer : null, 600);
+  const cfg = RESULT_CONFIG[status];
+  const { count: displayFinal, breathe } = useCountUp(status === 'success' ? finalOffer : null, 350);
   
-  // 3-beat reveal sequence
+  // Stage timing: emoji first, then details
   useEffect(() => {
-    const t1 = setTimeout(() => setStage('headline'), 500);
-    const t2 = setTimeout(() => setStage('details'), 900);
-    
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
+    const timer = setTimeout(() => setStage('details'), 120);
+    return () => clearTimeout(timer);
   }, []);
   
-  const handleCopy = async (type) => {
-    let text;
-    
-    if (type === 'result') {
-      const link = generateResultLink(resultId);
-      text = link;
-      setToastMessage('Link copied — only this outcome is visible.');
-    } else if (type === 'summary') {
-      text = `Negotiation outcome: ${config.title}\n\n${config.subtitle}`;
-      if (status === 'close' && suggested) {
-        text += `\n\nSuggested starting point: ${formatCurrency(suggested)}`;
-      }
-      setToastMessage('Summary copied to clipboard.');
+  // Auto-focus primary button when details appear
+  useEffect(() => {
+    if (stage === 'details') {
+      const btn = document.getElementById('primary-action-btn');
+      if (btn) btn.focus();
     }
+  }, [stage]);
+  
+  const handleCopy = async () => {
+    const link = generateResultLink(resultId);
+    const result = await copyToClipboard(link);
     
-    const result = await copyToClipboard(text);
     if (result.success) {
-      setShowToast(true);
       setCopyLabel('Copied ✓');
-      setTimeout(() => setCopyLabel(type === 'result' ? 'Copy result link' : 'Copy summary'), 2000);
+      setTimeout(() => setCopyLabel('Copy result link'), 1500);
     }
   };
   
@@ -262,151 +119,174 @@ export function ResultCard({ status, finalOffer, suggested, gapPercent, resultId
     window.location.reload();
   };
   
-  // Calculate display gap
-  const displayGap = gapPercent || (status === 'close' ? 8 : status === 'fail' ? 15 : null);
+  // Calculate gap percentage
+  const displayGap = gapPercent || (status === 'close' ? 8.0 : null);
   
   return (
-    <div className="fixed inset-0 bg-slate-900/70 flex items-center justify-center p-4 z-50 animate-in fade-in duration-300">
-      {/* Status-specific halo */}
-      <div 
-        className={`pointer-events-none absolute inset-x-0 -top-24 h-40 bg-gradient-to-b ${config.bg} to-transparent blur-2xl`}
-      />
+    <div className="fixed inset-0 flex items-center justify-center bg-slate-900/70 p-4 animate-[fadeIn_280ms_ease-out]">
+      {/* Subtle background shimmer for success only */}
+      {status === 'success' && (
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-transparent animate-pulse" />
+      )}
       
-      {/* Card */}
-      <div className="relative w-full max-w-xl mx-4 bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl transition-transform hover:shadow-xl hover:-translate-y-0.5">
-        <div className="p-6 md:p-8">
+      <div className="relative w-full max-w-md">
+        <div className="relative bg-white rounded-3xl shadow-xl p-6 md:p-8 animate-[cardIn_280ms_ease-out]">
           
-          {/* Beat 1: Locking state */}
-          <div className={`transition-all duration-300 ${
-            stage === 'locking' ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 hidden'
-          }`}>
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-200 animate-pulse">
-                <svg className="w-5 h-5 text-slate-600 animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm text-slate-600">Outcome locked in — running the mechanism…</p>
-              </div>
-            </div>
-          </div>
-          
-          {/* Beat 2 & 3: Headline + Details */}
-          <div className={`transition-all duration-300 ${
-            stage === 'headline' || stage === 'details' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
-          }`}>
-            
-            {/* Header row (icon + title) */}
-            <div className="flex items-start gap-3">
-              <div className={`flex h-11 w-11 items-center justify-center rounded-full ${config.iconBg} text-white text-xl font-bold shadow-lg ${
-                status === 'success' ? 'animate-in zoom-in duration-300' : 
-                status === 'close' ? 'animate-pulse' :
-                'animate-in zoom-in duration-300'
-              }`}>
-                {config.icon}
-              </div>
-              <div className="flex-1">
-                <h1 className="text-xl md:text-2xl font-semibold text-slate-900 relative">
-                  {config.title}
-                  {/* Animated underline */}
-                  <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-slate-300 to-transparent animate-in slide-in-from-left duration-500" />
-                </h1>
-                <p className="mt-1.5 text-sm md:text-base text-slate-600">{config.subtitle}</p>
-              </div>
+          {/* Hero band: Big emoji + outcome */}
+          <header className="flex flex-col items-center text-center">
+            <div
+              className={`
+                mb-4 flex h-16 w-16 md:h-18 md:w-18 items-center justify-center rounded-full
+                bg-slate-50 ring-4 ${cfg.bgRing}
+                text-4xl md:text-5xl ${cfg.color}
+                animate-[emojiPop_260ms_ease-out]
+              `}
+            >
+              <span>{cfg.emoji}</span>
             </div>
             
-            {/* Beat 3: Details section */}
-            <div className={`transition-all duration-300 delay-200 ${
+            <h1 className={`text-2xl md:text-3xl font-semibold text-slate-900 transition-all duration-300 ${
               stage === 'details' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
             }`}>
-              
-              {/* Hero metric section */}
-              <div className={`mt-6 ${status === 'success' ? 'mb-8' : 'mb-6'}`}>
-                {status === 'success' && (
-                  <div className="text-center">
-                    <div className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">
-                      Final Offer
-                    </div>
-                    <div className="text-3xl md:text-4xl font-semibold text-slate-900 mb-2">
-                      {formatCurrency(countedValue)}
-                    </div>
-                    <p className="text-sm text-slate-600">
-                      Locked in by the double-blind mechanism.
-                    </p>
-                  </div>
-                )}
-                
-                {status === 'close' && (
-                  <div className="text-center">
-                    <div className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">
-                      Gap Size
-                    </div>
-                    <div className="text-3xl md:text-4xl font-semibold text-slate-900 mb-2">
-                      {displayGap}%
-                    </div>
-                    <p className="text-sm text-slate-600">
-                      A small gap that a conversation could resolve.
-                    </p>
-                  </div>
-                )}
-                
-                {status === 'fail' && (
-                  <div className="text-center">
-                    <p className="text-sm font-medium text-rose-600">
-                      Gap &gt; 10% of company's maximum
-                    </p>
-                  </div>
-                )}
-              </div>
-              
-              {/* Layout: Grid for success/close on desktop, stack for fail */}
-              <div className={status !== 'fail' ? 'grid gap-6' : 'space-y-6'}>
-                
-                {/* Visualization */}
-                <div>
-                  <RangeVisualization status={status} />
-                </div>
-                
-                {/* Info box */}
-                <InfoBox status={status} suggested={suggested} />
-                
-              </div>
-              
-              {/* Action buttons */}
-              <div className="mt-6 flex flex-col sm:flex-row gap-3">
-                <button
-                  onClick={() => handleCopy(status === 'close' ? 'summary' : 'result')}
-                  className="flex-1 w-full bg-slate-900 text-white text-sm font-medium py-3 px-6 rounded-full hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  {status === 'close' ? 'Copy summary' : copyLabel}
-                </button>
-                <button
-                  onClick={handleNewOffer}
-                  className="flex-1 w-full bg-white text-slate-900 text-sm font-medium py-3 px-6 rounded-full border border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  Create another offer
-                </button>
-              </div>
-              
-              {/* Privacy explainer */}
-              <PrivacyExplainer />
-              
-            </div>
+              {cfg.title}
+            </h1>
             
+            <p className={`mt-2 text-sm md:text-base text-slate-600 max-w-sm transition-all duration-300 delay-75 ${
+              stage === 'details' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+            }`}>
+              {cfg.line}
+            </p>
+          </header>
+
+          {/* Details band: Content changes by status */}
+          <main className={`mt-6 space-y-4 transition-all duration-300 delay-150 ${
+            stage === 'details' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+          }`}>
+            
+            {/* Success: Big number */}
+            {status === 'success' && (
+              <section className="text-center">
+                <p className="text-xs uppercase tracking-[0.18em] text-slate-500">
+                  Final Offer
+                </p>
+                <p className={`mt-1 text-4xl md:text-5xl font-semibold text-slate-900 ${
+                  breathe ? 'animate-[numberBreathe_400ms_ease-in-out]' : ''
+                }`}>
+                  {formatCurrency(displayFinal)}
+                </p>
+                <p className="mt-2 text-xs text-slate-500">
+                  Exactly between your ranges, without revealing either side's number.
+                </p>
+              </section>
+            )}
+            
+            {/* Close: Gap percentage */}
+            {status === 'close' && (
+              <section className="text-center space-y-3">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.18em] text-slate-500">
+                    Gap Size
+                  </p>
+                  <p className="mt-1 text-3xl md:text-4xl font-semibold text-slate-900">
+                    {displayGap.toFixed(1)}%
+                  </p>
+                </div>
+                <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                  You're within the 10% bridge window. The mechanism stops here so you can decide together whether to stretch.
+                </p>
+                {suggested && (
+                  <div className="rounded-2xl bg-slate-50 px-4 py-3 text-xs text-slate-600">
+                    Non-binding starting point: <span className="font-semibold">{formatCurrency(suggested)}</span>
+                  </div>
+                )}
+              </section>
+            )}
+            
+            {/* Fail: Clear message */}
+            {status === 'fail' && (
+              <section className="text-center space-y-3">
+                <p className="text-sm md:text-base text-slate-700 font-medium">
+                  The gap is larger than <span className="text-rose-600">10%</span> of the company's maximum.
+                </p>
+                <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                  The mechanism can't suggest a fair middle without asking one of you to cross your stated limits.
+                </p>
+              </section>
+            )}
+            
+          </main>
+
+          {/* Actions band: Buttons */}
+          <div className={`mt-6 flex flex-col gap-3 transition-all duration-300 delay-200 ${
+            stage === 'details' ? 'opacity-100' : 'opacity-0'
+          }`}>
+            <button
+              id="primary-action-btn"
+              onClick={handleCopy}
+              className="w-full rounded-full bg-slate-900 text-white py-3 text-sm font-medium hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 transition-all active:scale-[0.98]"
+            >
+              {copyLabel}
+            </button>
+            
+            <button
+              onClick={handleNewOffer}
+              className="w-full rounded-full border border-slate-200 py-3 text-sm text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 transition-all active:scale-[0.98]"
+            >
+              {status === 'success' ? `Start a new offer ${cfg.actionIcon}` : 
+               status === 'close' ? `Talk it through ${cfg.actionIcon}` : 
+               `Back to search ${cfg.actionIcon}`}
+            </button>
           </div>
+          
+          {/* Outcome-only hint */}
+          <button
+            onClick={() => setShowHint(!showHint)}
+            className={`mt-4 w-full flex items-center justify-center gap-2 text-[11px] text-slate-500 hover:text-slate-700 transition-all duration-300 delay-250 ${
+              stage === 'details' ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+            <span>🔐</span>
+            <span>Outcome-only: neither side sees the other's number.</span>
+          </button>
+          
+          {showHint && (
+            <div className="mt-2 px-4 py-3 bg-slate-50 rounded-xl text-xs text-slate-600 animate-[slideDown_200ms_ease-out]">
+              <p>• Each side's original number stays private</p>
+              <p className="mt-1">• Only this final outcome is shareable</p>
+              <p className="mt-1">• The mechanism is single-use</p>
+            </div>
+          )}
           
         </div>
       </div>
-      
-      {/* Toast */}
-      {showToast && (
-        <Toast 
-          message={toastMessage} 
-          onClose={() => setShowToast(false)} 
-        />
-      )}
     </div>
   );
 }
+
+// Add custom animations to your CSS or Tailwind config
+const styles = `
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes cardIn {
+  0% { transform: scale(0.96); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes emojiPop {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes numberBreathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+@keyframes slideDown {
+  0% { transform: translateY(-8px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+`;
