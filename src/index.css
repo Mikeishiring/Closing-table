@@ -11,6 +11,8 @@
   --text-secondary: #666666;
   --accent-primary: #00C4CC;
   --accent-hover: #00B0B8;
+  --accent-candidate: #7C3AED;
+  --accent-candidate-hover: #6D28D9;
   --success-color: #34C759;
   --error-color: #FF3B30;
 }

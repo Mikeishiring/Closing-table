@@ -23,6 +23,10 @@ import {
   prefersReducedMotion,
 } from '../lib/audio';
 
+// Re-export new hooks
+export { useHaptics } from './useHaptics';
+export { useReducedMotion } from './useReducedMotion';
+
 /**
  * Hook for hash-based routing
  */

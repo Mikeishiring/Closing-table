@@ -1236,6 +1236,23 @@
                 opacity: 0;
             }
         }
+        
+        /* Ink tremor animation - micro-wiggle at high resistance */
+        /* Creates subtle vibration effect like pen pushing against resistance */
+        @keyframes inkTremor {
+            0%, 100% {
+                transform: translateY(-50%) scaleY(1);
+            }
+            25% {
+                transform: translateY(calc(-50% + 0.8px)) scaleY(1.05);
+            }
+            50% {
+                transform: translateY(calc(-50% - 0.5px)) scaleY(0.98);
+            }
+            75% {
+                transform: translateY(calc(-50% + 0.6px)) scaleY(1.02);
+            }
+        }
 
         .signature-slider__ink-dot {
             position: absolute;
@@ -1836,24 +1853,49 @@
             );
         };
 
-        // --- SALARY SLIDER THUMB COMPONENT (Reusable) ---
-        // This component can be reused across any slider
-        const SalarySliderThumb = () => (
+        // --- SALARY SLIDER THUMB COMPONENT (Reusable with Pressure/Resistance) ---
+        // Enhanced pen nib that responds to "resistance" (slider position)
+        // - Pressure flattening: circle squashes at high resistance
+        // - Nib angle: pen rotates more at high resistance  
+        // - Size growth: pen gets slightly larger under pressure
+        const SalarySliderThumb = ({ resistance = 0, isDragging = false }) => {
+            // resistance: 0 (low/left) to 1 (high/right)
+            // Maps to visual pressure effects
+            
+            // Pressure flattening - circle squashes vertically at high resistance
+            const scaleY = 1 - resistance * 0.08; // 1 -> 0.92
+            const scaleX = 1 + resistance * 0.02; // slight horizontal expansion
+            
+            // Pen size grows with pressure (14px -> 16px)
+            const penSize = 14 + resistance * 2;
+            
+            // Nib angle - rotates against direction of motion at high resistance
+            // Low: -20°, High: -35° (fighting the pull)
+            const nibAngle = -20 - resistance * 15;
+            
+            // Pen moves closer to track at high pressure
+            const penOffsetY = 1 + resistance * 1.5;
+            
+            return (
             <span 
                 className="slider-thumb-emoji"
                 style={{
-                    fontSize: '14px',
+                        fontSize: `${penSize}px`,
                     lineHeight: 0,
-                    transform: 'rotate(-25deg) translateY(1px)',
+                        transform: `rotate(${nibAngle}deg) translateY(${penOffsetY}px) scaleX(${scaleX}) scaleY(${scaleY})`,
                     userSelect: 'none',
-                    display: 'inline-block'
+                        display: 'inline-block',
+                        transition: isDragging ? 'none' : 'all 0.15s ease-out',
+                        filter: isDragging ? `drop-shadow(0 ${1 + resistance}px ${2 + resistance * 2}px rgba(0,0,0,0.15))` : 'none'
                 }}
             >
-                ✒️
+                    ✒️
             </span>
         );
+        };
 
         // --- SIGNATURE SLIDER COMPONENT (Radix-style with perfect centering) ---
+        // Enhanced with ink trail that "strains" behind the nib
         const SignatureSlider = ({ 
             value, 
             min, 
@@ -1870,6 +1912,23 @@
             const sliderRef = useRef(null);
 
             const percent = Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100));
+            
+            // Resistance calculation: 0 at min, 1 at max
+            // Higher values = more "pushback" / tension
+            const resistance = percent / 100;
+            
+            // Ink trail calculations based on resistance
+            // Trail length: last 15-20% of travelled distance
+            const trailLengthPercent = 18; // % of track behind nib
+            const trailStart = Math.max(0, percent - trailLengthPercent);
+            const trailWidth = percent - trailStart;
+            
+            // Ink properties vary with resistance
+            const inkThickness = 2 + resistance * 2.5; // 2px -> 4.5px
+            const inkOpacity = 0.25 + resistance * 0.55; // 0.25 -> 0.8
+            
+            // Tremor amplitude for high resistance (subtle wiggle)
+            const tremorAmplitude = resistance > 0.6 ? (resistance - 0.6) * 3 : 0; // 0 -> 1.2px
 
             const handleChange = (e) => {
                 const newValue = parseInt(e.target.value, 10);
@@ -1921,28 +1980,160 @@
                             height: '44px'
                         }}
                     >
-                        {/* Track - with horizontal padding */}
+                        {/* Track - base grey line (paper) */}
                         <div 
                             style={{
                                 position: 'relative',
                                 flex: 1,
-                                height: '3px',
+                                height: '4px',
                                 borderRadius: '9999px',
-                                backgroundColor: '#dedede',
+                                backgroundColor: '#e8e8e8',
                                 marginLeft: '1rem',
-                                marginRight: '1rem'
+                                marginRight: '1rem',
+                                overflow: 'visible',
+                                // Subtle paper texture
+                                boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.06)'
                             }}
                         >
-                            {/* Range - visual only */}
-                            <div 
-                                style={{
-                                    position: 'absolute',
-                                    height: '100%',
-                                    borderRadius: '9999px',
-                                    backgroundColor: '#dedede',
-                                    width: `${percent}%`
-                                }}
-                            />
+                            {/* Full ink stroke from start - like fountain pen ink */}
+                            {/* Starts thin/light, builds up thickness and darkness toward nib */}
+                            {percent > 0 && (
+                                <div 
+                                    style={{
+                                        position: 'absolute',
+                                        left: 0,
+                                        width: `${percent}%`,
+                                        height: '100%',
+                                        top: 0,
+                                        borderRadius: '9999px',
+                                        // Main ink color - deep teal/blue-black like real ink
+                                        background: `linear-gradient(90deg, 
+                                            rgba(0, 80, 90, 0.3) 0%,
+                                            rgba(0, 120, 130, 0.5) 30%,
+                                            rgba(0, 160, 170, 0.7) 70%,
+                                            rgba(0, 190, 200, 0.9) 100%)`,
+                                        transition: isDragging ? 'none' : 'width 0.1s ease-out'
+                                    }}
+                                />
+                            )}
+                            
+                            {/* Ink thickness buildup - gets thicker toward the nib (last 30%) */}
+                            {/* Shows "ink pooling" where the pen presses harder */}
+                            {percent > 5 && (
+                                <div 
+                                    style={{
+                                        position: 'absolute',
+                                        left: `${Math.max(0, percent - 30)}%`,
+                                        width: `${Math.min(30, percent)}%`,
+                                        height: `${4 + resistance * 3}px`,
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        borderRadius: '9999px',
+                                        // Thicker, more saturated ink near nib
+                                        background: `linear-gradient(90deg, 
+                                            rgba(0, 150, 160, 0) 0%,
+                                            rgba(0, 170, 180, ${0.4 + resistance * 0.3}) 40%,
+                                            rgba(0, 195, 205, ${0.6 + resistance * 0.35}) 100%)`,
+                                        transition: isDragging ? 'none' : 'all 0.15s ease-out',
+                                        // Micro-tremor at high resistance
+                                        animation: tremorAmplitude > 0 && isDragging 
+                                            ? 'inkTremor 0.08s ease-in-out infinite' 
+                                            : 'none'
+                                    }}
+                                />
+                            )}
+                            
+                            {/* Ink edge variation - subtle organic edges */}
+                            {percent > 10 && (
+                                <div 
+                                    style={{
+                                        position: 'absolute',
+                                        left: 0,
+                                        width: `${percent}%`,
+                                        height: '6px',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        borderRadius: '9999px',
+                                        // Very subtle feathered edge effect
+                                        background: `linear-gradient(90deg, 
+                                            transparent 0%,
+                                            rgba(0, 180, 190, 0.08) 20%,
+                                            rgba(0, 180, 190, 0.12) 60%,
+                                            rgba(0, 190, 200, 0.15) 100%)`,
+                                        filter: 'blur(1px)',
+                                        pointerEvents: 'none',
+                                        transition: isDragging ? 'none' : 'width 0.1s ease-out'
+                                    }}
+                                />
+                            )}
+                            
+                            {/* Fresh wet ink at nib - glossy pooling effect */}
+                            {percent > 2 && (
+                                <div 
+                                    style={{
+                                        position: 'absolute',
+                                        left: `calc(${percent}% - 10px)`,
+                                        width: '20px',
+                                        height: `${6 + resistance * 3}px`,
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        borderRadius: '9999px',
+                                        // Wet ink pool - darker center, lighter edges
+                                        background: `radial-gradient(ellipse 80% 60% at 70% 50%, 
+                                            rgba(0, 200, 210, ${0.7 + resistance * 0.25}) 0%,
+                                            rgba(0, 180, 190, ${0.5 + resistance * 0.2}) 40%,
+                                            rgba(0, 160, 170, 0.2) 70%,
+                                            transparent 100%)`,
+                                        // Glossy ink sheen
+                                        boxShadow: isDragging 
+                                            ? `0 0 ${3 + resistance * 3}px rgba(0, 200, 210, ${0.4 + resistance * 0.2}),
+                                               inset 0 -1px 2px rgba(255,255,255,0.2)`
+                                            : `0 0 2px rgba(0, 200, 210, 0.3)`,
+                                        transition: isDragging ? 'none' : 'all 0.15s ease-out',
+                                        pointerEvents: 'none'
+                                    }}
+                                />
+                            )}
+                            
+                            {/* Ink bleed dots - tiny random-looking dots along the line */}
+                            {/* Creates organic ink-on-paper feel */}
+                            {percent > 15 && (
+                                <>
+                                    <div style={{
+                                        position: 'absolute',
+                                        left: `${percent * 0.2}%`,
+                                        top: '50%',
+                                        transform: 'translate(-50%, -50%)',
+                                        width: '3px',
+                                        height: '3px',
+                                        borderRadius: '50%',
+                                        backgroundColor: 'rgba(0, 170, 180, 0.25)',
+                                        pointerEvents: 'none'
+                                    }} />
+                                    <div style={{
+                                        position: 'absolute',
+                                        left: `${percent * 0.45}%`,
+                                        top: 'calc(50% - 2px)',
+                                        transform: 'translate(-50%, -50%)',
+                                        width: '2px',
+                                        height: '2px',
+                                        borderRadius: '50%',
+                                        backgroundColor: 'rgba(0, 170, 180, 0.2)',
+                                        pointerEvents: 'none'
+                                    }} />
+                                    <div style={{
+                                        position: 'absolute',
+                                        left: `${percent * 0.7}%`,
+                                        top: 'calc(50% + 1px)',
+                                        transform: 'translate(-50%, -50%)',
+                                        width: '2px',
+                                        height: '2px',
+                                        borderRadius: '50%',
+                                        backgroundColor: 'rgba(0, 180, 190, 0.3)',
+                                        pointerEvents: 'none'
+                                    }} />
+                                </>
+                            )}
                         </div>
 
                         {/* Native range input - invisible but functional */}
@@ -1967,10 +2158,8 @@
                             }}
                         />
 
-                        {/* Thumb - absolutely positioned with perfect Y centering */}
-                        {/* Key: top: 50% + translateY(-50%) keeps thumb vertically centered */}
-                        {/* Radix handles X position; we only control Y */}
-                        {/* Calculates position accounting for track margin */}
+                        {/* Thumb - with pressure effects */}
+                        {/* Circle flattens slightly at high resistance */}
                         <div 
                             style={{
                                 position: 'absolute',
@@ -1979,22 +2168,23 @@
                                 display: 'flex',
                                 height: '2rem',
                                 width: '2rem',
-                                transform: `translate(-50%, -50%) ${isDragging ? 'scale(1.08)' : 'scale(1)'}`,
+                                // Pressure flattening: scaleY decreases at high resistance
+                                transform: `translate(-50%, -50%) ${isDragging ? 'scale(1.08)' : 'scale(1)'} scaleY(${1 - resistance * 0.05})`,
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 borderRadius: '9999px',
-                                border: '2px solid #00C7CF',
+                                border: `2px solid ${isDragging ? '#00B5BC' : '#00C7CF'}`,
                                 backgroundColor: 'white',
                                 boxShadow: isDragging 
-                                    ? '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+                                    ? `0 ${10 + resistance * 4}px ${15 + resistance * 5}px -3px rgba(0, 0, 0, ${0.1 + resistance * 0.05}), 0 4px 6px -2px rgba(0, 0, 0, 0.05)`
                                     : '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
                                 pointerEvents: 'none',
-                                transition: 'all 0.15s ease',
+                                transition: isDragging ? 'transform 0.05s ease-out, box-shadow 0.1s ease' : 'all 0.15s ease',
                                 zIndex: 5
                             }}
                         >
-                            {/* Emoji with optical centering */}
-                            <SalarySliderThumb />
+                            {/* Pen emoji with resistance-based pressure effects */}
+                            <SalarySliderThumb resistance={resistance} isDragging={isDragging} />
                         </div>
 
                         {/* Ink dot animation on release */}

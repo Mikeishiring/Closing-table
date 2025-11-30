@@ -1,20 +1,37 @@
 /**
  * SignatureSlider Component
- * Custom slider with pen emoji thumb - FIXED coordinate system
+ * Custom slider with pen emoji thumb - Enhanced with haptics and animations
+ * Features: milestone bumps, min/max feedback, home animation, ink droplet, ghost signature
  */
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
+import { 
+  getSnapPointsInRange, 
+  getSnapPointPercent, 
+  getNearestSnapPoint,
+  applySnapBehavior 
+} from '../lib/deal-math';
+import { createSnapSound } from '../lib/audio';
+import { useHaptics, useReducedMotion } from '../hooks';
+
+// Session storage key for intro animation
+const INTRO_PLAYED_KEY = 'closing-table-signature-intro-played';
+
+/**
+ * Milestones for haptic feedback (every $50k)
+ */
+const MILESTONES = [100_000, 150_000, 200_000, 250_000, 300_000, 350_000, 400_000];
 
 /**
  * Reusable slider thumb with pen emoji
- * Size increased by 30% (twice - 69% total increase from original)
  */
 export const SalarySliderThumb = () => (
   <span
     style={{
-      fontSize: '23px', // was 18px, now 23px (30% increase again: 18 * 1.3 = 23.4)
+      fontSize: '23px',
       lineHeight: 0,
-      transform: 'rotate(-25deg) translateY(1.7px)', // adjusted for larger size
+      transform: 'rotate(-25deg) translateY(1.7px)',
       userSelect: 'none',
       display: 'inline-block',
     }}
@@ -24,8 +41,130 @@ export const SalarySliderThumb = () => (
 );
 
 /**
- * Signature Slider with perfect centering
- * KEY FIX: Thumb is positioned INSIDE track container, not as sibling
+ * Ink Droplet Effect Component
+ */
+const InkDroplet = ({ show, reducedMotion }) => {
+  if (!show) return null;
+
+  if (reducedMotion) {
+    return (
+      <div
+        style={{
+          position: 'absolute',
+          width: '6px',
+          height: '6px',
+          borderRadius: '50%',
+          backgroundColor: 'rgba(0, 196, 204, 0.6)',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          pointerEvents: 'none',
+        }}
+      />
+    );
+  }
+
+  return (
+    <motion.div
+      initial={{ scale: 0.6, opacity: 0.8 }}
+      animate={{ scale: 1.1, opacity: 0 }}
+      transition={{ duration: 0.25, ease: 'easeOut' }}
+      style={{
+        position: 'absolute',
+        width: '12px',
+        height: '12px',
+        borderRadius: '50%',
+        backgroundColor: 'rgba(0, 196, 204, 0.5)',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        filter: 'blur(1px)',
+        pointerEvents: 'none',
+      }}
+    />
+  );
+};
+
+/**
+ * Ghost Signature Path SVG Component
+ */
+const GhostSignaturePath = ({ show, sliderWidth, reducedMotion }) => {
+  const pathRef = useRef(null);
+  const [pathLength, setPathLength] = useState(0);
+
+  useEffect(() => {
+    if (pathRef.current) {
+      setPathLength(pathRef.current.getTotalLength());
+    }
+  }, []);
+
+  if (!show || reducedMotion) {
+    // Show subtle underline for reduced motion
+    if (show && reducedMotion) {
+      return (
+        <div
+          style={{
+            position: 'absolute',
+            left: '10%',
+            right: '10%',
+            bottom: '-4px',
+            height: '2px',
+            backgroundColor: 'rgba(0, 196, 204, 0.4)',
+            borderRadius: '1px',
+          }}
+        />
+      );
+    }
+    return null;
+  }
+
+  return (
+    <motion.svg
+      style={{
+        position: 'absolute',
+        top: '-8px',
+        left: '1.3rem',
+        right: '1.3rem',
+        width: 'calc(100% - 2.6rem)',
+        height: '20px',
+        overflow: 'visible',
+        pointerEvents: 'none',
+      }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <motion.path
+        ref={pathRef}
+        d="M0,10 Q20,5 40,10 T80,8 Q100,6 120,10 T160,8"
+        fill="none"
+        stroke="#00C4CC"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        style={{
+          pathLength: 160,
+        }}
+        initial={{ 
+          strokeDasharray: pathLength || 160,
+          strokeDashoffset: pathLength || 160,
+          opacity: 0 
+        }}
+        animate={{ 
+          strokeDashoffset: 0,
+          opacity: [0, 1, 1, 0],
+        }}
+        transition={{ 
+          strokeDashoffset: { duration: 0.4, ease: 'easeOut' },
+          opacity: { duration: 1.2, times: [0, 0.1, 0.7, 1] }
+        }}
+      />
+    </motion.svg>
+  );
+};
+
+/**
+ * Signature Slider with haptics and micro-animations
  */
 export function SignatureSlider({
   value,
@@ -37,17 +176,160 @@ export function SignatureSlider({
   label,
   onDragStart,
   onDragEnd,
+  enableSnapPoints = true,
+  showSignatureFlourish = false,
 }) {
   const [isDragging, setIsDragging] = useState(false);
   const [showInkDot, setShowInkDot] = useState(false);
+  const [showInkDroplet, setShowInkDroplet] = useState(false);
   const [inkDotPosition, setInkDotPosition] = useState(0);
+  const [activeSnapPoint, setActiveSnapPoint] = useState(null);
+  const [snapPulse, setSnapPulse] = useState(false);
+  const [milestoneBump, setMilestoneBump] = useState(false);
+  const [endBounce, setEndBounce] = useState(null); // 'min' | 'max' | null
+  const [hasPlayedIntro, setHasPlayedIntro] = useState(true);
+  const [introOffset, setIntroOffset] = useState(0);
+  
   const lastValueRef = useRef(value);
+  const lastMilestoneRef = useRef(null);
+  const lastSnapPointRef = useRef(null);
   const sliderRef = useRef(null);
+  const snapSoundRef = useRef(null);
+  const dragStartTriggeredRef = useRef(false);
+
+  const haptics = useHaptics();
+  const reducedMotion = useReducedMotion();
+
+  // Initialize snap sound lazily
+  useEffect(() => {
+    if (enableSnapPoints && !snapSoundRef.current) {
+      snapSoundRef.current = createSnapSound();
+    }
+  }, [enableSnapPoints]);
+
+  // Check and run intro animation on mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    try {
+      const introPlayed = sessionStorage.getItem(INTRO_PLAYED_KEY);
+      if (introPlayed === 'true') {
+        setHasPlayedIntro(true);
+        return;
+      }
+      
+      // Run intro animation if not played and motion is allowed
+      if (!reducedMotion) {
+        setHasPlayedIntro(false);
+        // Small delay before animation
+        const timer = setTimeout(() => {
+          // Animate intro offset: 0 -> 6 -> 0
+          animate(0, 6, {
+            duration: 0.15,
+            ease: 'easeOut',
+            onUpdate: (v) => setIntroOffset(v),
+            onComplete: () => {
+              animate(6, 0, {
+                duration: 0.2,
+                ease: 'easeInOut',
+                onUpdate: (v) => setIntroOffset(v),
+                onComplete: () => {
+                  setHasPlayedIntro(true);
+                  sessionStorage.setItem(INTRO_PLAYED_KEY, 'true');
+                },
+              });
+            },
+          });
+        }, 200);
+        return () => clearTimeout(timer);
+      } else {
+        // Mark as played without animation for reduced motion
+        sessionStorage.setItem(INTRO_PLAYED_KEY, 'true');
+      }
+    } catch (e) {
+      // sessionStorage may not be available
+      setHasPlayedIntro(true);
+    }
+  }, [reducedMotion]);
 
   const percent = Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100));
 
+  // Get snap points within slider range
+  const snapPointsInRange = useMemo(() => {
+    if (!enableSnapPoints) return [];
+    return getSnapPointsInRange(min, max);
+  }, [min, max, enableSnapPoints]);
+
+  // Check milestone crossing
+  const checkMilestoneCrossing = useCallback((oldValue, newValue) => {
+    for (const milestone of MILESTONES) {
+      if (milestone >= min && milestone <= max) {
+        const crossedForward = oldValue < milestone && newValue >= milestone;
+        const crossedBackward = oldValue > milestone && newValue <= milestone;
+        
+        if ((crossedForward || crossedBackward) && lastMilestoneRef.current !== milestone) {
+          lastMilestoneRef.current = milestone;
+          haptics.pulse('milestone');
+          
+          if (!reducedMotion) {
+            setMilestoneBump(true);
+            setTimeout(() => setMilestoneBump(false), 150);
+          }
+          return;
+        }
+      }
+    }
+  }, [min, max, haptics, reducedMotion]);
+
+  // Check min/max boundaries
+  const checkBoundaries = useCallback((newValue) => {
+    const isAtMin = newValue <= min;
+    const isAtMax = newValue >= max;
+    
+    if (isAtMin && value !== min) {
+      haptics.pulse('tap');
+      if (!reducedMotion) {
+        setEndBounce('min');
+        setTimeout(() => setEndBounce(null), 150);
+      }
+    } else if (isAtMax && value !== max) {
+      haptics.pulse('tap');
+      if (!reducedMotion) {
+        setEndBounce('max');
+        setTimeout(() => setEndBounce(null), 150);
+      }
+    }
+  }, [min, max, value, haptics, reducedMotion]);
+
+  // Check for snap point proximity and trigger feedback
+  const checkSnapFeedback = useCallback((newValue) => {
+    if (!enableSnapPoints) return;
+
+    const snapInfo = getNearestSnapPoint(newValue);
+    
+    if (snapInfo) {
+      setActiveSnapPoint(snapInfo.snapPoint);
+      
+      // Trigger haptic and audio when ENTERING a new snap zone
+      if (lastSnapPointRef.current !== snapInfo.snapPoint) {
+        haptics.pulse('milestone');
+        if (snapSoundRef.current) {
+          snapSoundRef.current();
+        }
+        // Visual pulse feedback
+        setSnapPulse(true);
+        setTimeout(() => setSnapPulse(false), 150);
+        
+        lastSnapPointRef.current = snapInfo.snapPoint;
+      }
+    } else {
+      setActiveSnapPoint(null);
+      lastSnapPointRef.current = null;
+    }
+  }, [enableSnapPoints, haptics]);
+
   const handleChange = (e) => {
-    const newValue = parseInt(e.target.value, 10);
+    let newValue = parseInt(e.target.value, 10);
     if (isNaN(newValue)) return;
 
     if (!isDragging) {
@@ -55,18 +337,53 @@ export function SignatureSlider({
       if (onDragStart) onDragStart();
     }
 
+    // Check milestone crossing
+    checkMilestoneCrossing(value, newValue);
+    
+    // Check boundaries
+    checkBoundaries(newValue);
+
+    // Apply snap behavior (friction/nudge) when dragging
+    if (enableSnapPoints && isDragging) {
+      const snapResult = applySnapBehavior(value, newValue);
+      newValue = snapResult.value;
+    }
+
+    // Check for snap feedback
+    checkSnapFeedback(newValue);
+
     onChange({ target: { value: newValue } });
+  };
+
+  const handlePointerDown = () => {
+    setIsDragging(true);
+    dragStartTriggeredRef.current = false;
+  };
+
+  const handleDragStart = () => {
+    if (!dragStartTriggeredRef.current) {
+      dragStartTriggeredRef.current = true;
+      // Trigger ink droplet on drag start
+      setShowInkDroplet(true);
+      setTimeout(() => setShowInkDroplet(false), 250);
+    }
   };
 
   const handlePointerUp = () => {
     if (isDragging) {
       setIsDragging(false);
+      dragStartTriggeredRef.current = false;
 
       // Show ink dot animation on release if value changed
       if (Math.abs(value - lastValueRef.current) > 0) {
         setInkDotPosition(percent);
         setShowInkDot(true);
         setTimeout(() => setShowInkDot(false), 300);
+      }
+
+      // Snap haptic on release if near a snap point
+      if (activeSnapPoint !== null) {
+        haptics.pulse('snap');
       }
 
       lastValueRef.current = value;
@@ -81,8 +398,44 @@ export function SignatureSlider({
     }
   }, [value, isDragging]);
 
+  // Theme-based outline color
+  const getThumbOutlineColor = () => {
+    if (activeSnapPoint !== null) {
+      return '#00E5ED'; // Brighter when near snap point
+    }
+    if (variant === 'candidate') {
+      return '#7C3AED'; // Purple tint for candidate
+    }
+    return '#00C7CF'; // Teal for company (default)
+  };
+
+  // Calculate thumb animation state
+  const getThumbTransform = () => {
+    let scale = isDragging ? 1.08 : 1;
+    if (milestoneBump && !reducedMotion) {
+      scale = 1.12;
+    }
+    return scale;
+  };
+
+  // End bounce animation values
+  const getEndBounceY = () => {
+    if (!endBounce || reducedMotion) return 0;
+    return -2;
+  };
+
   return (
     <div className={`signature-slider signature-slider--${variant}`}>
+      {/* Ghost signature path overlay */}
+      <AnimatePresence>
+        {showSignatureFlourish && (
+          <GhostSignaturePath 
+            show={showSignatureFlourish} 
+            reducedMotion={reducedMotion}
+          />
+        )}
+      </AnimatePresence>
+
       {/* Root container */}
       <div
         ref={sliderRef}
@@ -94,19 +447,18 @@ export function SignatureSlider({
           display: 'flex',
           width: '100%',
           alignItems: 'center',
-          height: '57px', // was 44px, now 57px (30% increase)
+          height: '57px',
         }}
       >
-        {/* Track container = coordinate system for thumb AND range */}
-        {/* This is the FIX: thumb is now a CHILD of track, not sibling */}
+        {/* Track container */}
         <div
           style={{
             position: 'relative',
             flex: 1,
-            height: '4px', // was 3px, now 4px (30% increase, rounded)
+            height: '4px',
             borderRadius: '9999px',
             backgroundColor: '#dedede',
-            marginLeft: '1.3rem', // was 1rem, now 1.3rem (30% increase)
+            marginLeft: '1.3rem',
             marginRight: '1.3rem',
           }}
         >
@@ -121,34 +473,74 @@ export function SignatureSlider({
             }}
           />
 
-          {/* Thumb - NOW INSIDE track, same coordinate system */}
-          {/* At 0%, thumb center is at track's left edge */}
-          {/* At 100%, thumb center is at track's right edge */}
-          {/* Perfect alignment at all positions! */}
-          <div
+          {/* Snap point tick marks */}
+          {enableSnapPoints && snapPointsInRange.map((snapPoint) => {
+            const snapPercent = getSnapPointPercent(snapPoint, min, max);
+            const isActive = activeSnapPoint === snapPoint;
+            const isPassed = snapPercent <= percent;
+            
+            return (
+              <div
+                key={snapPoint}
+                style={{
+                  position: 'absolute',
+                  left: `${snapPercent}%`,
+                  top: '100%',
+                  transform: 'translateX(-50%)',
+                  width: '2px',
+                  height: isActive ? '6px' : '4px',
+                  marginTop: '4px',
+                  backgroundColor: isActive 
+                    ? '#00C7CF' 
+                    : isPassed 
+                      ? 'rgba(0, 199, 207, 0.5)' 
+                      : 'rgba(180, 180, 180, 0.6)',
+                  borderRadius: '1px',
+                  transition: 'all 0.15s ease',
+                  opacity: isActive && snapPulse ? 1 : 0.8,
+                }}
+              />
+            );
+          })}
+
+          {/* Thumb with animations */}
+          <motion.div
             style={{
               position: 'absolute',
               top: '50%',
               left: `${percent}%`,
-              transform: `translate(-50%, -50%) ${isDragging ? 'scale(1.08)' : 'scale(1)'}`,
               display: 'flex',
-              height: '2.6rem', // was 2rem, now 2.6rem (30% increase)
+              height: '2.6rem',
               width: '2.6rem',
               alignItems: 'center',
               justifyContent: 'center',
               borderRadius: '9999px',
-              border: '2.6px solid #00C7CF', // was 2px, now 2.6px (30% increase)
+              border: `2.6px solid ${getThumbOutlineColor()}`,
               backgroundColor: 'white',
-              boxShadow: isDragging
-                ? '0 13px 19px -4px rgba(0, 0, 0, 0.1), 0 5px 8px -3px rgba(0, 0, 0, 0.05)' // 30% increase
-                : '0 5px 8px -1px rgba(0, 0, 0, 0.1), 0 3px 5px -1px rgba(0, 0, 0, 0.06)', // 30% increase
+              boxShadow: activeSnapPoint !== null
+                ? `0 13px 19px -4px rgba(0, 0, 0, 0.1), 0 5px 8px -3px rgba(0, 0, 0, 0.05), 0 0 ${snapPulse ? '12px' : '8px'} rgba(0, 199, 207, 0.4)`
+                : isDragging
+                  ? '0 13px 19px -4px rgba(0, 0, 0, 0.1), 0 5px 8px -3px rgba(0, 0, 0, 0.05)'
+                  : '0 5px 8px -1px rgba(0, 0, 0, 0.1), 0 3px 5px -1px rgba(0, 0, 0, 0.06)',
               pointerEvents: 'none',
-              transition: 'all 0.15s ease',
               zIndex: 5,
             }}
+            initial={{ x: '-50%', y: '-50%' }}
+            animate={{
+              x: `calc(-50% + ${introOffset}px + ${showSignatureFlourish && !reducedMotion ? '8px' : '0px'})`,
+              y: `calc(-50% + ${getEndBounceY()}px)`,
+              scale: getThumbTransform(),
+            }}
+            transition={{
+              x: { duration: 0.2, ease: 'easeInOut' },
+              y: { duration: 0.12, ease: 'easeOut' },
+              scale: { duration: 0.15, ease: 'easeOut' },
+            }}
           >
+            {/* Ink droplet effect */}
+            <InkDroplet show={showInkDroplet} reducedMotion={reducedMotion} />
             <SalarySliderThumb />
-          </div>
+          </motion.div>
 
           {/* Ink dot animation on release */}
           <div
@@ -162,7 +554,7 @@ export function SignatureSlider({
           />
         </div>
 
-        {/* Invisible range input - aligned with track margins */}
+        {/* Invisible range input */}
         <input
           type="range"
           min={min}
@@ -170,14 +562,20 @@ export function SignatureSlider({
           step={step}
           value={value}
           onChange={handleChange}
-          onMouseDown={() => setIsDragging(true)}
-          onTouchStart={() => setIsDragging(true)}
+          onMouseDown={() => {
+            handlePointerDown();
+            handleDragStart();
+          }}
+          onTouchStart={() => {
+            handlePointerDown();
+            handleDragStart();
+          }}
           aria-label={label || `Slider value: $${value.toLocaleString()}`}
           style={{
             position: 'absolute',
-            left: '1.3rem', // was 1rem, now 1.3rem (30% increase)
+            left: '1.3rem',
             right: '1.3rem',
-            height: '57px', // was 44px, now 57px (30% increase)
+            height: '57px',
             opacity: 0,
             cursor: isDragging ? 'grabbing' : 'grab',
             zIndex: 10,
@@ -193,4 +591,3 @@ export function SignatureSlider({
     </div>
   );
 }
-
