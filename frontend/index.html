@@ -890,6 +890,60 @@
             font-weight: 500;
             color: var(--text-secondary);
         }
+
+        /* === AFTER INTERACTION REVEAL STYLES === */
+        .after-interaction {
+            transition:
+                opacity 280ms ease-out,
+                transform 280ms ease-out,
+                max-height 280ms ease-out;
+            opacity: 0;
+            transform: translateY(12px) scale(0.98);
+            pointer-events: none;
+            max-height: 0;
+            overflow: hidden;
+        }
+
+        .after-interaction--visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+            max-height: 600px;
+            overflow: visible;
+        }
+
+        /* Paper settle animation when first revealed */
+        .after-interaction--just-shown {
+            animation: paperSettle 280ms ease-out;
+        }
+
+        @keyframes paperSettle {
+            0% {
+                transform: translateY(16px) scale(0.96);
+                box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+            }
+            60% {
+                transform: translateY(-2px) scale(1.01);
+                box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+            }
+            100% {
+                transform: translateY(0) scale(1);
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            }
+        }
+
+        /* Respect reduced motion preference */
+        @media (prefers-reduced-motion: reduce) {
+            .after-interaction,
+            .after-interaction--visible {
+                transition: opacity 150ms ease-out;
+                transform: none;
+            }
+            
+            .after-interaction--just-shown {
+                animation: none;
+            }
+        }
     </style>
 </head>
 
@@ -2011,7 +2065,10 @@
             const [baseError, setBaseError] = useState('');
             const [equityError, setEquityError] = useState('');
             const [focusedInput, setFocusedInput] = useState(null); // 'total' | 'base' | 'equity'
+            const [hasInteracted, setHasInteracted] = useState(false);
+            const [justShown, setJustShown] = useState(false);
             const cardRef = useRef(null);
+            const initialTotalRef = useRef(130000);
 
             const BASE_MIN = 50000;
             const BASE_MAX = 300000;
@@ -2118,6 +2175,13 @@
                 const value = parseInt(e.target.value, 10);
                 if (isNaN(value)) return;
 
+                // Mark as interacted if value changed from initial
+                if (!hasInteracted && value !== initialTotalRef.current) {
+                    setHasInteracted(true);
+                    setJustShown(true);
+                    setTimeout(() => setJustShown(false), 300);
+                }
+
                 // Validation
                 if (value < 0) {
                     setBaseError(`Number must be between $${TOTAL_MIN.toLocaleString()} and $${TOTAL_MAX.toLocaleString()}.`);
@@ -2192,6 +2256,13 @@
                 const value = parseInt(e.target.value, 10);
                 if (isNaN(value)) return;
 
+                // Mark as interacted if value changed from initial
+                if (!hasInteracted && value !== initialTotalRef.current) {
+                    setHasInteracted(true);
+                    setJustShown(true);
+                    setTimeout(() => setJustShown(false), 300);
+                }
+
                 // Validation
                 if (value < 0) {
                     setBaseError(`Number must be between $${BASE_MIN.toLocaleString()} and $${BASE_MAX.toLocaleString()}.`);
@@ -2228,6 +2299,13 @@
             const handleEquityChange = (e) => {
                 const value = parseInt(e.target.value, 10);
                 if (isNaN(value)) return;
+
+                // Mark as interacted if value changed from initial
+                if (!hasInteracted) {
+                    setHasInteracted(true);
+                    setJustShown(true);
+                    setTimeout(() => setJustShown(false), 300);
+                }
 
                 if (equityEnabled) {
                     // When equity is enabled, update equity and total is automatically base + equity
@@ -2710,45 +2788,52 @@
                                     </AnimatePresence>
                                 </CompensationInputBlock>
 
-                                <div className="space-y-6 pt-6 border-t border-[#E0E0E0]">
-                                    <div>
-                                        <label className="block text-sm font-medium text-[#1C1C1E] mb-2">
-                                            Email (to send the link)
-                                        </label>
-                                        <div className="relative">
-                                            <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#666666]" />
-                                            <input
-                                                type="email"
-                                                value={email}
-                                                onChange={(e) => setEmail(e.target.value)}
-                                                placeholder="you@company.com"
-                                                aria-label="Company email address"
-                                                autoComplete="email"
-                                                className="w-full bg-[#EFF3F6] border-none rounded-xl py-4 pl-12 pr-4 text-[#1C1C1E] placeholder-[#999999] focus:outline-none focus:ring-2 focus:ring-[#00C4CC]/50 shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] transition-all duration-200"
-                                            />
+                                {/* Email + CTA - revealed after interaction */}
+                                <div 
+                                    className={`after-interaction ${hasInteracted ? 'after-interaction--visible' : ''} ${justShown ? 'after-interaction--just-shown' : ''}`}
+                                    aria-hidden={!hasInteracted}
+                                >
+                                    <div className="space-y-6 pt-6 border-t border-[#E0E0E0]">
+                                        <div>
+                                            <label className="block text-sm font-medium text-[#1C1C1E] mb-2">
+                                                Email (to send the link)
+                                            </label>
+                                            <div className="relative">
+                                                <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#666666]" />
+                                                <input
+                                                    type="email"
+                                                    value={email}
+                                                    onChange={(e) => setEmail(e.target.value)}
+                                                    placeholder="you@company.com"
+                                                    aria-label="Company email address"
+                                                    autoComplete="email"
+                                                    tabIndex={hasInteracted ? 0 : -1}
+                                                    className="w-full bg-[#EFF3F6] border-none rounded-xl py-4 pl-12 pr-4 text-[#1C1C1E] placeholder-[#999999] focus:outline-none focus:ring-2 focus:ring-[#00C4CC]/50 shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] transition-all duration-200"
+                                                />
+                                            </div>
+                                            <p className="mt-2 helper-text">
+                                                Used only for this offer. Auto-deleted in 7 days.
+                                            </p>
                                         </div>
-                                        <p className="mt-2 helper-text">
-                                            Used only for this offer. Auto-deleted in 7 days.
-                                        </p>
-                                    </div>
 
-                                    {error && (
-                                        <div className="bg-[#FFEBEB] border border-[#FF3B30]/30 p-4 rounded-xl">
-                                            <p className="text-[#FF3B30] text-sm">{error}</p>
+                                        {error && (
+                                            <div className="bg-[#FFEBEB] border border-[#FF3B30]/30 p-4 rounded-xl">
+                                                <p className="text-[#FF3B30] text-sm">{error}</p>
+                                            </div>
+                                        )}
+
+                                        <AnimatedSubmitButton
+                                            onClick={handleGenerateLink}
+                                            disabled={!email || loading}
+                                            buttonText={loading ? 'Creating Link...' : 'Lock it in & Get Link'}
+                                        />
+
+                                        <div className="flex items-start gap-2">
+                                            <Icons.Lock className="w-3.5 h-3.5 text-[#666666] flex-shrink-0 mt-0.5" />
+                                            <p className="text-xs text-[#666666]">
+                                                We only store whether a deal is possible and the final salary we compute.
+                                            </p>
                                         </div>
-                                    )}
-
-                                    <AnimatedSubmitButton
-                                        onClick={handleGenerateLink}
-                                        disabled={!email || loading}
-                                        buttonText={loading ? 'Creating Link...' : 'Lock it in & Get Link'}
-                                    />
-
-                                    <div className="flex items-start gap-2">
-                                        <Icons.Lock className="w-3.5 h-3.5 text-[#666666] flex-shrink-0 mt-0.5" />
-                                        <p className="text-xs text-[#666666]">
-                                            We only store whether a deal is possible and the final salary we compute.
-                                        </p>
                                     </div>
                                 </div>
                             </GlassCard>
@@ -2782,7 +2867,10 @@
             const [isSliderDragging, setIsSliderDragging] = useState(false);
             const [baseError, setBaseError] = useState('');
             const [equityError, setEquityError] = useState('');
+            const [hasInteracted, setHasInteracted] = useState(false);
+            const [justShown, setJustShown] = useState(false);
             const emailInputRef = useRef(null);
+            const initialTotalRef = useRef(100000);
 
             const BASE_MIN = 80000;
             const BASE_MAX = 250000;
@@ -2853,6 +2941,13 @@
                 const value = parseInt(e.target.value, 10);
                 if (isNaN(value)) return;
 
+                // Mark as interacted if value changed from initial
+                if (!hasInteracted && value !== initialTotalRef.current) {
+                    setHasInteracted(true);
+                    setJustShown(true);
+                    setTimeout(() => setJustShown(false), 300);
+                }
+
                 // Validate value
                 if (value < BASE_MIN) {
                     setBaseError(`Number must be between $${BASE_MIN.toLocaleString()} and $${BASE_MAX.toLocaleString()}.`);
@@ -2880,6 +2975,13 @@
             const handleEquityChange = (e) => {
                 const value = parseInt(e.target.value, 10);
                 if (isNaN(value)) return;
+
+                // Mark as interacted if value changed from initial
+                if (!hasInteracted) {
+                    setHasInteracted(true);
+                    setJustShown(true);
+                    setTimeout(() => setJustShown(false), 300);
+                }
 
                 // Validate value
                 if (value < EQUITY_MIN) {
@@ -3144,6 +3246,13 @@
                                                         if (value !== '') {
                                                             const numValue = parseInt(value, 10);
                                                             if (!isNaN(numValue)) {
+                                                                // Mark as interacted if value changed from initial
+                                                                if (!hasInteracted && numValue !== initialTotalRef.current) {
+                                                                    setHasInteracted(true);
+                                                                    setJustShown(true);
+                                                                    setTimeout(() => setJustShown(false), 300);
+                                                                }
+                                                                
                                                                 const clampedValue = Math.max(BASE_MIN, Math.min(BASE_MAX + EQUITY_MAX, numValue));
                                                                 if (equityEnabled) {
                                                                     if (clampedValue <= BASE_MAX) {
@@ -3187,6 +3296,14 @@
                                                 onChange={(e) => {
                                                     const value = parseInt(e.target.value, 10);
                                                     if (isNaN(value)) return;
+                                                    
+                                                    // Mark as interacted if value changed from initial
+                                                    if (!hasInteracted && value !== initialTotalRef.current) {
+                                                        setHasInteracted(true);
+                                                        setJustShown(true);
+                                                        setTimeout(() => setJustShown(false), 300);
+                                                    }
+                                                    
                                                     const clampedValue = Math.max(BASE_MIN, Math.min(BASE_MAX + EQUITY_MAX, value));
                                                     if (equityEnabled) {
                                                         if (clampedValue <= BASE_MAX) {
@@ -3211,54 +3328,60 @@
                                         </div>
                                     </CompensationInputBlock>
 
-                                    {/* Email Input */}
-                                    <div className="space-y-6 pt-6 border-t border-[#E0E0E0]">
-                                        <div>
-                                            <label className="block text-sm font-medium text-[#1C1C1E] mb-2">
-                                                Email (to send your result)
-                                            </label>
-                                            <div className="relative">
-                                                <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#666666]" />
-                                                <input
-                                                    ref={emailInputRef}
-                                                    type="email"
-                                                    value={email}
-                                                    onChange={(e) => {
-                                                        setEmail(e.target.value);
-                                                        if (validationError) setValidationError('');
-                                                    }}
-                                                    onKeyDown={handleEmailKeyDown}
-                                                    placeholder="you@email.com"
-                                                    aria-label="Candidate email address"
-                                                    autoComplete="email"
-                                                    className="w-full bg-[#EFF3F6] border-none rounded-xl py-4 pl-12 pr-4 text-[#1C1C1E] placeholder-[#999999] focus:outline-none focus:ring-2 focus:ring-[#00C4CC]/50 shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] transition-all duration-200"
-                                                />
-                                            </div>
-                                            {validationError && (
-                                                <div className="mt-2 flex items-start gap-2">
-                                                    <Icons.AlertTriangle className="w-4 h-4 text-[#FF3B30] flex-shrink-0 mt-0.5" />
-                                                    <p className="text-[#FF3B30] text-sm">{validationError}</p>
+                                    {/* Email + CTA - revealed after interaction */}
+                                    <div 
+                                        className={`after-interaction ${hasInteracted ? 'after-interaction--visible' : ''} ${justShown ? 'after-interaction--just-shown' : ''}`}
+                                        aria-hidden={!hasInteracted}
+                                    >
+                                        <div className="space-y-6 pt-6 border-t border-[#E0E0E0]">
+                                            <div>
+                                                <label className="block text-sm font-medium text-[#1C1C1E] mb-2">
+                                                    Email (to send your result)
+                                                </label>
+                                                <div className="relative">
+                                                    <Icons.Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#666666]" />
+                                                    <input
+                                                        ref={emailInputRef}
+                                                        type="email"
+                                                        value={email}
+                                                        onChange={(e) => {
+                                                            setEmail(e.target.value);
+                                                            if (validationError) setValidationError('');
+                                                        }}
+                                                        onKeyDown={handleEmailKeyDown}
+                                                        placeholder="you@email.com"
+                                                        aria-label="Candidate email address"
+                                                        autoComplete="email"
+                                                        tabIndex={hasInteracted ? 0 : -1}
+                                                        className="w-full bg-[#EFF3F6] border-none rounded-xl py-4 pl-12 pr-4 text-[#1C1C1E] placeholder-[#999999] focus:outline-none focus:ring-2 focus:ring-[#00C4CC]/50 shadow-[inset_3px_3px_6px_#d1d9e6,inset_-3px_-3px_6px_#ffffff] transition-all duration-200"
+                                                    />
                                                 </div>
-                                            )}
-                                            <p className="mt-2 helper-text">
-                                                Used only for this offer. Auto-deleted in 7 days.
-                                            </p>
-                                        </div>
+                                                {validationError && (
+                                                    <div className="mt-2 flex items-start gap-2">
+                                                        <Icons.AlertTriangle className="w-4 h-4 text-[#FF3B30] flex-shrink-0 mt-0.5" />
+                                                        <p className="text-[#FF3B30] text-sm">{validationError}</p>
+                                                    </div>
+                                                )}
+                                                <p className="mt-2 helper-text">
+                                                    Used only for this offer. Auto-deleted in 7 days.
+                                                </p>
+                                            </div>
 
-                                        <AnimatedSubmitButton
-                                            onClick={() => {
-                                                if (validateForm()) {
-                                                    submit();
-                                                }
-                                            }}
-                                            buttonText="Lock it in & Get Link"
-                                        />
+                                            <AnimatedSubmitButton
+                                                onClick={() => {
+                                                    if (validateForm()) {
+                                                        submit();
+                                                    }
+                                                }}
+                                                buttonText="Lock it in & Get Link"
+                                            />
 
-                                        <div className="flex items-start gap-2">
-                                            <Icons.Lock className="w-3.5 h-3.5 text-[#666666] flex-shrink-0 mt-0.5" />
-                                            <p className="text-xs text-[#666666]">
-                                                We only store whether a deal is possible and the final salary we compute.
-                                            </p>
+                                            <div className="flex items-start gap-2">
+                                                <Icons.Lock className="w-3.5 h-3.5 text-[#666666] flex-shrink-0 mt-0.5" />
+                                                <p className="text-xs text-[#666666]">
+                                                    We only store whether a deal is possible and the final salary we compute.
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </GlassCard>
