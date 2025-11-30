@@ -94,23 +94,18 @@ export function CandidateView({ offerId }) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl p-8 shadow-lg">
+      <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl animate-[cardIn_280ms_ease-out]">
         <div className="animate-pulse space-y-6">
-          {/* Skeleton header */}
           <div className="space-y-2">
-            <div className="h-8 bg-slate-200 rounded w-1/3" />
-            <div className="h-4 bg-slate-100 rounded w-2/3" />
+            <div className="h-8 bg-slate-200 rounded w-1/3 mx-auto" />
+            <div className="h-4 bg-slate-100 rounded w-2/3 mx-auto" />
           </div>
-          
-          {/* Skeleton slider */}
           <div className="space-y-2">
             <div className="h-4 bg-slate-100 rounded w-1/4" />
             <div className="h-10 bg-slate-200 rounded w-full" />
             <div className="h-2 bg-slate-200 rounded-full w-full" />
           </div>
-          
-          {/* Skeleton button */}
-          <div className="h-12 bg-slate-200 rounded-lg w-full" />
+          <div className="h-12 bg-slate-200 rounded-full w-full" />
         </div>
       </div>
     );
@@ -118,14 +113,27 @@ export function CandidateView({ offerId }) {
 
   if (error) {
     return (
-      <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
-        <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg className="w-8 h-8 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
+      <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl animate-[cardIn_280ms_ease-out]">
+        <header className="flex flex-col items-center text-center">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 ring-4 ring-rose-100 text-4xl text-rose-600 animate-[emojiPop_260ms_ease-out]">
+            <span>⚠️</span>
+          </div>
+          <h1 className="text-2xl md:text-3xl font-semibold text-slate-900">
+            Oops
+          </h1>
+          <p className="mt-2 text-sm md:text-base text-slate-600">
+            {error}
+          </p>
+        </header>
+        
+        <div className="mt-6">
+          <button
+            onClick={() => window.location.hash = ''}
+            className="w-full rounded-full bg-slate-900 text-white py-3 text-sm font-medium hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 transition-all active:scale-[0.98]"
+          >
+            Go to home
+          </button>
         </div>
-        <h2 className="text-2xl font-bold text-slate-900 mb-2">Oops</h2>
-        <p className="text-slate-600">{error}</p>
       </div>
     );
   }
@@ -145,7 +153,7 @@ export function CandidateView({ offerId }) {
   const totalMin = baseMin + (offer.equityEnabled ? equityMin : 0);
 
   return (
-    <div className="bg-white rounded-2xl p-8 shadow-lg">
+    <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl animate-[cardIn_280ms_ease-out]">
       <h2 className="text-2xl font-semibold mb-2">Candidate View</h2>
       <p className="text-slate-600 mb-6">
         Enter your minimum acceptable offer. The company will never see this number.
@@ -173,7 +181,7 @@ export function CandidateView({ offerId }) {
 
         {/* Equity */}
         {offer.equityEnabled && (
-          <div>
+          <div className="animate-slideDown">
             <label className="block text-sm font-medium text-slate-700 mb-2">
               Minimum Equity (Annual Value)
             </label>
@@ -207,11 +215,10 @@ export function CandidateView({ offerId }) {
         disabled={submitting}
       />
 
-      <div className="mt-6 p-4 bg-slate-50 rounded-lg text-sm text-slate-600">
-        <p className="font-medium mb-1">🔒 How it works</p>
-        <p>The mechanism will check if your minimum and the company's maximum overlap. If they do, it splits the difference 50/50.</p>
+      <div className="mt-4 flex items-center justify-center gap-2 text-[11px] text-slate-500">
+        <span>🔒</span>
+        <span>The mechanism checks if ranges overlap and splits the difference 50/50</span>
       </div>
     </div>
   );
 }
-

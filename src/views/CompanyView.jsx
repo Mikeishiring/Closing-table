@@ -47,44 +47,71 @@ export function CompanyView() {
 
   if (offerLink) {
     return (
-      <div className="bg-white rounded-2xl p-8 shadow-lg">
-        <div className="text-center mb-6">
-          <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
+      <div className="bg-white rounded-3xl shadow-xl p-6 md:p-8 animate-[cardIn_280ms_ease-out]">
+        
+        {/* Hero: Big emoji + headline */}
+        <header className="flex flex-col items-center text-center">
+          <div className="mb-4 flex h-16 w-16 md:h-18 md:w-18 items-center justify-center rounded-full bg-slate-50 ring-4 ring-emerald-100 text-4xl md:text-5xl text-emerald-600 animate-[emojiPop_260ms_ease-out]">
+            <span>🔗</span>
           </div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Offer Created</h2>
-          <p className="text-slate-600">Share this link with your candidate</p>
+          
+          <h1 className="text-2xl md:text-3xl font-semibold text-slate-900">
+            Offer Created
+          </h1>
+          
+          <p className="mt-2 text-sm md:text-base text-slate-600 max-w-sm">
+            Share this link with your candidate. It works once and expires in 24 hours.
+          </p>
+        </header>
+
+        {/* Details: The link */}
+        <main className="mt-6 space-y-4">
+          <section className="text-center">
+            <p className="text-xs uppercase tracking-[0.18em] text-slate-500 mb-3">
+              Shareable Link
+            </p>
+            <div className="rounded-2xl bg-slate-50 px-4 py-3 text-xs md:text-sm text-slate-700 break-all font-mono border border-slate-200">
+              {offerLink}
+            </div>
+            <p className="mt-2 text-xs text-slate-500">
+              Click below to copy this link to your clipboard
+            </p>
+          </section>
+        </main>
+
+        {/* Actions: Buttons */}
+        <div className="mt-6 flex flex-col gap-3">
+          <button
+            onClick={handleCopyLink}
+            className="w-full rounded-full bg-slate-900 text-white py-3 text-sm font-medium hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 transition-all active:scale-[0.98]"
+          >
+            {copied ? 'Copied ✓' : 'Copy Link'}
+          </button>
+          
+          <button
+            onClick={() => {
+              setOfferLink(null);
+              setBaseMax(120000);
+              setEquityMax(30000);
+            }}
+            className="w-full rounded-full border border-slate-200 py-3 text-sm text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 transition-all active:scale-[0.98]"
+          >
+            Create Another Offer 🔁
+          </button>
         </div>
-
-        <div className="bg-slate-50 rounded-lg p-4 mb-6 break-all text-sm text-slate-700">
-          {offerLink}
+        
+        {/* Privacy hint */}
+        <div className="mt-4 flex items-center justify-center gap-2 text-[11px] text-slate-500">
+          <span>🔐</span>
+          <span>Your maximum stays private until the mechanism runs</span>
         </div>
-
-        <button
-          onClick={handleCopyLink}
-          className="w-full bg-slate-900 text-white py-3 px-6 rounded-lg font-medium hover:bg-slate-800 transition-colors mb-4"
-        >
-          {copied ? '✓ Copied!' : 'Copy Link'}
-        </button>
-
-        <button
-          onClick={() => {
-            setOfferLink(null);
-            setBaseMax(120000);
-            setEquityMax(30000);
-          }}
-          className="w-full bg-slate-100 text-slate-900 py-3 px-6 rounded-lg font-medium hover:bg-slate-200 transition-colors"
-        >
-          Create Another Offer
-        </button>
+        
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-2xl p-8 shadow-lg">
+    <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl animate-[cardIn_280ms_ease-out]">
       <h2 className="text-2xl font-semibold mb-2">Company View</h2>
       <p className="text-slate-600 mb-6">
         Set your maximum offer. The candidate will never see this number.
@@ -132,7 +159,7 @@ export function CompanyView() {
 
         {/* Equity */}
         {equityEnabled && (
-          <div className="animate-slideUp">
+          <div className="animate-slideDown">
             <label className="block text-sm font-medium text-slate-700 mb-2">
               Maximum Equity (Annual Value)
             </label>
@@ -166,9 +193,9 @@ export function CompanyView() {
         disabled={loading}
       />
 
-      <div className="mt-6 p-4 bg-slate-50 rounded-lg text-sm text-slate-600">
-        <p className="font-medium mb-1">🔒 Privacy</p>
-        <p>Your numbers stay private. Only the final outcome will be shared.</p>
+      <div className="mt-4 flex items-center justify-center gap-2 text-[11px] text-slate-500">
+        <span>🔒</span>
+        <span>Your numbers stay private. Only the final outcome will be shared.</span>
       </div>
     </div>
   );
