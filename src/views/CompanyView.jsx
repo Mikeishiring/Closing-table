@@ -11,21 +11,17 @@ import { formatCurrency } from '../lib/deal-math';
 
 export function CompanyView() {
   const [baseMax, setBaseMax] = useState(120000);
-  const [equityMax, setEquityMax] = useState(30000);
-  const [equityEnabled, setEquityEnabled] = useState(true);
   const [offerLink, setOfferLink] = useState(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const totalMax = baseMax + (equityEnabled ? equityMax : 0);
+  const totalMax = baseMax;
 
   const handleSubmit = async () => {
     try {
       setLoading(true);
       const response = await createOffer({
-        companyBaseMax: baseMax,
-        companyEquityMax: equityEnabled ? equityMax : 0,
-        equityEnabled,
+        max: baseMax,
       });
       
       const link = generateOfferLink(response.offerId);
@@ -89,10 +85,16 @@ export function CompanyView() {
           </button>
           
           <button
+            onClick={() => window.open(offerLink, '_blank', 'noopener')}
+            className="w-full rounded-full bg-slate-100 text-slate-900 py-3 text-sm font-medium hover:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 transition-all active:scale-[0.98]"
+          >
+            Open candidate page ➡️
+          </button>
+
+          <button
             onClick={() => {
               setOfferLink(null);
               setBaseMax(120000);
-              setEquityMax(30000);
             }}
             className="w-full rounded-full border border-slate-200 py-3 text-sm text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 transition-all active:scale-[0.98]"
           >
@@ -148,47 +150,6 @@ export function CompanyView() {
             label="Company maximum base"
           />
         </div>
-
-        {/* Equity Toggle */}
-        <div className="flex items-center justify-between py-4 border-t border-slate-200">
-          <div>
-            <label className="font-medium text-slate-900">Include Equity?</label>
-            <p className="text-sm text-slate-500">Add equity component to the offer</p>
-          </div>
-          <button
-            onClick={() => setEquityEnabled(!equityEnabled)}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              equityEnabled ? 'bg-emerald-500' : 'bg-slate-300'
-            }`}
-          >
-            <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                equityEnabled ? 'translate-x-6' : 'translate-x-1'
-              }`}
-            />
-          </button>
-        </div>
-
-        {/* Equity */}
-        {equityEnabled && (
-          <div className="animate-slideDown">
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Maximum Equity (Annual Value)
-            </label>
-            <div className="text-3xl font-bold mb-4">
-              {formatCurrency(equityMax)}
-            </div>
-            <SignatureSlider
-              value={equityMax}
-              min={0}
-              max={200000}
-              step={5000}
-              onChange={(e) => setEquityMax(Number(e.target.value))}
-              variant="company"
-              label="Company maximum equity"
-            />
-          </div>
-        )}
 
         {/* Total */}
         <div className="pt-4 border-t border-slate-200">
