@@ -6,16 +6,14 @@
 import React, { useState, useEffect } from 'react';
 import { SignatureSlider } from '../components/SignatureSlider';
 import { AnimatedSubmitButton } from '../components/AnimatedSubmitButton';
-import { getOffer, generateResultLink } from '../lib/api';
-import { formatCurrency } from '../lib/deal-math';
+import { getOffer, submitResponse } from '../lib/api';
+import { formatCurrency, LIMITS } from '../lib/deal-math';
 import { ResultCard } from '../components/ResultCard';
 
 export function CandidateView({ offerId }) {
-  const [offer, setOffer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [baseMin, setBaseMin] = useState(100000);
-  const [equityMin, setEquityMin] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState(null);
 
@@ -39,8 +37,6 @@ export function CandidateView({ offerId }) {
           setError('Offer has expired');
           return;
         }
-        
-        setOffer(data);
       } catch (err) {
         setError(err.message || 'Failed to load offer');
       } finally {
@@ -55,20 +51,16 @@ export function CandidateView({ offerId }) {
     try {
       setSubmitting(true);
       
-      const response = await fetch(`http://localhost:3000/api/offers/${offerId}/submit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          candidateBaseMin: baseMin,
-          candidateEquityMin: offer.equityEnabled ? equityMin : 0,
-        }),
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to submit response');
+      // Client-side validation for sanity
+      if (baseMin < LIMITS.TOTAL_MIN || baseMin > LIMITS.TOTAL_MAX) {
+        throw new Error(
+          `Please keep your minimum between ${formatCurrency(LIMITS.TOTAL_MIN)} and ${formatCurrency(LIMITS.TOTAL_MAX)}.`
+        );
       }
+      
+      const data = await submitResponse(offerId, {
+        min: baseMin,
+      });
       
       // Calculate gap percentage for display
       let gapPercent = null;
@@ -131,7 +123,7 @@ export function CandidateView({ offerId }) {
             onClick={() => window.location.hash = ''}
             className="w-full rounded-full bg-slate-900 text-white py-3 text-sm font-medium hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 transition-all active:scale-[0.98]"
           >
-            Go to home
+            Start over
           </button>
         </div>
       </div>
@@ -150,15 +142,15 @@ export function CandidateView({ offerId }) {
     );
   }
 
-  const totalMin = baseMin + (offer.equityEnabled ? equityMin : 0);
+  const totalMin = baseMin;
 
   return (
     <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl animate-[cardIn_280ms_ease-out]">
       <div className="inline-flex items-center justify-center px-3 py-1 mb-3 rounded-full bg-[#E6F9FA] text-xs font-medium text-[#007C80]">
         Candidate view
       </div>
-      <h2 className="text-2xl font-semibold mb-2">Candidate View</h2>
-      <p className="text-slate-600 mb-2">
+      <h2 className="section-title mb-2">Candidate View</h2>
+      <p className="section-lead mb-2">
         Enter your minimum acceptable offer. The company will never see this number.
       </p>
 
@@ -214,27 +206,6 @@ export function CandidateView({ offerId }) {
             label="Candidate minimum base"
           />
         </div>
-
-        {/* Equity */}
-        {offer.equityEnabled && (
-          <div className="animate-slideDown">
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Minimum Equity (Annual Value)
-            </label>
-            <div className="text-3xl font-bold mb-4">
-              {formatCurrency(equityMin)}
-            </div>
-            <SignatureSlider
-              value={equityMin}
-              min={0}
-              max={200000}
-              step={5000}
-              onChange={(e) => setEquityMin(Number(e.target.value))}
-              variant="candidate"
-              label="Candidate minimum equity"
-            />
-          </div>
-        )}
 
         {/* Total */}
         <div className="pt-4 border-t border-slate-200">

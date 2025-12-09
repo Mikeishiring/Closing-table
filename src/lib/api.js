@@ -3,10 +3,18 @@
  * Centralized API calls with consistent error handling
  */
 
-const API_BASE = import.meta.env.VITE_API_BASE || 
-  (window.location.hostname === 'localhost' 
-    ? 'http://localhost:3000' 
+const API_BASE =
+  import.meta.env.VITE_API_BASE ||
+  (typeof window !== 'undefined' && window.location.hostname === 'localhost'
+    ? 'http://localhost:3000'
     : 'https://closing-table-backend.onrender.com');
+
+// Optional frontend base for shareable links
+const FRONTEND_BASE =
+  import.meta.env.VITE_APP_BASE_URL ||
+  (typeof window !== 'undefined'
+    ? `${window.location.origin}${window.location.pathname}`
+    : '');
 
 // Add timeout support
 const DEFAULT_TIMEOUT = 10000; // 10 seconds
@@ -107,14 +115,20 @@ export function isValidEmail(email) {
  * Generate shareable link for offer
  */
 export function generateOfferLink(offerId) {
-  return `${window.location.origin}${window.location.pathname}#offer=${offerId}`;
+  const base = FRONTEND_BASE || (typeof window !== 'undefined'
+    ? `${window.location.origin}${window.location.pathname}`
+    : '');
+  return `${base}#offer=${offerId}`;
 }
 
 /**
  * Generate shareable link for result
  */
 export function generateResultLink(resultId) {
-  return `${window.location.origin}${window.location.pathname}#result=${resultId}`;
+  const base = FRONTEND_BASE || (typeof window !== 'undefined'
+    ? `${window.location.origin}${window.location.pathname}`
+    : '');
+  return `${base}#result=${resultId}`;
 }
 
 /**
