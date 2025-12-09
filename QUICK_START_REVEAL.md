@@ -47,7 +47,7 @@ This runs the Express server on `http://localhost:3000`
 cd Closing-table
 npm run dev
 ```
-This runs Vite on `http://localhost:3002` (or next available port)
+This runs Vite on `http://localhost:3001` (or next available port)
 
 ### 3. Open in Browser
 Navigate to the Vite dev server URL (shown in terminal)
@@ -56,16 +56,12 @@ Navigate to the Vite dev server URL (shown in terminal)
 
 ### Test Scenario 1: FAIR_SPLIT (Success)
 1. On home page, set company offer:
-   - Base: $150,000
-   - Equity: $30,000 (optional)
-   - Total: $180,000
+   - Total compensation: $180,000
 2. Click "Lock it in & Get Link"
 3. Copy the link
 4. Open link in new tab/window
 5. Set candidate minimum:
-   - Base: $140,000
-   - Equity: $20,000 (if equity enabled)
-   - Total: $160,000
+   - Total compensation: $160,000
 6. Click "Lock it in & See Result"
 7. **Expected**: Green success reveal with final offer of $170,000
 
@@ -293,5 +289,6 @@ All components are heavily commented with:
 **Last Updated**: 2025-11-30
 
 The grand reveal UI is ready for testing and deployment! 🎉
+
 
 

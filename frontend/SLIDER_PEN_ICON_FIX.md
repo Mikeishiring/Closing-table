@@ -155,3 +155,4 @@ The icon uses `currentColor`, so set text color on parent:
 ✅ Clean separation of layers (background vs icon)
 
 
+

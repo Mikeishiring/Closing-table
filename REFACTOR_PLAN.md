@@ -461,9 +461,7 @@ CompanyView alone has **24 useState calls**:
 
 ```javascript
 const [baseMax, setBaseMax] = useState(100000);
-const [equityMax, setEquityMax] = useState(40000);
 const [totalBudget, setTotalBudget] = useState(130000);
-const [equityEnabled, setEquityEnabled] = useState(false);
 const [showCopyToast, setShowCopyToast] = useState(false);
 const [link, setLink] = useState(null);
 const [loading, setLoading] = useState(false);
@@ -476,36 +474,21 @@ const [error, setError] = useState(null);
 ```javascript
 // frontend/js/hooks/useCompanyForm.js
 const initialState = {
-  compensation: { base: 100000, equity: 40000, total: 140000 },
-  ui: { equityEnabled: false, loading: false, error: null },
-  animations: { baseAnimating: false, ledFlicker: false },
+  compensation: { total: 140000 },
+  ui: { loading: false, error: null },
+  animations: { totalAnimating: false, ledFlicker: false },
   result: { link: null, showCopyToast: false },
 };
 
 function companyReducer(state, action) {
   switch (action.type) {
-    case 'SET_BASE':
+    case 'SET_TOTAL':
       return {
         ...state,
         compensation: {
           ...state.compensation,
-          base: action.value,
-          total: action.value + (state.ui.equityEnabled ? state.compensation.equity : 0),
+          total: action.value,
         },
-      };
-    case 'SET_EQUITY':
-      return {
-        ...state,
-        compensation: {
-          ...state.compensation,
-          equity: action.value,
-          total: state.compensation.base + action.value,
-        },
-      };
-    case 'TOGGLE_EQUITY':
-      return {
-        ...state,
-        ui: { ...state.ui, equityEnabled: !state.ui.equityEnabled },
       };
     case 'START_SUBMIT':
       return { ...state, ui: { ...state.ui, loading: true, error: null } };
@@ -621,5 +604,6 @@ Consider adding Vite or similar for:
 4. **Consider tooling** (Vite, ESLint) for Phase 5+
 
 This refactoring maintains all functionality while making the codebase significantly more maintainable and performant.
+
 
 

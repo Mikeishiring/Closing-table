@@ -322,9 +322,9 @@ Copy this checklist and run through:
 ```
 Company Flow:
 □ Enter email
-□ Toggle equity on/off
-□ Adjust sliders (base & equity)
-□ See total update
+□ Set total compensation
+□ Adjust single slider
+□ Confirm total update
 □ Click "Lock it in & Get Link"
 □ See progress bar (step 1 done, step 2 active)
 □ See teal badge bounce in
@@ -410,5 +410,6 @@ If stuck after trying above:
 **Last Updated**: November 30, 2025  
 **Status**: Production Ready ✅  
 **Version**: 2.0 (with enhancements)
+
 
 

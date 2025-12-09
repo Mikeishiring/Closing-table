@@ -322,3 +322,4 @@ This guide showcases the three outcome states of the redesigned reveal page.
 All components have been implemented and tested. The reveal UI is ready for production use within the existing Closing Table app.
 
 
+

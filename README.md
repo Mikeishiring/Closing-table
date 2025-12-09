@@ -7,12 +7,12 @@ The Closing Table is a web application that implements a **single-shot compensat
 The Closing Table addresses a fundamental problem in compensation negotiations: **back-and-forth haggling and negotiation fatigue**. Traditional negotiations often involve multiple rounds where neither party reveals their true limits, leading to inefficient outcomes and potential deal failures.
 
 **The core idea:**
-> Company sets its maximum **total compensation** (base + optional equity, entered as a single yearly number).  
-> Candidate sets their minimum **total compensation** (base + optional equity, entered as a single yearly number).  
+> Company sets its maximum **total compensation** (one all-in yearly number).  
+> Candidate sets their minimum **total compensation** (one all-in yearly number).  
 > If the ranges overlap, the app instantly closes a fair deal by splitting the difference 50/50.  
 > If they don't overlap, the app clearly signals whether a human conversation could bridge the gap.
 
-**Note on total compensation:** Both parties enter base salary and equity (if applicable) separately, but the mechanism runs on the **combined total**. This ensures the deal is evaluated on the complete compensation package, not just base salary.
+**Note on total compensation:** Both parties enter a single, all-inclusive total compensation number. The mechanism runs on that one figure—no breakdowns or extra components.
 
 This is a **prototype** to explore fair, transparent negotiation mechanisms — not a production compensation tool.
 
@@ -25,12 +25,8 @@ The mechanism operates on a simple mathematical principle: when two parties' acc
 ### The Mechanism (Mathematical Definition)
 
 **Inputs:**
-- `CMax`: Company's true maximum **total compensation** (base + equity combined, private, submitted first)
-- `CMin`: Candidate's true minimum **total compensation** (base + equity combined, private, submitted second)
-
-**How total compensation is calculated:** Both base salary and equity are entered separately in the UI, but the mechanism adds them together and operates on the combined total. This means:
-- Company enters: Base Max ($X) + Equity Max ($Y) → Total CMax = X + Y
-- Candidate enters: Base Min ($A) + Equity Min ($B) → Total CMin = A + B
+- `CMax`: Company's true maximum **total compensation** (single, all-in number; private, submitted first)
+- `CMin`: Candidate's true minimum **total compensation** (single, all-in number; private, submitted second)
 
 **Calculation:**
 1. **FAIR_SPLIT (Overlap Case):** If `CMin ≤ CMax`
@@ -51,7 +47,7 @@ The mechanism operates on a simple mathematical principle: when two parties' acc
    - Status: `fail` (deal cannot be closed)
 
 **Key Properties:**
-- **Total compensation:** The mechanism evaluates the complete package (base + equity), not just base salary
+- **Total compensation:** The mechanism evaluates the complete package as one all-in number, not just base salary
 - **Single-shot submission:** Each party inputs their total compensation as a single combined number
 - **Single-use:** Each offer can only be submitted once, then immediately deleted from memory
 - **Fair split:** When overlap exists, surplus is divided exactly 50/50
@@ -64,7 +60,7 @@ The mechanism operates on a simple mathematical principle: when two parties' acc
 ## What It's Good For
 
 ✅ **Single-shot negotiations** — When both parties want to make one final offer and close the deal quickly  
-✅ **Total compensation clarity** — Evaluates the complete package (base + equity), not just base salary  
+✅ **Total compensation clarity** — Evaluates the complete package as one all-in number, not just base salary  
 ✅ **Transparency and fairness** — The mechanism is simple and predictable; both parties know how it works  
 ✅ **Time-sensitive situations** — Fast resolution when there's urgency to close  
 ✅ **Reducing negotiation fatigue** — No back-and-forth; submit numbers once and get an answer  
@@ -78,7 +74,7 @@ The mechanism operates on a simple mathematical principle: when two parties' acc
 ## What It's NOT Good For
 
 ❌ **Multi-round negotiations** — This is a **single-use mechanism**. Each offer can only be submitted once. Once used, the offer is immediately deleted from memory.  
-❌ **Non-monetizable benefits** — Only handles base salary and equity as dollar amounts. Does not account for signing bonuses, benefits, PTO, or other non-standard components  
+❌ **Non-monetizable benefits** — Only handles a single total compensation dollar amount. Does not account for signing bonuses, benefits, PTO, or other non-standard components  
 ❌ **Situations requiring human judgment** — The 10% "bridge zone" is flagged for human conversation, but the mechanism itself is purely algorithmic  
 ❌ **Long-term relationship building** — This is transactional, not relational. No negotiation history or relationship context  
 ❌ **Production use cases** — This is a prototype. No permanent data storage, no email integration, no audit trails  
@@ -99,42 +95,43 @@ This is by design — it prevents gaming the system and ensures both parties com
 
 ## Using the app
 
-The app consists of a single-page frontend (`index.html`) and a minimal Node.js backend (`server.js`). The mechanism runs on the server to ensure privacy and security.
+The app consists of a Vite-based React frontend (`src/` → `dist/`) and a minimal Node.js backend (`server.js`). The mechanism runs on the server to ensure privacy and security.
 
 ### Technical Details
 
 **Frontend:**
-- **React 18** (production builds via CDN)
-- **Babel Standalone** for JSX transformation in the browser
-- **Tailwind CSS** via CDN
-- All frontend code is in a single HTML file with inline JavaScript
+- **React 18** built with **Vite** (`src/` sources, compiled to `dist/`)
+- Tailwind and framer-motion for styling/animation
+- Dev server on **http://localhost:3001** (proxying `/api` to backend 3000)
+- Single “Total Compensation” input/slider (no base/equity breakdowns)
 
 **Backend:**
 - **Node.js** with Express
+- Serves the built frontend from `dist/`
 - In-memory offer storage (no database)
-- Offers expire after 24 hours
-- Automatic cleanup of expired offers
+- Offers expire after 24 hours; results expire after 7 days
 
 ### Running the app
 
 ```bash
 git clone https://github.com/Mikeishiring/Closing-table.git
 cd Closing-table
-```
-
-**Install dependencies:**
-```bash
 npm install
 ```
 
-**Start the server:**
+**Development (Vite + proxy to API):**
 ```bash
+npm run dev
+```
+- Frontend: http://localhost:3001
+- API proxy: http://localhost:3000/api
+
+**Production build + serve:**
+```bash
+npm run build
 npm start
 ```
-
-The server will run on `http://localhost:3000` (or the port specified by the `PORT` environment variable).
-
-Open `http://localhost:3000` in your browser.
+- Build outputs to `dist/`; Express (`server.js`) serves that bundle on `http://localhost:3000`.
 
 ### Running Tests
 
@@ -150,14 +147,14 @@ The test suite includes:
 
 **Phase 1: Commitment Panel (INPUT)**
 - **Company View:** 
-  - Company enters their maximum total compensation (base + optional equity)
+  - Company enters their maximum total compensation (single all-in number)
   - Clicks "Lock it in & Get Link"
   - Receives a shareable link (works once, expires in 24 hours)
   
 - **Candidate View:**
   - Candidate opens the company's link
   - Views landing page explaining the mechanism
-  - Enters their minimum total compensation (base + optional equity)
+  - Enters their minimum total compensation (single all-in number)
   - Clicks "Lock it in & Get Link"
 
 **Phase 2: Mechanism Processing (LOADING)**
@@ -171,7 +168,7 @@ The test suite includes:
   - **NO_DEAL (Red):** "No Deal" status explaining the ranges were too far apart
 
 **Key features:**
-- **Total compensation:** Base and equity are entered separately but mechanism runs on combined total
+- **Total compensation:** The mechanism runs on a single, all-inclusive total compensation number
 - **Single-flow UI:** Commitment Panel → Loading → Result Panel (no redundant graphics)
 - **Single-use, immediate deletion:** Each offer is deleted immediately after the mechanism runs
 - **Time-limited storage:** Offers expire after 24 hours if unused, results after 7 days
@@ -223,7 +220,7 @@ The application consists of:
 - **No email collection** — No email addresses are collected or stored at any point
 - **Immediate deletion** — Offers are deleted immediately after the mechanism runs (not just marked as used)
 - **Outcome-only storage** — Results store only: status (success/close/fail), final number, suggested (for close), and timestamp
-- **No input retention** — Company max, candidate min, base/equity breakdowns are never stored in results
+- **No input retention** — Company max, candidate min, and any breakdowns are never stored in results
 - **Time-limited** — Offers expire after 24 hours if unused, results after 7 days
 - **In-memory only** — All data is ephemeral (lost on server restart)
 - **No negotiation thread** — No history, no audit trail, no records

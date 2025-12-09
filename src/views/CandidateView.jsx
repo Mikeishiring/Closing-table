@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { SignatureSlider } from '../components/SignatureSlider';
-import { AnimatedSubmitButton } from '../components/AnimatedSubmitButton';
+import { SlideToConfirm } from '../components/SlideToConfirm';
 import { getOffer, submitResponse } from '../lib/api';
 import { formatCurrency, LIMITS } from '../lib/deal-math';
 import { ResultCard } from '../components/ResultCard';
@@ -13,9 +13,11 @@ import { ResultCard } from '../components/ResultCard';
 export function CandidateView({ offerId }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [baseMin, setBaseMin] = useState(100000);
+  const [totalComp, setTotalComp] = useState(100000);
+  const [totalInput, setTotalInput] = useState('100,000');
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState(null);
+  const [isFocusing, setIsFocusing] = useState(false);
 
   useEffect(() => {
     async function fetchOffer() {
@@ -47,19 +49,51 @@ export function CandidateView({ offerId }) {
     fetchOffer();
   }, [offerId]);
 
+  useEffect(() => {
+    if (isFocusing) {
+      document.body.classList.add('focus-mode');
+    } else {
+      document.body.classList.remove('focus-mode');
+    }
+    return () => document.body.classList.remove('focus-mode');
+  }, [isFocusing]);
+
+  const formatNumber = (value) => {
+    if (!Number.isFinite(value)) return '';
+    return value.toLocaleString('en-US');
+  };
+
+  const parseCurrencyInput = (raw) => {
+    if (!raw) return 0;
+    const str = raw.toString().trim().toLowerCase().replace(/[$,\s]/g, '');
+    const multiplier = str.includes('m') ? 1_000_000 : str.includes('k') ? 1_000 : 1;
+    const numeric = parseFloat(str.replace(/[km]/g, ''));
+    if (Number.isNaN(numeric)) return 0;
+    return Math.round(numeric * multiplier);
+  };
+
+  const handleTotalInputChange = (val) => {
+    setTotalInput(val);
+    const parsed = parseCurrencyInput(val);
+    const clamped = Math.min(Math.max(parsed, LIMITS.TOTAL_MIN), LIMITS.TOTAL_MAX);
+    setTotalComp(clamped);
+  };
+
   const handleSubmit = async () => {
     try {
       setSubmitting(true);
       
+      const clampedTotal = Math.min(Math.max(totalComp, LIMITS.TOTAL_MIN), LIMITS.TOTAL_MAX);
+
       // Client-side validation for sanity
-      if (baseMin < LIMITS.TOTAL_MIN || baseMin > LIMITS.TOTAL_MAX) {
+      if (clampedTotal < LIMITS.TOTAL_MIN || clampedTotal > LIMITS.TOTAL_MAX) {
         throw new Error(
           `Please keep your minimum between ${formatCurrency(LIMITS.TOTAL_MIN)} and ${formatCurrency(LIMITS.TOTAL_MAX)}.`
         );
       }
       
       const data = await submitResponse(offerId, {
-        min: baseMin,
+        min: clampedTotal,
       });
       
       setResult({
@@ -76,7 +110,7 @@ export function CandidateView({ offerId }) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl space-y-6 animate-[cardIn_280ms_ease-out]">
+      <div className="glass-panel space-y-6 animate-[cardIn_280ms_ease-out]">
         <div className="animate-pulse space-y-6">
           <div className="space-y-2 text-center">
             <div className="h-8 bg-slate-200 rounded w-1/3 mx-auto" />
@@ -95,7 +129,7 @@ export function CandidateView({ offerId }) {
 
   if (error) {
     return (
-      <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl space-y-6 animate-[cardIn_280ms_ease-out]">
+      <div className="glass-panel space-y-6 animate-[cardIn_280ms_ease-out]">
         <header className="flex flex-col items-center text-center space-y-3">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 ring-4 ring-rose-100 text-4xl text-rose-600 animate-[emojiPop_260ms_ease-out]">
             <span>⚠️</span>
@@ -130,86 +164,100 @@ export function CandidateView({ offerId }) {
     );
   }
 
-  const totalMin = baseMin;
+  const currentStep = 1;
+  const steps = ['Set Number', 'See Result'];
 
   return (
-    <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl space-y-6 animate-[cardIn_280ms_ease-out]">
+    <div className="glass-panel space-y-8 animate-[cardIn_280ms_ease-out]" data-focus-mode={isFocusing}>
+      {/* Stepper */}
       <div className="space-y-2">
-        <h2 className="section-title">Set your floor. See the outcome.</h2>
-        <p className="section-lead">
-          Your input stays private; only the final number is shown.
+        <div className="flex items-center gap-2">
+          {steps.map((label, idx) => {
+            const stepIndex = idx + 1;
+            const active = stepIndex <= currentStep;
+            const isCurrent = stepIndex === currentStep;
+
+            return (
+              <div key={label} className="flex-1">
+                <div
+                  className={`h-2 rounded-full transition-all ${
+                    active
+                      ? 'bg-gradient-to-r from-emerald-400 via-cyan-400 to-sky-500 shadow-[0_6px_16px_-6px_rgba(14,165,233,0.6)]'
+                      : 'bg-slate-200'
+                  }`}
+                />
+                {isCurrent && (
+                  <p className="mt-1 text-[11px] font-semibold text-slate-900 tracking-tight">
+                    {label}
+                  </p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Hero number */}
+      <div className="space-y-3 text-center focus-priority">
+        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
+          Total Compensation
+        </p>
+        <p className="text-5xl md:text-6xl font-extrabold text-slate-900 tracking-tight">
+          {formatCurrency(totalComp)}
+        </p>
+        <p className="text-sm text-slate-500">
+          One all-in number. Adjust and lock it in.
         </p>
       </div>
 
-      {/* Privacy note */}
-      <div className="inline-flex items-center gap-2 text-sm text-[#555]">
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M7 11V7a5 5 0 0 1 10 0v4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-        <span>We delete your input after the run; only the result is stored.</span>
-      </div>
-
-      {/* Progress header */}
-      <div className="flex items-center justify-center gap-2 text-xs">
-        <div className="flex items-center gap-1">
-          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-white font-semibold">
-            ✓
+      {/* Inputs */}
+      <div className="space-y-7 focus-priority">
+        {/* Total Compensation */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between text-sm">
+            <span className="font-semibold text-slate-900">Minimum Total Compensation</span>
+            <span className="text-sm font-semibold text-slate-700">{formatCurrency(totalComp)}</span>
           </div>
-          <span className="font-medium text-emerald-600">Set Minimum</span>
-        </div>
-        <div className="h-px w-8 bg-emerald-500" />
-        <div className="flex items-center gap-1">
-          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-white font-semibold">
-            2
-          </div>
-          <span className="font-semibold text-slate-900">Submit</span>
-        </div>
-        <div className="h-px w-8 bg-slate-300" />
-        <div className="flex items-center gap-1">
-          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-200 text-slate-500 font-semibold">
-            3
-          </div>
-          <span className="text-slate-500">See Result</span>
-        </div>
-      </div>
-
-      <div className="space-y-6">
-        {/* Base Salary */}
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
-            Minimum Base Salary
-          </label>
-          <div className="text-3xl font-bold mb-4">
-            {formatCurrency(baseMin)}
+          <div className="relative">
+            <div className="currency-prefix">$</div>
+            <input
+              className="currency-input"
+              value={totalInput}
+              onFocus={() => setIsFocusing(true)}
+              onBlur={() => setIsFocusing(false)}
+              onChange={(e) => handleTotalInputChange(e.target.value)}
+              inputMode="numeric"
+              aria-label="Total compensation"
+            />
           </div>
           <SignatureSlider
-            value={baseMin}
-            min={50000}
-            max={300000}
+            value={totalComp}
+            min={LIMITS.TOTAL_MIN}
+            max={LIMITS.TOTAL_MAX}
             step={5000}
-            onChange={(e) => setBaseMin(Number(e.target.value))}
+            onChange={(e) => {
+              const next = Number(e.target.value);
+              setTotalComp(next);
+              setTotalInput(formatNumber(next));
+            }}
             variant="candidate"
-            label="Candidate minimum base"
+            label="Candidate minimum total compensation"
+            thumbEmoji="🪙"
+            onDragStart={() => setIsFocusing(true)}
+            onDragEnd={() => setIsFocusing(false)}
           />
         </div>
-
-        {/* Total */}
-        <div className="pt-4 border-t border-slate-200">
-          <div className="flex justify-between items-center">
-            <span className="text-sm font-medium text-slate-700">Total Minimum</span>
-            <span className="text-2xl font-bold text-slate-900">{formatCurrency(totalMin)}</span>
-          </div>
-        </div>
       </div>
 
-      <div className="rounded-2xl bg-slate-50 px-4 py-3 text-xs text-slate-600 border border-slate-200">
-        Single use; expires in 24 hours. Result only: status, number, timestamp.
+      {/* Privacy note */}
+      <div className="rounded-2xl bg-slate-50 px-4 py-3 text-xs text-slate-600 border border-slate-200 dim-when-unfocused">
+        Single-use link; expires in 24 hours. We delete your inputs after the run.
       </div>
 
-      <AnimatedSubmitButton
-        onClick={handleSubmit}
-        buttonText="Lock & see"
+      <SlideToConfirm
+        text="Slide to Lock Offer"
+        onConfirm={handleSubmit}
+        loading={submitting}
         disabled={submitting}
       />
     </div>

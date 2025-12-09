@@ -3,25 +3,48 @@
  * Where companies set their maximum offer
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SignatureSlider } from '../components/SignatureSlider';
-import { AnimatedSubmitButton } from '../components/AnimatedSubmitButton';
+import { SlideToConfirm } from '../components/SlideToConfirm';
 import { createOffer, generateOfferLink, copyToClipboard } from '../lib/api';
-import { formatCurrency } from '../lib/deal-math';
+import { formatCurrency, LIMITS } from '../lib/deal-math';
 
 export function CompanyView() {
-  const [baseMax, setBaseMax] = useState(120000);
+  const [totalMax, setTotalMax] = useState(120000);
+  const [totalInput, setTotalInput] = useState('120,000');
   const [offerLink, setOfferLink] = useState(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isFocusing, setIsFocusing] = useState(false);
 
-  const totalMax = baseMax;
+  useEffect(() => {
+    if (isFocusing) {
+      document.body.classList.add('focus-mode');
+    } else {
+      document.body.classList.remove('focus-mode');
+    }
+    return () => document.body.classList.remove('focus-mode');
+  }, [isFocusing]);
+
+  const parseCurrencyInput = (raw) => {
+    if (!raw) return 0;
+    const str = raw.toString().trim().toLowerCase().replace(/[$,\s]/g, '');
+    const multiplier = str.includes('m') ? 1_000_000 : str.includes('k') ? 1_000 : 1;
+    const numeric = parseFloat(str.replace(/[km]/g, ''));
+    if (Number.isNaN(numeric)) return 0;
+    return Math.round(numeric * multiplier);
+  };
+
+  const formatNumber = (value) => {
+    if (!Number.isFinite(value)) return '';
+    return value.toLocaleString('en-US');
+  };
 
   const handleSubmit = async () => {
     try {
       setLoading(true);
       const response = await createOffer({
-        max: baseMax,
+        max: totalMax,
       });
       
       const link = generateOfferLink(response.offerId);
@@ -41,52 +64,63 @@ export function CompanyView() {
     }
   };
 
+  const handleTotalInputChange = (val) => {
+    setTotalInput(val);
+    const parsed = parseCurrencyInput(val);
+    const clamped = Math.min(Math.max(parsed, LIMITS.TOTAL_MIN), LIMITS.TOTAL_MAX);
+    setTotalMax(clamped);
+  };
+
   if (offerLink) {
     return (
-      <div className="bg-white rounded-3xl shadow-xl p-6 md:p-8 space-y-6 animate-[cardIn_280ms_ease-out]">
-        
-        {/* Hero: Big emoji + headline */}
-        <header className="flex flex-col items-center text-center space-y-3">
-          <div className="flex h-16 w-16 md:h-18 md:w-18 items-center justify-center rounded-full bg-slate-50 ring-4 ring-emerald-100 text-4xl md:text-5xl text-emerald-600 animate-[emojiPop_260ms_ease-out]">
-            <span>🔗</span>
+      <div className="glass-panel space-y-8 animate-[cardIn_280ms_ease-out]" data-focus-mode={isFocusing}>
+        {/* Hero: Big icon + headline */}
+        <header className="flex flex-col items-center text-center space-y-3 dim-when-unfocused">
+          <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-emerald-400 via-cyan-400 to-sky-500 text-white shadow-[0_20px_40px_-12px_rgba(14,165,233,0.55)] animate-[emojiPop_260ms_ease-out]">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M5 13l4 4L19 7" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </div>
           
-          <h1 className="text-2xl md:text-3xl font-semibold text-slate-900">
+          <h1 className="text-3xl font-extrabold text-slate-900">
             Link ready
           </h1>
           
-          <p className="text-sm md:text-base text-slate-600 max-w-sm">
-            Works once, expires in 24 hours. Only the final outcome is shown.
+          <p className="text-base text-slate-600 max-w-sm">
+            Works once and expires in 24 hours. This is the handshake—keep it handy.
           </p>
         </header>
-
+        
         {/* Details: The link */}
         <main className="space-y-4">
-          <section className="text-center">
-            <p className="text-xs uppercase tracking-[0.18em] text-slate-500 mb-3">
-              Shareable Link
+          <section className="space-y-3">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
+              Shareable link
             </p>
-            <div className="rounded-2xl bg-slate-50 px-4 py-3 text-xs md:text-sm text-slate-700 break-all font-mono border border-slate-200">
-              {offerLink}
+            <div className="relative flex items-center rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3 text-xs md:text-sm text-slate-800 font-mono">
+              <span className="break-all pr-12">{offerLink}</span>
+              <button
+                onClick={handleCopyLink}
+                className="absolute right-2 inline-flex items-center gap-1 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 shadow-sm hover:bg-slate-100 transition"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" strokeWidth="2" />
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" strokeWidth="2" />
+                </svg>
+                {copied ? 'Copied' : 'Copy'}
+              </button>
             </div>
-            <p className="mt-2 text-xs text-slate-500">
-              Copy it, or open the candidate page to preview.
+            <p className="text-sm text-slate-500">
+              Preview or paste it in a note. The candidate sees only the final outcome.
             </p>
           </section>
         </main>
-
-        {/* Actions: Buttons */}
-        <div className="flex flex-col gap-3">
-          <button
-            onClick={handleCopyLink}
-            className="w-full rounded-full bg-slate-900 text-white py-3 text-sm font-medium hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 transition-all active:scale-[0.98]"
-          >
-            {copied ? 'Copied ✓' : 'Copy Link'}
-          </button>
-          
+        
+        {/* Actions */}
+        <div className="flex flex-col gap-3 focus-priority">
           <button
             onClick={() => window.open(offerLink, '_blank', 'noopener')}
-            className="w-full rounded-full bg-slate-100 text-slate-900 py-3 text-sm font-medium hover:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 transition-all active:scale-[0.98]"
+            className="w-full rounded-full bg-slate-900 text-white py-3 text-sm font-semibold hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 transition-all active:scale-[0.98]"
           >
             Open link
           </button>
@@ -94,18 +128,19 @@ export function CompanyView() {
           <button
             onClick={() => {
               setOfferLink(null);
-              setBaseMax(120000);
+              setTotalMax(120000);
+              setTotalInput('120,000');
             }}
-            className="w-full rounded-full border border-slate-200 py-3 text-sm text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 transition-all active:scale-[0.98]"
+            className="w-full text-sm font-semibold text-slate-700 hover:underline py-2"
           >
-            New offer 🔁
+            New offer
           </button>
         </div>
         
         {/* Privacy hint */}
-        <div className="flex items-center justify-center gap-2 text-[11px] text-slate-500">
+        <div className="flex items-center justify-center gap-2 text-[12px] text-slate-500">
           <span>🔐</span>
-          <span>Your max is deleted after the run; only status/number stay.</span>
+          <span>Your max is deleted after the run; only the outcome stays.</span>
         </div>
         
       </div>
@@ -113,10 +148,10 @@ export function CompanyView() {
   }
 
   return (
-    <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl space-y-6 animate-[cardIn_280ms_ease-out]">
+    <div className="glass-panel space-y-8 animate-[cardIn_280ms_ease-out]" data-focus-mode={isFocusing}>
       <div className="space-y-2">
-        <h2 className="section-title">Set your ceiling. Send one link.</h2>
-        <p className="section-lead">
+        <h2 className="section-title dim-when-unfocused">Set your ceiling. Send one link.</h2>
+        <p className="section-lead dim-when-unfocused">
           One-time, 24h link. Only the final outcome is shown.
         </p>
       </div>
@@ -131,37 +166,46 @@ export function CompanyView() {
       </div>
 
       <div className="space-y-6">
-        {/* Base Salary */}
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
-            Maximum Base Salary
+        {/* Total Compensation */}
+        <div className="focus-priority space-y-4">
+          <label className="block text-sm font-medium text-slate-700">
+            Maximum Total Compensation
           </label>
-          <div className="text-3xl font-bold mb-4">
-            {formatCurrency(baseMax)}
+          <div className="relative">
+            <div className="currency-prefix">$</div>
+            <input
+              className="hero-currency-input"
+              value={totalInput}
+              onFocus={() => setIsFocusing(true)}
+              onBlur={() => setIsFocusing(false)}
+              onChange={(e) => handleTotalInputChange(e.target.value)}
+              inputMode="numeric"
+              aria-label="Maximum total compensation"
+            />
           </div>
           <SignatureSlider
-            value={baseMax}
-            min={50000}
-            max={300000}
+            value={totalMax}
+            min={LIMITS.TOTAL_MIN}
+            max={LIMITS.TOTAL_MAX}
             step={5000}
-            onChange={(e) => setBaseMax(Number(e.target.value))}
+            onChange={(e) => {
+              const next = Number(e.target.value);
+              setTotalMax(next);
+              setTotalInput(formatNumber(next));
+            }}
             variant="company"
-            label="Company maximum base"
+            label="Company maximum total compensation"
+            thumbEmoji="🪙"
+            onDragStart={() => setIsFocusing(true)}
+            onDragEnd={() => setIsFocusing(false)}
           />
-        </div>
-
-        {/* Total */}
-        <div className="pt-4 border-t border-slate-200">
-          <div className="flex justify-between items-center">
-            <span className="text-sm font-medium text-slate-700">Total Maximum</span>
-            <span className="text-2xl font-bold text-slate-900">{formatCurrency(totalMax)}</span>
-          </div>
         </div>
       </div>
 
-      <AnimatedSubmitButton
-        onClick={handleSubmit}
-        buttonText="Lock offer"
+      <SlideToConfirm
+        text="Slide to Lock Offer"
+        onConfirm={handleSubmit}
+        loading={loading}
         disabled={loading}
       />
     </div>

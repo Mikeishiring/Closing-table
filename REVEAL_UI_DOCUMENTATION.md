@@ -34,13 +34,13 @@ Wrapper component that:
 ### Views
 
 #### CompanyView (`src/views/CompanyView.jsx`)
-- Sets maximum base salary and optional equity
+- Sets maximum total compensation (single number)
 - Generates shareable offer link
 - Displays success state after link creation
 
 #### CandidateView (`src/views/CandidateView.jsx`)
 - Responds to company offer
-- Sets minimum base salary and optional equity
+- Sets minimum total compensation (single number)
 - Triggers mechanism and shows ResultCard inline
 
 ## Outcome Treatments
@@ -160,9 +160,9 @@ Replaces the large "OUTCOME-ONLY DISPLAY" block with:
 - Non-intrusive, doesn't compete with hero content
 
 ### What's Hidden
-- Company's original maximum (base + equity)
-- Candidate's original minimum (base + equity)
-- Individual base/equity breakdown
+- Company's original maximum total compensation
+- Candidate's original minimum total compensation
+- Any granular breakdowns of the number
 
 ### What's Shown
 - Status (success/close/fail)
@@ -333,5 +333,6 @@ The new reveal UI transforms the negotiation outcome from a bland system notice 
 - ✅ Works seamlessly in the existing app
 
 All while maintaining the core principle: **single-shot, outcome-only, privacy-first negotiation**.
+
 
 

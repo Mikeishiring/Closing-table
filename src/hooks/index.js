@@ -3,16 +3,10 @@
  * Reusable React hooks for common patterns
  */
 
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { parseHash } from '../lib/routing';
 import { 
-  clampBase, 
-  clampEquity, 
-  clampBudget, 
-  calculateTotal,
-  splitBudget,
-  validateBase,
-  validateEquity,
+  clampTotal,
   validateTotal,
 } from '../lib/deal-math';
 import { 
@@ -46,25 +40,13 @@ export function useHashRoute() {
 }
 
 /**
- * Hook for managing budget controls (base, equity, total)
+ * Hook for managing a single total compensation control
  */
-export function useBudgetControls(initialTotal, equityDefault = false) {
-  const [equityEnabled, setEquityEnabled] = useState(equityDefault);
-  const [total, setTotal] = useState(initialTotal);
-  
-  // Calculate base and equity from total
-  const { base: initialBase, equity: initialEquity } = useMemo(
-    () => splitBudget(total, equityEnabled),
-    [total, equityEnabled]
-  );
-  
-  const [base, setBase] = useState(initialBase);
-  const [equity, setEquity] = useState(initialEquity);
-  const [baseError, setBaseError] = useState('');
-  const [equityError, setEquityError] = useState('');
+export function useBudgetControls(initialTotal) {
+  const [total, setTotal] = useState(() => clampTotal(initialTotal));
   const [totalError, setTotalError] = useState('');
 
-  // Update total when base or equity changes
+  // Update total when the single control changes
   const updateTotal = useCallback((newTotal) => {
     const validation = validateTotal(newTotal);
     
@@ -74,77 +56,14 @@ export function useBudgetControls(initialTotal, equityDefault = false) {
     }
     
     setTotalError('');
-    const clamped = clampBudget(validation.value);
+    const clamped = clampTotal(validation.value);
     setTotal(clamped);
-    
-    // Recalculate base/equity split
-    const split = splitBudget(clamped, equityEnabled);
-    setBase(split.base);
-    setEquity(split.equity);
-  }, [equityEnabled]);
-
-  // Update base salary
-  const updateBase = useCallback((newBase) => {
-    const validation = validateBase(newBase);
-    
-    if (!validation.valid) {
-      setBaseError(validation.error);
-      return;
-    }
-    
-    setBaseError('');
-    const clamped = clampBase(validation.value);
-    setBase(clamped);
-    setTotal(calculateTotal(clamped, equity));
-  }, [equity]);
-
-  // Update equity
-  const updateEquity = useCallback((newEquity) => {
-    const validation = validateEquity(newEquity);
-    
-    if (!validation.valid) {
-      setEquityError(validation.error);
-      return;
-    }
-    
-    setEquityError('');
-    const clamped = clampEquity(validation.value);
-    setEquity(clamped);
-    setTotal(calculateTotal(base, clamped));
-  }, [base]);
-
-  // Toggle equity
-  const toggleEquity = useCallback(() => {
-    setEquityEnabled(prev => {
-      const next = !prev;
-      if (!next) {
-        // When disabling equity, move it all to base
-        setEquity(0);
-        setTotal(base);
-      } else {
-        // When enabling, split current total
-        const split = splitBudget(total, true);
-        setBase(split.base);
-        setEquity(split.equity);
-      }
-      return next;
-    });
-  }, [base, total]);
+  }, []);
 
   return {
-    base,
-    equity,
     total,
-    equityEnabled,
-    baseError,
-    equityError,
     totalError,
-    setEquityEnabled: toggleEquity,
     updateTotal,
-    updateBase,
-    updateEquity,
-    setBaseError,
-    setEquityError,
     setTotalError,
   };
 }

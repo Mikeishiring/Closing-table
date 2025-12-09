@@ -82,16 +82,54 @@ function useCountUp(target, duration = 350) {
  * Main ResultReveal Component
  */
 export function ResultCard({ status, finalOffer, suggested }) {
-  const [stage, setStage] = useState('emoji'); // 'emoji' | 'details'
-  
+  const [stage, setStage] = useState('computing'); // 'computing' | 'emoji' | 'details'
+  const [slotValue, setSlotValue] = useState(null);
   const cfg = RESULT_CONFIG[status];
-  const { count: displayFinal, breathe } = useCountUp(status === 'success' ? finalOffer : null, 350);
-  
-  // Stage timing: emoji first, then details
+  const revealTarget =
+    status === 'success' ? finalOffer : status === 'close' ? suggested : null;
+  const { count: displayFinal, breathe } = useCountUp(
+    stage === 'details' ? revealTarget : null,
+    420
+  );
+
   useEffect(() => {
-    const timer = setTimeout(() => setStage('details'), 120);
-    return () => clearTimeout(timer);
-  }, []);
+    if (status === 'fail') {
+      const t = setTimeout(() => setStage('details'), 1200);
+      return () => clearTimeout(t);
+    }
+
+    // Slot-machine pre-reveal
+    const runInterval = setInterval(() => {
+      const random = Math.floor(80_000 + Math.random() * 280_000);
+      setSlotValue(random);
+    }, 80);
+
+    const timer = setTimeout(() => {
+      clearInterval(runInterval);
+      setStage('emoji');
+      setTimeout(() => setStage('details'), 200);
+    }, 1500);
+
+    return () => {
+      clearInterval(runInterval);
+      clearTimeout(timer);
+    };
+  }, [status]);
+
+  useEffect(() => {
+    if (stage === 'details' && status === 'success') {
+      import('canvas-confetti')
+        .then((m) =>
+          m.default({
+            particleCount: 90,
+            spread: 70,
+            origin: { y: 0.6 },
+            ticks: 180,
+          })
+        )
+        .catch(() => {});
+    }
+  }, [stage, status]);
   
   const handleNewOffer = () => {
     window.location.hash = '';
@@ -122,74 +160,80 @@ export function ResultCard({ status, finalOffer, suggested }) {
             </div>
             
             <h1 className={`text-2xl md:text-3xl font-semibold text-slate-900 transition-all duration-300 ${
-              stage === 'details' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+              stage !== 'computing' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
             }`}>
-              {cfg.title}
+              {stage === 'computing' ? 'Computing…' : cfg.title}
             </h1>
             
             <p className={`mt-2 text-sm md:text-base text-slate-600 max-w-sm transition-all duration-300 delay-75 ${
-              stage === 'details' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+              stage !== 'computing' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
             }`}>
               {cfg.line}
             </p>
           </header>
 
           {/* Details band: Content changes by status */}
-          <main className={`mt-6 space-y-4 transition-all duration-300 delay-150 ${
-            stage === 'details' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
-          }`}>
-            
-            {/* Success: Big number */}
-            {status === 'success' && (
-              <section className="text-center">
-                <p className="text-xs uppercase tracking-[0.18em] text-slate-500">
-                  Final Offer
-                </p>
-                <p className={`mt-1 text-4xl md:text-5xl font-semibold text-slate-900 ${
-                  breathe ? 'animate-[numberBreathe_400ms_ease-in-out]' : ''
-                }`}>
-                  {formatCurrency(displayFinal)}
-                </p>
-                <p className="mt-2 text-xs text-slate-500">
-                  Exactly between your ranges; inputs were deleted after the run.
+          <main className="mt-6 space-y-4 transition-all duration-300 delay-150">
+            {stage === 'computing' && (
+              <section className="text-center space-y-3">
+                <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Computing…</p>
+                <p className="text-4xl md:text-5xl font-semibold text-slate-900">
+                  {slotValue ? formatCurrency(slotValue) : '—'}
                 </p>
               </section>
             )}
-            
-            {/* Close: Gap percentage */}
-            {status === 'close' && (
-              <section className="text-center space-y-3">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.18em] text-slate-500">
-                    Bridge Window
-                  </p>
-                  <p className="mt-1 text-base md:text-lg font-semibold text-slate-900">
-                    Within 10% of the company maximum
-                  </p>
-                </div>
-                <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                  The mechanism pauses here so you can decide together whether to stretch.
-                </p>
-                {suggested && (
-                  <div className="rounded-2xl bg-slate-50 px-4 py-3 text-xs text-slate-600">
-                    Start at the midpoint: <span className="font-semibold">{formatCurrency(suggested)}</span>
-                  </div>
+
+            {stage === 'details' && (
+              <>
+                {status === 'success' && (
+                  <section className="text-center">
+                    <p className="text-xs uppercase tracking-[0.18em] text-emerald-500">
+                      Final Offer
+                    </p>
+                    <p className={`mt-1 text-4xl md:text-5xl font-semibold text-emerald-600 ${
+                      breathe ? 'animate-[numberBreathe_400ms_ease-in-out]' : ''
+                    }`}>
+                      {formatCurrency(displayFinal)}
+                    </p>
+                    <p className="mt-2 text-xs text-slate-500">
+                      Exactly between your ranges; inputs were deleted after the run.
+                    </p>
+                  </section>
                 )}
-              </section>
+
+                {status === 'close' && (
+                  <section className="text-center space-y-3">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.18em] text-amber-500">
+                        Bridge Window
+                      </p>
+                      <p className="mt-1 text-base md:text-lg font-semibold text-amber-600">
+                        {suggested ? formatCurrency(displayFinal || suggested) : 'Within 10% of max'}
+                      </p>
+                    </div>
+                    <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                      The mechanism pauses here so you can decide together whether to stretch.
+                    </p>
+                    {suggested && (
+                      <div className="rounded-2xl bg-amber-50 px-4 py-3 text-xs text-amber-700">
+                        Start at the midpoint: <span className="font-semibold">{formatCurrency(suggested)}</span>
+                      </div>
+                    )}
+                  </section>
+                )}
+
+                {status === 'fail' && (
+                  <section className="text-center space-y-3">
+                    <p className="text-sm md:text-base text-slate-700 font-medium">
+                      The gap is larger than <span className="text-slate-500">10%</span> of the company's maximum.
+                    </p>
+                    <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                      The mechanism won't suggest a middle that crosses either side's stated limit.
+                    </p>
+                  </section>
+                )}
+              </>
             )}
-            
-            {/* Fail: Clear message */}
-            {status === 'fail' && (
-              <section className="text-center space-y-3">
-                <p className="text-sm md:text-base text-slate-700 font-medium">
-                  The gap is larger than <span className="text-rose-600">10%</span> of the company's maximum.
-                </p>
-                <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                  The mechanism won't suggest a middle that crosses either side's stated limit.
-                </p>
-              </section>
-            )}
-            
           </main>
 
           {/* Actions band: Buttons */}

@@ -184,3 +184,4 @@ const res = await Promise.race([fetchPromise, timeoutPromise]);
 The app now feels significantly faster and more responsive!
 
 
+

@@ -48,7 +48,7 @@ A sophisticated React component featuring:
 ### Views
 - ✅ **src/views/CompanyView.jsx** (130 lines)
   - Complete company input flow
-  - Base + optional equity sliders
+  - Single total compensation slider
   - Link generation and copy functionality
 
 - ✅ **src/views/CandidateView.jsx** (140 lines)
@@ -394,5 +394,6 @@ The grand reveal UI transforms the final page from a system notice into an **emo
 **Deployment**: Ready for staging  
 
 🎉 **Ready to ship!**
+
 
 

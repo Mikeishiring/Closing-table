@@ -86,11 +86,11 @@ npm install
 npm start          # → http://localhost:3000
 
 # Terminal 2: Frontend
-npm run dev        # → http://localhost:3002
+ npm run dev        # → http://localhost:3001
 ```
 
 ### Quick Test
-1. Open `http://localhost:3002`
+1. Open `http://localhost:3001`
 2. Set company offer: $180k total
 3. Copy link, open in new tab
 4. Set candidate minimum: $160k total
@@ -151,8 +151,7 @@ interface ResultCardProps {
 Company-side input flow.
 
 **Features**:
-- Base salary slider
-- Optional equity toggle + slider
+- Total compensation slider
 - Total calculation
 - Link generation
 - Copy to clipboard
@@ -168,7 +167,7 @@ Candidate-side input flow.
 
 **Features**:
 - Responds to company offer
-- Base + equity sliders (if applicable)
+- Single total compensation slider
 - Inline ResultCard after submit
 - Error handling
 
@@ -197,8 +196,8 @@ Wrapper for shareable result links.
 
 #### 1. Success (FAIR_SPLIT)
 ```
-Company:    Base $150k + Equity $30k = $180k
-Candidate:  Base $140k + Equity $20k = $160k
+Company:    $180k total
+Candidate:  $160k total
 Expected:   Final offer $170k
 Theme:      Emerald green
 ```
@@ -215,8 +214,8 @@ Theme:      Emerald green
 
 #### 2. Close (BRIDGE_ZONE)
 ```
-Company:    Base $140k = $140k
-Candidate:  Base $150k = $150k
+Company:    $140k total
+Candidate:  $150k total
 Expected:   7.1% gap, $145k suggested
 Theme:      Amber yellow
 ```
@@ -232,8 +231,8 @@ Theme:      Amber yellow
 
 #### 3. Fail (NO_DEAL)
 ```
-Company:    Base $100k = $100k
-Candidate:  Base $150k = $150k
+Company:    $100k total
+Candidate:  $150k total
 Expected:   50% gap, no number
 Theme:      Rose red
 ```
@@ -527,7 +526,7 @@ This project is part of The Closing Table prototype. See main README.md for deta
 
 ### Issues?
 - Check PostCSS config (use `tailwindcss` not `@tailwindcss/postcss`)
-- Check port conflicts (3000, 3002)
+- Check port conflicts (3000, 3001)
 - Check import paths (`../components/`, `../views/`)
 
 ---
@@ -548,5 +547,6 @@ It stays true to the core principles:
 **Documentation**: Comprehensive  
 
 🎉 **Ready to reveal!**
+
 
 

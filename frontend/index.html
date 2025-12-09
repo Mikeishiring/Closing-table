@@ -2213,20 +2213,6 @@
             );
         };
 
-        // --- EQUITY ICON SVG COMPONENT ---
-        const EquityIcon = () => (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" 
-                    fill="url(#equityGradient)" stroke="#00C4CC" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <defs>
-                    <linearGradient id="equityGradient" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
-                        <stop stopColor="#0D9488"/>
-                        <stop offset="1" stopColor="#14B8A6"/>
-                    </linearGradient>
-                </defs>
-            </svg>
-        );
-
         // --- ANIMATED SUBMIT BUTTON COMPONENT ---
         const LockIcon = ({ isLocked, className = "" }) => {
             return isLocked ? (
@@ -2437,7 +2423,7 @@
                             </motion.h3>
                         </div>
 
-                        {/* Children (equity toggle, input, slider) */}
+                        {/* Children (total compensation input/slider) */}
                         {children}
                     </div>
                 </motion.div>
@@ -2699,25 +2685,19 @@
         const CompanyView = () => {
             const [baseMax, setBaseMax] = useState(100000);
             const [totalBudget, setTotalBudget] = useState(100000);
-            const equityMax = 0;
-            const equityEnabled = false;
-            const setEquityEnabled = () => {};
-            const setEquityMax = () => {};
             const [email, setEmail] = useState('');
             const [showCopyToast, setShowCopyToast] = useState(false);
             const [link, setLink] = useState(null);
             const [loading, setLoading] = useState(false);
             const [error, setError] = useState(null);
             const [baseAnimating, setBaseAnimating] = useState(false);
-            const [equityAnimating, setEquityAnimating] = useState(false);
             const [totalAnimating, setTotalAnimating] = useState(false);
             const [ledFlicker, setLedFlicker] = useState(false);
             const [cardSink, setCardSink] = useState(false);
             const [securitySeal, setSecuritySeal] = useState(false);
             const [isSliderDragging, setIsSliderDragging] = useState(false);
             const [baseError, setBaseError] = useState('');
-            const [equityError, setEquityError] = useState('');
-            const [focusedInput, setFocusedInput] = useState(null); // 'total' | 'base' | 'equity'
+            const [focusedInput, setFocusedInput] = useState(null); // 'total' | 'base'
             const [hasInteracted, setHasInteracted] = useState(false);
             const [justShown, setJustShown] = useState(false);
             const cardRef = useRef(null);
@@ -2725,16 +2705,14 @@
 
             const BASE_MIN = 50000;
             const BASE_MAX = 300000;
-            const EQUITY_MIN = 0;
-            const EQUITY_MAX = 0;
             const TOTAL_MIN = BASE_MIN;
             const TOTAL_MAX = BASE_MAX;
 
-            // With equity removed, total comp matches base
+            // Single input: total compensation matches base selection
             const totalComp = baseMax;
 
             const totalScale = (() => {
-                const maxPossible = BASE_MAX + EQUITY_MAX;
+                const maxPossible = BASE_MAX;
                 const norm = Math.min(
                     1,
                     Math.max(0, totalComp / maxPossible)
@@ -3146,9 +3124,6 @@
 
         const CandidateView = ({ offerId }) => {
             const [baseMin, setBaseMin] = useState(100000);
-            const equityMin = 0;
-            const equityEnabled = false;
-            const setEquityEnabled = () => {};
             const [step, setStep] = useState('loading');
             const [result, setResult] = useState(null);
             const [offerStatus, setOfferStatus] = useState(null);
@@ -3164,7 +3139,6 @@
 
             const BASE_MIN = 80000;
             const BASE_MAX = 250000;
-            const EQUITY_MAX = 0;
             const totalMin = baseMin;
 
             const totalScale = (() => {
@@ -3467,8 +3441,6 @@
 
                                     {/* Animated Compensation Input Block */}
                                     <CompensationInputBlock
-                                        equityEnabled={false}
-                                        onEquityToggle={() => {}}
                                         isSliderDragging={isSliderDragging}
                                         setIsSliderDragging={setIsSliderDragging}
                                     >

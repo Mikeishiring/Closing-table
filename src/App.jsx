@@ -14,7 +14,7 @@ const ResultView = React.lazy(() => import('./views/ResultView').then(m => ({ de
 // Loading fallback component
 function LoadingFallback() {
   return (
-    <div className="bg-white rounded-2xl p-8 shadow-lg">
+    <div className="glass-panel">
       <div className="animate-pulse space-y-6">
         <div className="space-y-2">
           <div className="h-8 bg-slate-200 rounded w-1/3" />
@@ -37,7 +37,7 @@ function App() {
   return (
     <div className="aurora-shell flex items-center justify-center p-4">
       <div className="relative max-w-4xl w-full z-10">
-        <h1 className="app-title">
+        <h1 className="app-title dim-when-unfocused">
           The Closing Table
         </h1>
 
