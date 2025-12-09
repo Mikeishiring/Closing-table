@@ -47,3 +47,4 @@ const ProgressHeader = ({ currentStep, completedSteps = [] }) => {
 // Export for global access
 window.ProgressHeader = ProgressHeader;
 
+

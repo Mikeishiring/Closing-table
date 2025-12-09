@@ -236,3 +236,4 @@ marginRight: '1rem',
 - All existing props and callbacks remain unchanged
 - The component is backward compatible with existing usage
 
+

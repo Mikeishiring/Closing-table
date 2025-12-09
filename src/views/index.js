@@ -7,3 +7,4 @@ export { CompanyView } from './CompanyView';
 export { CandidateView } from './CandidateView';
 export { ResultView } from './ResultView';
 
+

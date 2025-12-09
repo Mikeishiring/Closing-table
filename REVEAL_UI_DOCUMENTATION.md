@@ -334,3 +334,4 @@ The new reveal UI transforms the negotiation outcome from a bland system notice 
 
 All while maintaining the core principle: **single-shot, outcome-only, privacy-first negotiation**.
 
+

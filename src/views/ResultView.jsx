@@ -46,10 +46,18 @@ export function ResultView({ resultId }) {
   
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-slate-300 border-t-slate-900 mb-4" />
-          <p className="text-slate-600">Loading result...</p>
+      <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl space-y-6 animate-[cardIn_280ms_ease-out]">
+        <div className="animate-pulse space-y-6">
+          <div className="space-y-2 text-center">
+            <div className="h-8 bg-slate-200 rounded w-1/3 mx-auto" />
+            <div className="h-4 bg-slate-100 rounded w-2/3 mx-auto" />
+          </div>
+          <div className="space-y-2">
+            <div className="h-4 bg-slate-100 rounded w-1/4" />
+            <div className="h-10 bg-slate-200 rounded w-full" />
+            <div className="h-2 bg-slate-200 rounded-full w-full" />
+          </div>
+          <div className="h-12 bg-slate-200 rounded-full w-full" />
         </div>
       </div>
     );
@@ -57,18 +65,18 @@ export function ResultView({ resultId }) {
   
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-2xl p-8 shadow-lg text-center">
-          <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+      <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl space-y-6 text-center animate-[cardIn_280ms_ease-out]">
+        <div className="flex flex-col items-center space-y-3">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 ring-4 ring-rose-100 text-4xl text-rose-600 animate-[emojiPop_260ms_ease-out]">
+            <span>⚠️</span>
           </div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Oops</h2>
-          <p className="text-slate-600 mb-6">{error}</p>
+          <h2 className="text-2xl md:text-3xl font-semibold text-slate-900">Oops</h2>
+          <p className="text-slate-600">{error}</p>
+        </div>
+        <div className="flex flex-col gap-3">
           <button
             onClick={() => window.location.hash = ''}
-            className="bg-slate-900 text-white py-2 px-6 rounded-lg font-medium hover:bg-slate-800 transition-colors"
+            className="w-full rounded-full bg-slate-900 text-white py-3 text-sm font-medium hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 transition-all active:scale-[0.98]"
           >
             Go to home
           </button>
@@ -81,24 +89,13 @@ export function ResultView({ resultId }) {
     return null;
   }
   
-  // Calculate gap percentage if applicable
-  let gapPercent = null;
-  if (result.status === 'close' && result.suggested) {
-    // Estimate gap from suggested midpoint
-    // This is approximate since we don't have the original values
-    gapPercent = 8; // Within bridge zone (< 10%)
-  } else if (result.status === 'fail') {
-    gapPercent = 15; // Above bridge zone
-  }
-  
   return (
     <ResultCard
       status={result.status}
       finalOffer={result.final}
       suggested={result.suggested}
-      gapPercent={gapPercent}
-      resultId={resultId}
     />
   );
 }
+
 

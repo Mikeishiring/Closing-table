@@ -62,20 +62,10 @@ export function CandidateView({ offerId }) {
         min: baseMin,
       });
       
-      // Calculate gap percentage for display
-      let gapPercent = null;
-      if (data.status === 'close') {
-        gapPercent = 8; // Approximate, within bridge zone
-      } else if (data.status === 'fail') {
-        gapPercent = 15; // Approximate, above bridge zone
-      }
-      
       setResult({
         status: data.status,
         finalOffer: data.final,
         suggested: data.suggested,
-        gapPercent,
-        resultId: data.resultId,
       });
     } catch (err) {
       alert('Error submitting response: ' + err.message);
@@ -86,9 +76,9 @@ export function CandidateView({ offerId }) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl animate-[cardIn_280ms_ease-out]">
+      <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl space-y-6 animate-[cardIn_280ms_ease-out]">
         <div className="animate-pulse space-y-6">
-          <div className="space-y-2">
+          <div className="space-y-2 text-center">
             <div className="h-8 bg-slate-200 rounded w-1/3 mx-auto" />
             <div className="h-4 bg-slate-100 rounded w-2/3 mx-auto" />
           </div>
@@ -105,25 +95,25 @@ export function CandidateView({ offerId }) {
 
   if (error) {
     return (
-      <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl animate-[cardIn_280ms_ease-out]">
-        <header className="flex flex-col items-center text-center">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 ring-4 ring-rose-100 text-4xl text-rose-600 animate-[emojiPop_260ms_ease-out]">
+      <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl space-y-6 animate-[cardIn_280ms_ease-out]">
+        <header className="flex flex-col items-center text-center space-y-3">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 ring-4 ring-rose-100 text-4xl text-rose-600 animate-[emojiPop_260ms_ease-out]">
             <span>⚠️</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-semibold text-slate-900">
             Oops
           </h1>
-          <p className="mt-2 text-sm md:text-base text-slate-600">
+          <p className="text-sm md:text-base text-slate-600">
             {error}
           </p>
         </header>
         
-        <div className="mt-6">
+        <div className="flex flex-col gap-3">
           <button
             onClick={() => window.location.hash = ''}
             className="w-full rounded-full bg-slate-900 text-white py-3 text-sm font-medium hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 transition-all active:scale-[0.98]"
           >
-            Start over
+            Ask for a new link
           </button>
         </div>
       </div>
@@ -136,8 +126,6 @@ export function CandidateView({ offerId }) {
         status={result.status}
         finalOffer={result.finalOffer}
         suggested={result.suggested}
-        gapPercent={result.gapPercent}
-        resultId={result.resultId}
       />
     );
   }
@@ -145,26 +133,25 @@ export function CandidateView({ offerId }) {
   const totalMin = baseMin;
 
   return (
-    <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl animate-[cardIn_280ms_ease-out]">
-      <div className="inline-flex items-center justify-center px-3 py-1 mb-3 rounded-full bg-[#E6F9FA] text-xs font-medium text-[#007C80]">
-        Candidate view
+    <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl space-y-6 animate-[cardIn_280ms_ease-out]">
+      <div className="space-y-2">
+        <h2 className="section-title">Set your floor. See the outcome.</h2>
+        <p className="section-lead">
+          Your input stays private; only the final number is shown.
+        </p>
       </div>
-      <h2 className="section-title mb-2">Candidate View</h2>
-      <p className="section-lead mb-2">
-        Enter your minimum acceptable offer. The company will never see this number.
-      </p>
 
       {/* Privacy note */}
-      <div className="mb-6 inline-flex items-center gap-2 text-sm text-[#555]">
+      <div className="inline-flex items-center gap-2 text-sm text-[#555]">
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <rect x="3" y="11" width="18" height="11" rx="2" ry="2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           <path d="M7 11V7a5 5 0 0 1 10 0v4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
-        <span>We only show the final number, never your inputs.</span>
+        <span>We delete your input after the run; only the result is stored.</span>
       </div>
 
       {/* Progress header */}
-      <div className="mb-6 flex items-center justify-center gap-2 text-xs">
+      <div className="flex items-center justify-center gap-2 text-xs">
         <div className="flex items-center gap-1">
           <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-white font-semibold">
             ✓
@@ -187,7 +174,7 @@ export function CandidateView({ offerId }) {
         </div>
       </div>
 
-      <div className="space-y-6 mb-8">
+      <div className="space-y-6">
         {/* Base Salary */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -216,9 +203,13 @@ export function CandidateView({ offerId }) {
         </div>
       </div>
 
+      <div className="rounded-2xl bg-slate-50 px-4 py-3 text-xs text-slate-600 border border-slate-200">
+        Single use; expires in 24 hours. Result only: status, number, timestamp.
+      </div>
+
       <AnimatedSubmitButton
         onClick={handleSubmit}
-        buttonText="Lock it in & See Result"
+        buttonText="Lock & see"
         disabled={submitting}
       />
     </div>

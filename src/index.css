@@ -5,7 +5,7 @@
 
 /* CSS Variables */
 :root {
-  --bg-page: #F8F8F8;
+  --bg-page: #060a13;
   --bg-card: #FFFFFF;
   --text-primary: #1C1C1E;
   --text-secondary: #666666;
@@ -15,6 +15,10 @@
   --accent-candidate-hover: #6D28D9;
   --success-color: #34C759;
   --error-color: #FF3B30;
+  --aurora-1: #8b5cf6;
+  --aurora-2: #22d3ee;
+  --aurora-3: #f472b6;
+  --aurora-4: #fbbf24;
 }
 
 body {
@@ -23,6 +27,146 @@ body {
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Page-wide gradient animation */
+.aurora-shell {
+  position: relative;
+  min-height: 100vh;
+  background:
+    radial-gradient(120% 120% at 8% 18%, rgba(139, 92, 246, 0.18), transparent 40%),
+    radial-gradient(120% 120% at 85% 10%, rgba(34, 211, 238, 0.18), transparent 42%),
+    radial-gradient(120% 140% at 70% 85%, rgba(244, 114, 182, 0.16), transparent 46%),
+    radial-gradient(130% 130% at 10% 90%, rgba(251, 191, 36, 0.14), transparent 42%),
+    linear-gradient(125deg, #0b1021 0%, #0c172d 45%, #0a0f1f 100%);
+  background-size: 220% 220%;
+  animation: auroraDrift 18s ease-in-out infinite alternate;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.aurora-shell::before {
+  content: '';
+  position: absolute;
+  inset: -25%;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(139, 92, 246, 0.34), transparent 45%),
+    radial-gradient(circle at 82% 22%, rgba(34, 211, 238, 0.30), transparent 42%),
+    radial-gradient(circle at 64% 78%, rgba(244, 114, 182, 0.34), transparent 48%),
+    radial-gradient(circle at 22% 82%, rgba(251, 191, 36, 0.26), transparent 45%);
+  filter: blur(80px);
+  opacity: 0.92;
+  animation: auroraWander 26s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.aurora-shell::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(140% 120% at 30% 40%, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 42%),
+    radial-gradient(120% 120% at 70% 60%, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 40%);
+  mix-blend-mode: screen;
+  opacity: 0.4;
+  animation: auroraShimmer 22s ease-in-out infinite alternate-reverse;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes auroraDrift {
+  0% {
+    background-position: 0% 50%;
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    background-position: 100% 48%;
+    transform: scale(1.04) rotate(1deg);
+  }
+  100% {
+    background-position: 0% 52%;
+    transform: scale(1) rotate(-1deg);
+  }
+}
+
+@keyframes auroraWander {
+  0% {
+    transform: translate3d(-6%, -4%, 0) scale(1.02) rotate(-2deg);
+    opacity: 0.85;
+  }
+  33% {
+    transform: translate3d(4%, 3%, 0) scale(1.06) rotate(1deg);
+    opacity: 0.95;
+  }
+  66% {
+    transform: translate3d(2%, -6%, 0) scale(1.04) rotate(-1deg);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate3d(-4%, 5%, 0) scale(1.02) rotate(2deg);
+    opacity: 0.92;
+  }
+}
+
+@keyframes auroraShimmer {
+  0% {
+    opacity: 0.32;
+    transform: translate3d(0%, 0%, 0) scale(1);
+  }
+  50% {
+    opacity: 0.48;
+    transform: translate3d(2%, -3%, 0) scale(1.03);
+  }
+  100% {
+    opacity: 0.36;
+    transform: translate3d(-2%, 3%, 0) scale(1.01);
+  }
+}
+
+/* Typography refresh */
+::selection {
+  background: rgba(139, 92, 246, 0.28);
+  color: #0b1225;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #0f172a;
+}
+
+p,
+label,
+span {
+  letter-spacing: -0.005em;
+  font-variant-numeric: tabular-nums;
+}
+
+.app-title {
+  margin: 0 auto 2.25rem;
+  text-align: center;
+  font-size: clamp(2.75rem, 2vw + 2rem, 3.75rem);
+  line-height: 1.02;
+  background: linear-gradient(120deg, #facc15 0%, #f472b6 38%, #60a5fa 68%, #22d3ee 100%);
+  -webkit-background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 12px 40px rgba(15, 23, 42, 0.35));
+}
+
+.section-title {
+  font-size: clamp(1.6rem, 1.2vw + 1rem, 2.25rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #0f172a;
+}
+
+.section-lead {
+  color: #475569;
+  letter-spacing: -0.01em;
+  line-height: 1.65;
 }
 
 /* Signature Slider Styles */

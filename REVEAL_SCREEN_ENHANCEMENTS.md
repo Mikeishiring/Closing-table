@@ -436,3 +436,4 @@ const config = STATUS_CONFIG[status];
 
 The reveal now feels like a **special moment** that honors the weight of the negotiation outcome.
 
+

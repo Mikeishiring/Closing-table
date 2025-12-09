@@ -48,6 +48,8 @@ const OFFER_TTL_MS = 24 * 60 * 60 * 1000;       // 24h offers
 const RESULT_TTL_MS = 7 * 24 * 60 * 60 * 1000;  // 7d results
 const BRIDGE_ZONE_PCT = 0.10;                   // 10% bridge zone
 const ROUNDING_GRANULARITY = 1000;              // $1,000 rounding
+const TOTAL_MIN = 50_000;                       // Align with frontend limits
+const TOTAL_MAX = 500_000;
 
 // --- IN-MEMORY STORES ---
 /**
@@ -56,10 +58,10 @@ const ROUNDING_GRANULARITY = 1000;              // $1,000 rounding
  * Retention policy:
  * - Offers are IMMEDIATELY DELETED after first use (success, close, or fail)
  * - Offers are also automatically deleted after OFFER_TTL_MS (24 hours) expires
- * - No sensitive data (max, base/equity breakdown) is retained after mechanism runs
+ * - No sensitive data beyond the single max value is retained after the mechanism runs
  * - This ensures "single-use, outcome-only" behavior
  * 
- * Keys: offerId -> { max, createdAt, expiresAt, equityEnabled }
+ * Keys: offerId -> { max, createdAt, expiresAt }
  * Note: We only store the minimum needed to run the mechanism once
  */
 const offers = new Map();
@@ -69,7 +71,7 @@ const offers = new Map();
  * 
  * Retention policy:
  * - Results store ONLY the outcome: status, final number, suggested (for close), and timestamp
- * - NO original inputs (company max, candidate min, base/equity, emails) are ever stored here
+ * - NO original inputs (company max, candidate min, emails) are ever stored here
  * - Results are automatically deleted after RESULT_TTL_MS (7 days)
  * - This ensures privacy: only "did it work?" and "what's the number?" are retained
  * 
@@ -153,12 +155,12 @@ function calculateDeal(cMax, cMin) {
 // If email notifications are needed in the future, implement here with clear privacy documentation.
 
 // --- SERVE STATIC FILES ---
-// Serve frontend static files (js, css, images) from the frontend directory
-app.use(express.static(path.join(__dirname, 'frontend')));
+// Serve built static files from the dist directory (faster than inline Babel)
+app.use(express.static(path.join(__dirname, 'dist')));
 
 // --- SERVE FRONTEND ---
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 // --- HEALTHCHECK ---
@@ -172,58 +174,37 @@ app.get('/health', (req, res) => {
  * 
  * Privacy note: We do NOT collect or store email addresses.
  * The offer stores only the minimum data needed to run the mechanism once:
- * - max: total compensation (base + equity)
+ * - max: total compensation
  * - createdAt/expiresAt: for TTL enforcement
- * - equityEnabled: to inform candidate UI
  * 
  * The offer is DELETED immediately after the mechanism runs.
  */
 app.post('/api/offers', (req, res) => {
-  const { max, equityEnabled, companyBaseMax, companyEquityMax } = req.body || {};
+  const { max } = req.body || {};
 
-  // Support both old (single max) and new (base+equity) formats
-  let baseMax, equityMax, equity;
-  
-  if (typeof equityEnabled === 'boolean') {
-    // New format: base + equity
-    equity = equityEnabled;
-    baseMax = companyBaseMax;
-    equityMax = equityEnabled ? (companyEquityMax || 0) : 0;
-    
-    if (typeof baseMax !== 'number' || !Number.isFinite(baseMax) || baseMax <= 0) {
-      return res.status(400).json({ error: 'Invalid or missing "companyBaseMax"' });
-    }
-    if (equityEnabled && (typeof equityMax !== 'number' || !Number.isFinite(equityMax) || equityMax < 0)) {
-      return res.status(400).json({ error: 'Invalid "companyEquityMax"' });
-    }
-  } else {
-    // Old format: single max (treat as base-only)
-    if (typeof max !== 'number' || !Number.isFinite(max) || max <= 0) {
-      return res.status(400).json({ error: 'Invalid or missing "max"' });
-    }
-    baseMax = max;
-    equityMax = 0;
-    equity = false;
+  if (typeof max !== 'number' || !Number.isFinite(max) || max <= 0) {
+    return res.status(400).json({ error: 'Invalid or missing "max"' });
   }
 
-  const totalMax = baseMax + equityMax;
+  if (max < TOTAL_MIN || max > TOTAL_MAX) {
+    return res.status(400).json({ error: `"max" must be between ${TOTAL_MIN} and ${TOTAL_MAX}` });
+  }
+
+  const totalMax = max;
   const createdAt = Date.now();
   const expiresAt = createdAt + OFFER_TTL_MS;
   const offerId = generateId('o');
 
   // Store only the minimum data needed for single-use mechanism
-  // Note: No email, no base/equity breakdown stored (only total max)
+  // Note: No email or compensation breakdown stored (only total max)
   offers.set(offerId, {
     max: totalMax, // Total compensation for mechanism
     createdAt,
     expiresAt,
-    equityEnabled: equity,
   });
 
   console.log('[offer_created]', { 
-    offerId, 
-    max: totalMax, 
-    equityEnabled: equity, 
+    offerId,
     createdAt 
   });
 
@@ -246,10 +227,8 @@ app.get('/api/offers/:offerId', (req, res) => {
     return res.json({ status: 'expired' });
   }
 
-  // Include equity information for candidate
   return res.json({ 
     status: 'ok',
-    equityEnabled: offer.equityEnabled || false
   });
 });
 
@@ -259,36 +238,20 @@ app.get('/api/offers/:offerId', (req, res) => {
  * 
  * Privacy note: We do NOT collect or store email addresses.
  * The mechanism runs once, stores only the outcome, then IMMEDIATELY DELETES
- * the offer (including company max, base/equity breakdown).
+ * the offer (including company max).
  * 
  * Result storage: Only status, final number, suggested (for close), and timestamp.
  */
 app.post('/api/offers/:offerId/submit', async (req, res) => {
   const { offerId } = req.params;
-  const { min, candidateBaseMin, candidateEquityMin } = req.body || {};
+  const { min } = req.body || {};
 
-  // Support both old (single min) and new (base+equity) formats
-  let totalMin;
-  
-  if (typeof candidateBaseMin === 'number') {
-    // New format: base + equity
-    const baseMin = candidateBaseMin;
-    const equityMin = candidateEquityMin || 0;
-    
-    if (!Number.isFinite(baseMin) || baseMin <= 0) {
-      return res.status(400).json({ error: 'Invalid or missing "candidateBaseMin"' });
-    }
-    if (equityMin < 0 || !Number.isFinite(equityMin)) {
-      return res.status(400).json({ error: 'Invalid "candidateEquityMin"' });
-    }
-    
-    totalMin = baseMin + equityMin;
-  } else {
-    // Old format: single min
-    if (typeof min !== 'number' || !Number.isFinite(min) || min <= 0) {
-      return res.status(400).json({ error: 'Invalid or missing "min"' });
-    }
-    totalMin = min;
+  if (typeof min !== 'number' || !Number.isFinite(min) || min <= 0) {
+    return res.status(400).json({ error: 'Invalid or missing "min"' });
+  }
+
+  if (min < TOTAL_MIN || min > TOTAL_MAX) {
+    return res.status(400).json({ error: `"min" must be between ${TOTAL_MIN} and ${TOTAL_MAX}` });
   }
 
   const offer = offers.get(offerId);
@@ -305,7 +268,7 @@ app.post('/api/offers/:offerId/submit', async (req, res) => {
   }
 
   const cMax = offer.max;
-  const cMin = totalMin;
+  const cMin = min;
 
   // Run the mechanism (pure function)
   const dealResult = calculateDeal(cMax, cMin);
@@ -324,12 +287,11 @@ app.post('/api/offers/:offerId/submit', async (req, res) => {
   });
 
   // IMMEDIATELY DELETE the offer after mechanism runs
-  // This ensures no sensitive data (max, base/equity) is retained
+  // This ensures no sensitive data (max or breakdown) is retained
   offers.delete(offerId);
 
   console.log('[offer_submitted]', {
     offerId,
-    status,
     resultId,
     offerDeleted: true,
   });
@@ -354,7 +316,7 @@ app.post('/api/offers/:offerId/submit', async (req, res) => {
  * - suggested: number (for close) or null - non-binding starting point
  * - createdAt: timestamp
  * 
- * NO original inputs (company max, candidate min, base/equity, emails) are returned.
+ * NO original inputs (company max, candidate min, emails) are returned.
  */
 app.get('/api/results/:resultId', (req, res) => {
   const { resultId } = req.params;

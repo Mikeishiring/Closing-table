@@ -35,9 +35,9 @@ function App() {
   const route = useHashRoute();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
-      <div className="max-w-4xl w-full">
-        <h1 className="text-4xl font-bold text-center mb-8 text-slate-900">
+    <div className="aurora-shell flex items-center justify-center p-4">
+      <div className="relative max-w-4xl w-full z-10">
+        <h1 className="app-title">
           The Closing Table
         </h1>
 

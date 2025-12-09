@@ -4,7 +4,6 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { generateResultLink, copyToClipboard } from '../lib/api';
 
 // Simple status configuration
 const RESULT_CONFIG = {
@@ -12,24 +11,24 @@ const RESULT_CONFIG = {
     emoji: "✅",
     color: "text-emerald-600",
     bgRing: "ring-emerald-100",
-    title: "Deal Closed",
-    line: "The mechanism found a fair middle ground and split the surplus 50/50.",
+    title: "Deal: Fair split",
+    line: "Ranges overlapped; we split the surplus 50/50.",
     actionIcon: "🔁",
   },
   close: {
     emoji: "🤏",
     color: "text-amber-600",
     bgRing: "ring-amber-100",
-    title: "Close, But Not Quite",
-    line: "You're within the 10% bridge window. A human conversation could close the gap.",
+    title: "Close gap",
+    line: "Within 10% of the max; start at the midpoint together.",
     actionIcon: "💬",
   },
   fail: {
     emoji: "❌",
     color: "text-rose-600",
     bgRing: "ring-rose-100",
-    title: "No Deal Under This Mechanism",
-    line: "The ranges are too far apart for a fair split under the rules you agreed to.",
+    title: "No deal",
+    line: "Gap is over 10%; we won’t ask either side to stretch.",
     actionIcon: "🔍",
   },
 };
@@ -82,10 +81,8 @@ function useCountUp(target, duration = 350) {
 /**
  * Main ResultReveal Component
  */
-export function ResultCard({ status, finalOffer, suggested, gapPercent, resultId }) {
+export function ResultCard({ status, finalOffer, suggested }) {
   const [stage, setStage] = useState('emoji'); // 'emoji' | 'details'
-  const [copyLabel, setCopyLabel] = useState('Copy result link');
-  const [showHint, setShowHint] = useState(false);
   
   const cfg = RESULT_CONFIG[status];
   const { count: displayFinal, breathe } = useCountUp(status === 'success' ? finalOffer : null, 350);
@@ -96,31 +93,10 @@ export function ResultCard({ status, finalOffer, suggested, gapPercent, resultId
     return () => clearTimeout(timer);
   }, []);
   
-  // Auto-focus primary button when details appear
-  useEffect(() => {
-    if (stage === 'details') {
-      const btn = document.getElementById('primary-action-btn');
-      if (btn) btn.focus();
-    }
-  }, [stage]);
-  
-  const handleCopy = async () => {
-    const link = generateResultLink(resultId);
-    const result = await copyToClipboard(link);
-    
-    if (result.success) {
-      setCopyLabel('Copied ✓');
-      setTimeout(() => setCopyLabel('Copy result link'), 1500);
-    }
-  };
-  
   const handleNewOffer = () => {
     window.location.hash = '';
     window.location.reload();
   };
-  
-  // Calculate gap percentage
-  const displayGap = gapPercent || (status === 'close' ? 8.0 : null);
   
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-slate-900/70 p-4 animate-[fadeIn_280ms_ease-out]">
@@ -175,7 +151,7 @@ export function ResultCard({ status, finalOffer, suggested, gapPercent, resultId
                   {formatCurrency(displayFinal)}
                 </p>
                 <p className="mt-2 text-xs text-slate-500">
-                  Exactly between your ranges, without revealing either side's number.
+                  Exactly between your ranges; inputs were deleted after the run.
                 </p>
               </section>
             )}
@@ -185,18 +161,18 @@ export function ResultCard({ status, finalOffer, suggested, gapPercent, resultId
               <section className="text-center space-y-3">
                 <div>
                   <p className="text-xs uppercase tracking-[0.18em] text-slate-500">
-                    Gap Size
+                    Bridge Window
                   </p>
-                  <p className="mt-1 text-3xl md:text-4xl font-semibold text-slate-900">
-                    {displayGap.toFixed(1)}%
+                  <p className="mt-1 text-base md:text-lg font-semibold text-slate-900">
+                    Within 10% of the company maximum
                   </p>
                 </div>
                 <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                  You're within the 10% bridge window. The mechanism stops here so you can decide together whether to stretch.
+                  The mechanism pauses here so you can decide together whether to stretch.
                 </p>
                 {suggested && (
                   <div className="rounded-2xl bg-slate-50 px-4 py-3 text-xs text-slate-600">
-                    Non-binding starting point: <span className="font-semibold">{formatCurrency(suggested)}</span>
+                    Start at the midpoint: <span className="font-semibold">{formatCurrency(suggested)}</span>
                   </div>
                 )}
               </section>
@@ -209,7 +185,7 @@ export function ResultCard({ status, finalOffer, suggested, gapPercent, resultId
                   The gap is larger than <span className="text-rose-600">10%</span> of the company's maximum.
                 </p>
                 <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                  The mechanism can't suggest a fair middle without asking one of you to cross your stated limits.
+                  The mechanism won't suggest a middle that crosses either side's stated limit.
                 </p>
               </section>
             )}
@@ -221,42 +197,17 @@ export function ResultCard({ status, finalOffer, suggested, gapPercent, resultId
             stage === 'details' ? 'opacity-100' : 'opacity-0'
           }`}>
             <button
-              id="primary-action-btn"
-              onClick={handleCopy}
-              className="w-full rounded-full bg-slate-900 text-white py-3 text-sm font-medium hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 transition-all active:scale-[0.98]"
-            >
-              {copyLabel}
-            </button>
-            
-            <button
               onClick={handleNewOffer}
               className="w-full rounded-full border border-slate-200 py-3 text-sm text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 transition-all active:scale-[0.98]"
             >
-              {status === 'success' ? `Start a new offer ${cfg.actionIcon}` : 
+              {status === 'success' ? `Start new offer ${cfg.actionIcon}` : 
                status === 'close' ? `Talk it through ${cfg.actionIcon}` : 
-               `Back to search ${cfg.actionIcon}`}
+               `Try again ${cfg.actionIcon}`}
             </button>
+            <p className="text-[11px] text-center text-slate-500">
+              Stored: status, final number, timestamp. Inputs deleted; result expires in 7 days.
+            </p>
           </div>
-          
-          {/* Outcome-only hint */}
-          <button
-            onClick={() => setShowHint(!showHint)}
-            className={`mt-4 w-full flex items-center justify-center gap-2 text-[11px] text-slate-500 hover:text-slate-700 transition-all duration-300 delay-250 ${
-              stage === 'details' ? 'opacity-100' : 'opacity-0'
-            }`}
-          >
-            <span>🔐</span>
-            <span>Outcome-only: neither side sees the other's number.</span>
-          </button>
-          
-          {showHint && (
-            <div className="mt-2 px-4 py-3 bg-slate-50 rounded-xl text-xs text-slate-600 animate-[slideDown_200ms_ease-out]">
-              <p>• Each side's original number stays private</p>
-              <p className="mt-1">• Only this final outcome is shareable</p>
-              <p className="mt-1">• The mechanism is single-use</p>
-            </div>
-          )}
-          
         </div>
       </div>
     </div>

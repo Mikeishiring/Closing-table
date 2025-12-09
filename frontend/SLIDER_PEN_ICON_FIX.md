@@ -154,3 +154,4 @@ The icon uses `currentColor`, so set text color on parent:
 ✅ Perfect centering via `inset: 0` + flexbox
 ✅ Clean separation of layers (background vs icon)
 
+

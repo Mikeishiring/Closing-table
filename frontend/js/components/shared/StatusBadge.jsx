@@ -61,3 +61,4 @@ const StatusBadge = ({ status, size = 'large' }) => {
 // Export for global access
 window.StatusBadge = StatusBadge;
 
+
