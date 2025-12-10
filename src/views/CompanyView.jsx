@@ -73,7 +73,7 @@ export function CompanyView() {
 
   if (offerLink) {
     return (
-      <div className="glass-panel space-y-8 animate-[cardIn_280ms_ease-out]" data-focus-mode={isFocusing}>
+      <div className="glass-panel card-flow animate-[cardIn_280ms_ease-out]" data-focus-mode={isFocusing}>
         {/* Hero: Big icon + headline */}
         <header className="flex flex-col items-center text-center space-y-3 dim-when-unfocused">
           <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-emerald-400 via-cyan-400 to-sky-500 text-white shadow-[0_20px_40px_-12px_rgba(14,165,233,0.55)] animate-[emojiPop_260ms_ease-out]">
@@ -148,28 +148,27 @@ export function CompanyView() {
   }
 
   return (
-    <div className="glass-panel space-y-8 animate-[cardIn_280ms_ease-out]" data-focus-mode={isFocusing}>
-      <div className="space-y-2">
-        <h2 className="section-title dim-when-unfocused">Set your ceiling. Send one link.</h2>
-        <p className="section-lead dim-when-unfocused">
-          One-time, 24h link. Only the final outcome is shown.
-        </p>
-      </div>
+    <div className="panel-with-side">
+      <div className="glass-panel card-flow animate-[cardIn_280ms_ease-out] panel-main" data-focus-mode={isFocusing}>
+        <section className="card-block dim-when-unfocused">
+          <p className="eyebrow">Offer setup</p>
+          <h2 className="section-title">Set your ceiling. Send one link.</h2>
+          <p className="section-lead quiet-text">
+            One-time, 24h link. Only the final outcome is shown.
+          </p>
+          <div className="privacy-note">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <span>We delete your max after the run; only the result is shown.</span>
+          </div>
+        </section>
 
-      {/* Privacy note */}
-      <div className="inline-flex items-center gap-2 text-sm text-[#555]">
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M7 11V7a5 5 0 0 1 10 0v4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-        <span>We delete your max after the run; only the result is shown.</span>
-      </div>
-
-      <div className="space-y-6">
         {/* Total Compensation */}
-        <div className="focus-priority space-y-4">
-          <label className="block text-sm font-medium text-slate-700">
-            Maximum Total Compensation
+        <section className="card-block focus-priority">
+          <label className="input-label">
+            Maximum total compensation
           </label>
           <div className="relative">
             <div className="currency-prefix">$</div>
@@ -182,6 +181,14 @@ export function CompanyView() {
               inputMode="numeric"
               aria-label="Maximum total compensation"
             />
+          </div>
+        </section>
+
+        {/* Slider */}
+        <section className="card-block focus-priority">
+          <div className="flex items-center justify-between">
+            <span className="quiet-text text-sm font-semibold">Fine-tune with slider</span>
+            <span className="value-chip">{formatCurrency(totalMax)}</span>
           </div>
           <SignatureSlider
             value={totalMax}
@@ -199,15 +206,25 @@ export function CompanyView() {
             onDragStart={() => setIsFocusing(true)}
             onDragEnd={() => setIsFocusing(false)}
           />
-        </div>
+        </section>
+
+        <section className="card-block card-block--cta">
+          <SlideToConfirm
+            text="Slide to Lock Offer"
+            onConfirm={handleSubmit}
+            loading={loading}
+            disabled={loading}
+          />
+          <p className="microcopy quiet-text cta-hint dim-when-unfocused">
+            Works once and expires in 24 hours. We delete your max after the run.
+          </p>
+        </section>
       </div>
 
-      <SlideToConfirm
-        text="Slide to Lock Offer"
-        onConfirm={handleSubmit}
-        loading={loading}
-        disabled={loading}
-      />
+      <aside className="mini-widget mini-widget--side dim-when-unfocused">
+        <p className="mini-widget__title">Private, single-use link</p>
+        <p className="mini-widget__body">Share your ceiling once—only the final outcome is visible.</p>
+      </aside>
     </div>
   );
 }

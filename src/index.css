@@ -93,33 +93,33 @@ body.focus-mode .glass-panel {
 @keyframes auroraDrift {
   0% {
     background-position: 0% 50%;
-    transform: scale(1) rotate(0deg);
+    transform: rotate(0deg);
   }
   50% {
     background-position: 100% 48%;
-    transform: scale(1.04) rotate(1deg);
+    transform: rotate(1deg);
   }
   100% {
     background-position: 0% 52%;
-    transform: scale(1) rotate(-1deg);
+    transform: rotate(-1deg);
   }
 }
 
 @keyframes auroraWander {
   0% {
-    transform: translate3d(-6%, -4%, 0) scale(1.02) rotate(-2deg);
+    transform: translate3d(-6%, -4%, 0) rotate(-2deg);
     opacity: 0.85;
   }
   33% {
-    transform: translate3d(4%, 3%, 0) scale(1.06) rotate(1deg);
+    transform: translate3d(4%, 3%, 0) rotate(1deg);
     opacity: 0.95;
   }
   66% {
-    transform: translate3d(2%, -6%, 0) scale(1.04) rotate(-1deg);
+    transform: translate3d(2%, -6%, 0) rotate(-1deg);
     opacity: 0.9;
   }
   100% {
-    transform: translate3d(-4%, 5%, 0) scale(1.02) rotate(2deg);
+    transform: translate3d(-4%, 5%, 0) rotate(2deg);
     opacity: 0.92;
   }
 }
@@ -127,15 +127,15 @@ body.focus-mode .glass-panel {
 @keyframes auroraShimmer {
   0% {
     opacity: 0.32;
-    transform: translate3d(0%, 0%, 0) scale(1);
+    transform: translate3d(0%, 0%, 0);
   }
   50% {
     opacity: 0.48;
-    transform: translate3d(2%, -3%, 0) scale(1.03);
+    transform: translate3d(2%, -3%, 0);
   }
   100% {
     opacity: 0.36;
-    transform: translate3d(-2%, 3%, 0) scale(1.01);
+    transform: translate3d(-2%, 3%, 0);
   }
 }
 
@@ -148,50 +148,56 @@ body.focus-mode .glass-panel {
 h1,
 h2,
 h3 {
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: #0f172a;
 }
 
 p,
 label,
 span {
-  letter-spacing: -0.005em;
+  letter-spacing: -0.003em;
   font-variant-numeric: tabular-nums;
 }
 
 .app-title {
-  margin: 0 auto 2.25rem;
+  margin: 0 auto 1.75rem;
   text-align: center;
-  font-size: clamp(2.75rem, 2vw + 2rem, 3.75rem);
-  line-height: 1.02;
-  background: linear-gradient(120deg, #facc15 0%, #f472b6 38%, #60a5fa 68%, #22d3ee 100%);
+  font-size: clamp(2.2rem, 1.4vw + 1.6rem, 3rem);
+  line-height: 1.08;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  background: linear-gradient(130deg, #dbeafe 0%, #c4b5fd 52%, #a5f3fc 100%);
   -webkit-background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 12px 40px rgba(15, 23, 42, 0.35));
+  filter: drop-shadow(0 10px 28px rgba(0, 0, 0, 0.2));
 }
 
 .section-title {
   font-size: clamp(1.6rem, 1.2vw + 1rem, 2.25rem);
-  line-height: 1.15;
-  letter-spacing: -0.02em;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
   color: #0f172a;
+  font-weight: 700;
 }
 
 .section-lead {
-  color: #475569;
-  letter-spacing: -0.01em;
-  line-height: 1.65;
+  color: #4b5563;
+  letter-spacing: -0.005em;
+  line-height: 1.7;
+  max-width: 36ch;
 }
 
 .glass-panel {
   position: relative;
   background: var(--bg-card);
-  border-radius: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
-  padding: clamp(28px, 4vw, 48px);
-  backdrop-filter: blur(16px);
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 18px 44px -18px rgba(15, 23, 42, 0.32),
+    0 0 0 1px rgba(255, 255, 255, 0.6);
+  padding: clamp(32px, 4vw, 56px) clamp(28px, 3vw, 44px);
+  backdrop-filter: saturate(180%) blur(12px);
 }
 
 .glass-panel::after {
@@ -199,16 +205,79 @@ span {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.35), transparent 35%);
-  opacity: 0.35;
+  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.32), transparent 36%);
+  opacity: 0.28;
   pointer-events: none;
+}
+
+.card-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.card-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-block--cta {
+  gap: 14px;
+  padding-top: 8px;
+}
+
+.quiet-text {
+  color: #4b5563;
+  opacity: 0.82;
+}
+
+.eyebrow {
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.microcopy {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #64748b;
+}
+
+.privacy-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #475569;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.input-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.value-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: #f1f5f9;
+  color: #0f172a;
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
 /* Signature Slider Styles */
 .signature-slider {
   --accent-color: #00C4CC;
   position: relative;
-  padding: 1.2rem 0;
+  padding: 1.4rem 0 1.2rem;
 }
 
 .signature-slider--company {
@@ -222,13 +291,15 @@ span {
 .signature-slider__labels {
   display: flex;
   justify-content: space-between;
-  margin-top: 0.75rem;
-  padding: 0 1.3rem;
+  margin-top: 1rem;
+  padding: 0 1.6rem;
 }
 
 .signature-slider__label {
-  font-size: 0.92rem;
-  color: #6b7280;
+  font-size: 0.93rem;
+  font-weight: 600;
+  color: #475569;
+  letter-spacing: -0.01em;
 }
 
 /* Ink dot animation */
@@ -256,7 +327,7 @@ span {
 .currency-prefix {
   position: absolute;
   inset-y: 0;
-  left: 14px;
+  left: 12px;
   display: flex;
   align-items: center;
   color: #94a3b8;
@@ -266,30 +337,31 @@ span {
 
 .currency-input {
   width: 100%;
-  border-radius: 14px;
-  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  border: 1px solid #dfe6ef;
   padding: 12px 14px 12px 30px;
   font-weight: 600;
   color: #0f172a;
   background: #f8fafc;
-  transition: border-color 160ms ease, box-shadow 160ms ease;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
 }
 
 .currency-input:focus {
   outline: none;
   border-color: #22d3ee;
-  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.18);
+  box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.12);
   background: #fff;
 }
 
 .hero-currency-input {
   width: 100%;
-  border-radius: 18px;
-  border: 1px solid #e2e8f0;
-  padding: 18px 18px 18px 36px;
-  font-weight: 800;
-  font-size: clamp(2rem, 3vw, 2.75rem);
-  letter-spacing: -0.02em;
+  border-radius: 14px;
+  border: 1px solid #dfe6ef;
+  padding: 16px 18px 16px 34px;
+  font-weight: 600;
+  font-size: clamp(1.9rem, 2.6vw, 2.6rem);
+  letter-spacing: -0.015em;
+  line-height: 1.15;
   color: #0f172a;
   background: #f8fafc;
   transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
@@ -298,11 +370,87 @@ span {
 .hero-currency-input:focus {
   outline: none;
   border-color: #22d3ee;
-  box-shadow: 0 12px 30px -16px rgba(34, 211, 238, 0.55);
+  box-shadow: 0 12px 30px -18px rgba(34, 211, 238, 0.4);
   background: #fff;
 }
 
 .signature-slider__ink-dot--active {
   animation: ink-dot 0.3s ease-out forwards;
+}
+
+.mini-widget {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-radius: 16px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, #111827, #0f172a);
+  color: #e5e7eb;
+  box-shadow:
+    0 12px 30px -16px rgba(0, 0, 0, 0.35),
+    0 6px 14px -10px rgba(15, 23, 42, 0.35);
+}
+
+.mini-widget__title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #f8fafc;
+  letter-spacing: -0.01em;
+}
+
+.mini-widget__body {
+  font-size: 0.95rem;
+  color: #cbd5e1;
+  line-height: 1.45;
+}
+
+.panel-with-side {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.panel-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.mini-widget--side {
+  flex: 0 0 240px;
+  max-width: 260px;
+  min-width: 200px;
+  align-self: flex-start;
+}
+
+@media (max-width: 900px) {
+  .panel-with-side {
+    flex-direction: column;
+  }
+  .mini-widget--side {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.slide-cta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.slide-track {
+  background: rgba(248, 250, 252, 0.92);
+  border: 1px solid #dbe4ef;
+  box-shadow: 0 12px 40px -18px rgba(15, 23, 42, 0.28);
+}
+
+.slide-track .cta-label {
+  color: #475569;
+  letter-spacing: -0.01em;
+}
+
+.cta-hint {
+  text-align: center;
 }
 

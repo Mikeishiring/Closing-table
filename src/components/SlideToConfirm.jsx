@@ -96,10 +96,10 @@ export function SlideToConfirm({
     : 'linear-gradient(90deg, rgba(148, 163, 184, 0.55), rgba(148, 163, 184, 0.75))';
 
   return (
-    <div className="focus-priority">
+    <div className="slide-cta focus-priority">
       <div
         ref={trackRef}
-        className={`relative w-full h-14 rounded-full bg-slate-100 border border-slate-200 overflow-hidden select-none ${
+        className={`slide-track relative w-full h-14 rounded-full bg-slate-100 border border-slate-200 overflow-hidden select-none ${
           disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
         }`}
         style={{ touchAction: 'none' }}
@@ -116,7 +116,7 @@ export function SlideToConfirm({
 
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <span
-            className="text-sm font-semibold text-slate-500 transition-opacity"
+            className="cta-label text-sm font-semibold text-slate-500 transition-opacity"
             style={{ opacity: 1 - Math.min(progress / 100, 1) }}
           >
             {text}

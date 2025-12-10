@@ -168,55 +168,52 @@ export function CandidateView({ offerId }) {
   const steps = ['Set Number', 'See Result'];
 
   return (
-    <div className="glass-panel space-y-8 animate-[cardIn_280ms_ease-out]" data-focus-mode={isFocusing}>
-      {/* Stepper */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          {steps.map((label, idx) => {
-            const stepIndex = idx + 1;
-            const active = stepIndex <= currentStep;
-            const isCurrent = stepIndex === currentStep;
+    <div className="panel-with-side">
+      <div className="glass-panel card-flow animate-[cardIn_280ms_ease-out] panel-main" data-focus-mode={isFocusing}>
+        {/* Stepper */}
+        <section className="card-block">
+          <div className="flex items-center gap-2">
+            {steps.map((label, idx) => {
+              const stepIndex = idx + 1;
+              const active = stepIndex <= currentStep;
+              const isCurrent = stepIndex === currentStep;
 
-            return (
-              <div key={label} className="flex-1">
-                <div
-                  className={`h-2 rounded-full transition-all ${
-                    active
-                      ? 'bg-gradient-to-r from-emerald-400 via-cyan-400 to-sky-500 shadow-[0_6px_16px_-6px_rgba(14,165,233,0.6)]'
-                      : 'bg-slate-200'
-                  }`}
-                />
-                {isCurrent && (
-                  <p className="mt-1 text-[11px] font-semibold text-slate-900 tracking-tight">
-                    {label}
-                  </p>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
+              return (
+                <div key={label} className="flex-1">
+                  <div
+                    className={`h-2 rounded-full transition-all ${
+                      active
+                        ? 'bg-gradient-to-r from-emerald-400 via-cyan-400 to-sky-500 shadow-[0_6px_16px_-6px_rgba(14,165,233,0.6)]'
+                        : 'bg-slate-200'
+                    }`}
+                  />
+                  {isCurrent && (
+                    <p className="mt-1 text-[11px] font-semibold text-slate-900 tracking-tight">
+                      {label}
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
 
-      {/* Hero number */}
-      <div className="space-y-3 text-center focus-priority">
-        <p className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
-          Total Compensation
-        </p>
-        <p className="text-5xl md:text-6xl font-extrabold text-slate-900 tracking-tight">
-          {formatCurrency(totalComp)}
-        </p>
-        <p className="text-sm text-slate-500">
-          One all-in number. Adjust and lock it in.
-        </p>
-      </div>
+        {/* Hero number */}
+        <section className="card-block text-center focus-priority">
+          <p className="eyebrow">Total Compensation</p>
+          <p className="text-5xl md:text-6xl font-semibold text-slate-900 tracking-tight">
+            {formatCurrency(totalComp)}
+          </p>
+          <p className="microcopy quiet-text">
+            One all-in number. Adjust and lock it in.
+          </p>
+        </section>
 
-      {/* Inputs */}
-      <div className="space-y-7 focus-priority">
-        {/* Total Compensation */}
-        <div className="space-y-3">
+        {/* Inputs */}
+        <section className="card-block focus-priority">
           <div className="flex items-center justify-between text-sm">
-            <span className="font-semibold text-slate-900">Minimum Total Compensation</span>
-            <span className="text-sm font-semibold text-slate-700">{formatCurrency(totalComp)}</span>
+            <span className="input-label">Minimum total compensation</span>
+            <span className="value-chip">{formatCurrency(totalComp)}</span>
           </div>
           <div className="relative">
             <div className="currency-prefix">$</div>
@@ -246,20 +243,33 @@ export function CandidateView({ offerId }) {
             onDragStart={() => setIsFocusing(true)}
             onDragEnd={() => setIsFocusing(false)}
           />
-        </div>
+        </section>
+
+        {/* Privacy note */}
+        <section className="card-block dim-when-unfocused">
+          <div className="privacy-note">
+            <span>🔐</span>
+            <span>Single-use link; expires in 24 hours. We delete your inputs after the run.</span>
+          </div>
+        </section>
+
+        <section className="card-block card-block--cta">
+          <SlideToConfirm
+            text="Slide to Lock Offer"
+            onConfirm={handleSubmit}
+            loading={submitting}
+            disabled={submitting}
+          />
+          <p className="microcopy quiet-text cta-hint dim-when-unfocused">
+            You can adjust before locking; this will notify the company once submitted.
+          </p>
+        </section>
       </div>
 
-      {/* Privacy note */}
-      <div className="rounded-2xl bg-slate-50 px-4 py-3 text-xs text-slate-600 border border-slate-200 dim-when-unfocused">
-        Single-use link; expires in 24 hours. We delete your inputs after the run.
-      </div>
-
-      <SlideToConfirm
-        text="Slide to Lock Offer"
-        onConfirm={handleSubmit}
-        loading={submitting}
-        disabled={submitting}
-      />
+      <aside className="mini-widget mini-widget--side dim-when-unfocused">
+        <p className="mini-widget__title">Your single number</p>
+        <p className="mini-widget__body">Set the all-in comp you need; we reveal only the final match.</p>
+      </aside>
     </div>
   );
 }
