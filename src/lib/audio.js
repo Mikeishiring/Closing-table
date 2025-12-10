@@ -3,14 +3,28 @@
  * Centralized audio effects with graceful degradation
  */
 
+let sharedAudioContext = null;
+
+function getAudioContext() {
+  if (sharedAudioContext) return sharedAudioContext;
+  if (typeof window === 'undefined') return null;
+
+  const AudioCtor = window.AudioContext || window.webkitAudioContext;
+  if (!AudioCtor) return null;
+
+  sharedAudioContext = new AudioCtor();
+  return sharedAudioContext;
+}
+
 /**
  * Create click sound using Web Audio API
  */
 export function createClickSound() {
-  try {
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    
-    return () => {
+  const audioContext = getAudioContext();
+  if (!audioContext) return () => {};
+
+  return () => {
+    try {
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
       
@@ -28,21 +42,21 @@ export function createClickSound() {
       
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + 0.1);
-    };
-  } catch (error) {
-    console.warn('Audio not supported:', error);
-    return () => {}; // No-op fallback
-  }
+    } catch (error) {
+      console.warn('Click sound failed:', error);
+    }
+  };
 }
 
 /**
  * Create success sound using Web Audio API
  */
 export function createSuccessSound() {
-  try {
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    
-    return () => {
+  const audioContext = getAudioContext();
+  if (!audioContext) return () => {};
+
+  return () => {
+    try {
       const oscillator1 = audioContext.createOscillator();
       const oscillator2 = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
@@ -66,25 +80,31 @@ export function createSuccessSound() {
       oscillator2.start(audioContext.currentTime);
       oscillator1.stop(audioContext.currentTime + 0.3);
       oscillator2.stop(audioContext.currentTime + 0.3);
-    };
-  } catch (error) {
-    console.warn('Audio not supported:', error);
-    return () => {}; // No-op fallback
-  }
+    } catch (error) {
+      console.warn('Success sound failed:', error);
+    }
+  };
 }
 
 /**
  * Create tension sound for slider interaction
  */
 export function createTensionSound() {
-  try {
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    let oscillator = null;
-    let gainNode = null;
-    let isPlaying = false;
-    
+  const audioContext = getAudioContext();
+  if (!audioContext) {
     return {
-      play(progress) {
+      play: () => {},
+      stop: () => {},
+    };
+  }
+
+  let oscillator = null;
+  let gainNode = null;
+  let isPlaying = false;
+  
+  return {
+    play(progress) {
+      try {
         if (!isPlaying) {
           oscillator = audioContext.createOscillator();
           gainNode = audioContext.createGain();
@@ -108,34 +128,35 @@ export function createTensionSound() {
             audioContext.currentTime
           );
         }
-      },
-      
-      stop() {
+      } catch (error) {
+        console.warn('Tension sound failed:', error);
+      }
+    },
+    
+    stop() {
+      try {
         if (isPlaying && oscillator) {
           oscillator.stop();
           oscillator = null;
           gainNode = null;
           isPlaying = false;
         }
-      },
-    };
-  } catch (error) {
-    console.warn('Audio not supported:', error);
-    return {
-      play: () => {},
-      stop: () => {},
-    };
-  }
+      } catch (error) {
+        console.warn('Stop tension sound failed:', error);
+      }
+    },
+  };
 }
 
 /**
  * Create thunk sound for slider release
  */
 export function createThunkSound() {
-  try {
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    
-    return () => {
+  const audioContext = getAudioContext();
+  if (!audioContext) return () => {};
+
+  return () => {
+    try {
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
       
@@ -153,11 +174,10 @@ export function createThunkSound() {
       
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + 0.15);
-    };
-  } catch (error) {
-    console.warn('Audio not supported:', error);
-    return () => {}; // No-op fallback
-  }
+    } catch (error) {
+      console.warn('Thunk sound failed:', error);
+    }
+  };
 }
 
 /**
@@ -225,10 +245,11 @@ export const haptics = {
  * Softer than click, just a tiny audio cue
  */
 export function createSnapSound() {
-  try {
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    
-    return () => {
+  const audioContext = getAudioContext();
+  if (!audioContext) return () => {};
+
+  return () => {
+    try {
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
       
@@ -248,10 +269,9 @@ export function createSnapSound() {
       
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + 0.05);
-    };
-  } catch (error) {
-    console.warn('Audio not supported:', error);
-    return () => {}; // No-op fallback
-  }
+    } catch (error) {
+      console.warn('Snap sound failed:', error);
+    }
+  };
 }
 

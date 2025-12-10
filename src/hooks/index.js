@@ -4,11 +4,11 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { parseHash } from '../lib/routing';
+import { parseHash } from '../routing';
 import { 
   clampTotal,
   validateTotal,
-} from '../lib/deal-math';
+} from '../lib/deal';
 import { 
   createClickSound, 
   createSuccessSound,
@@ -20,6 +20,7 @@ import {
 // Re-export new hooks
 export { useHaptics } from './useHaptics';
 export { useReducedMotion } from './useReducedMotion';
+export { useFocusMode } from './useFocusMode';
 
 /**
  * Hook for hash-based routing

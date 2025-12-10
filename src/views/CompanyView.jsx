@@ -3,11 +3,12 @@
  * Where companies set their maximum offer
  */
 
-import React, { useState, useEffect } from 'react';
-import { SignatureSlider } from '../components/SignatureSlider';
-import { SlideToConfirm } from '../components/SlideToConfirm';
-import { createOffer, generateOfferLink, copyToClipboard } from '../lib/api';
-import { formatCurrency, LIMITS } from '../lib/deal-math';
+import React, { useCallback, useMemo, useState } from 'react';
+import { PrimaryCard, PrimaryPanel, PrimarySlider, SecondaryPanel, SlideToConfirm, ValueInputSection } from '../components';
+import { createOffer, generateOfferLink, copyToClipboard } from '../api';
+import { LIMITS, parseMoneyInput, formatNumber } from '../lib/deal';
+import { useFocusMode } from '../hooks';
+import { PRIVACY_COPY, EXPIRY } from '../tokens';
 
 export function CompanyView() {
   const [totalMax, setTotalMax] = useState(120000);
@@ -16,33 +17,25 @@ export function CompanyView() {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isFocusing, setIsFocusing] = useState(false);
+  const [formError, setFormError] = useState('');
+  const { enable: enableFocusMode, disable: disableFocusMode } = useFocusMode();
+  const companyLinkCopy = useMemo(
+    () => PRIVACY_COPY.companyLink.replace('24 hours', `${EXPIRY.offerHours} hours`),
+    []
+  );
 
-  useEffect(() => {
-    if (isFocusing) {
-      document.body.classList.add('focus-mode');
-    } else {
-      document.body.classList.remove('focus-mode');
-    }
-    return () => document.body.classList.remove('focus-mode');
-  }, [isFocusing]);
+  const resetForm = useCallback(() => {
+    setOfferLink(null);
+    setTotalMax(120000);
+    setTotalInput('120,000');
+    setFormError('');
+  }, []);
 
-  const parseCurrencyInput = (raw) => {
-    if (!raw) return 0;
-    const str = raw.toString().trim().toLowerCase().replace(/[$,\s]/g, '');
-    const multiplier = str.includes('m') ? 1_000_000 : str.includes('k') ? 1_000 : 1;
-    const numeric = parseFloat(str.replace(/[km]/g, ''));
-    if (Number.isNaN(numeric)) return 0;
-    return Math.round(numeric * multiplier);
-  };
-
-  const formatNumber = (value) => {
-    if (!Number.isFinite(value)) return '';
-    return value.toLocaleString('en-US');
-  };
-
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
+    if (loading) return;
     try {
       setLoading(true);
+      setFormError('');
       const response = await createOffer({
         max: totalMax,
       });
@@ -50,143 +43,120 @@ export function CompanyView() {
       const link = generateOfferLink(response.offerId);
       setOfferLink(link);
     } catch (error) {
-      alert('Error creating offer: ' + error.message);
+      setFormError(error.message || 'We could not create this offer. Please retry.');
     } finally {
       setLoading(false);
     }
-  };
+  }, [loading, totalMax]);
 
-  const handleCopyLink = async () => {
+  const handleCopyLink = useCallback(async () => {
+    if (!offerLink) return;
     const result = await copyToClipboard(offerLink);
     if (result.success) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
-  };
+  }, [offerLink]);
 
-  const handleTotalInputChange = (val) => {
-    setTotalInput(val);
-    const parsed = parseCurrencyInput(val);
-    const clamped = Math.min(Math.max(parsed, LIMITS.TOTAL_MIN), LIMITS.TOTAL_MAX);
-    setTotalMax(clamped);
-  };
+  const handleTotalInputChange = useCallback((val) => {
+    const { value, display } = parseMoneyInput(val, LIMITS);
+    setTotalInput(display);
+    setTotalMax(value);
+    setFormError('');
+  }, []);
 
   if (offerLink) {
     return (
-      <div className="glass-panel card-flow animate-[cardIn_280ms_ease-out]" data-focus-mode={isFocusing}>
-        {/* Hero: Big icon + headline */}
-        <header className="flex flex-col items-center text-center space-y-3 dim-when-unfocused">
-          <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-emerald-400 via-cyan-400 to-sky-500 text-white shadow-[0_20px_40px_-12px_rgba(14,165,233,0.55)] animate-[emojiPop_260ms_ease-out]">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M5 13l4 4L19 7" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+      <PrimaryCard className="animate-[cardIn_280ms_ease-out]" data-focus-mode={isFocusing}>
+        <div className="card-flow">
+          <header className="flex flex-col items-center text-center space-y-3">
+            <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-emerald-400 via-cyan-400 to-sky-500 text-white shadow-[0_20px_40px_-12px_rgba(14,165,233,0.55)] animate-[emojiPop_260ms_ease-out]">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M5 13l4 4L19 7" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            
+            <h1 className="text-3xl font-extrabold text-slate-900">
+              Link ready
+            </h1>
+            
+            <p className="text-base text-slate-600 max-w-sm">
+              {`${companyLinkCopy} This is the handshake—keep it handy.`}
+            </p>
+          </header>
+          
+          <main className="space-y-4">
+            <section className="space-y-3">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
+                Shareable link
+              </p>
+              <div className="relative flex items-center rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3 text-xs md:text-sm text-slate-800 font-mono">
+                <span className="break-all pr-12">{offerLink}</span>
+                <button
+                  onClick={handleCopyLink}
+                  className="absolute right-2 inline-flex items-center gap-1 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 shadow-sm hover:bg-slate-100 transition"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" strokeWidth="2" />
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" strokeWidth="2" />
+                  </svg>
+                  {copied ? 'Copied' : 'Copy link'}
+                </button>
+              </div>
+              <p className="text-sm text-slate-500">
+                Preview it or drop it in a note. The candidate only sees the final outcome.
+              </p>
+            </section>
+          </main>
+          
+          <div className="flex flex-col gap-3 focus-priority">
+            <button
+              onClick={() => window.open(offerLink, '_blank', 'noopener')}
+              className="w-full rounded-full bg-slate-900 text-white py-3 text-sm font-semibold hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 transition-all active:scale-[0.98]"
+            >
+              Open link
+            </button>
+
+            <button onClick={resetForm} className="w-full text-sm font-semibold text-slate-700 hover:underline py-2">
+              New offer
+            </button>
           </div>
           
-          <h1 className="text-3xl font-extrabold text-slate-900">
-            Link ready
-          </h1>
-          
-          <p className="text-base text-slate-600 max-w-sm">
-            Works once and expires in 24 hours. This is the handshake—keep it handy.
-          </p>
-        </header>
-        
-        {/* Details: The link */}
-        <main className="space-y-4">
-          <section className="space-y-3">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
-              Shareable link
-            </p>
-            <div className="relative flex items-center rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3 text-xs md:text-sm text-slate-800 font-mono">
-              <span className="break-all pr-12">{offerLink}</span>
-              <button
-                onClick={handleCopyLink}
-                className="absolute right-2 inline-flex items-center gap-1 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 shadow-sm hover:bg-slate-100 transition"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" strokeWidth="2" />
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" strokeWidth="2" />
-                </svg>
-                {copied ? 'Copied' : 'Copy'}
-              </button>
-            </div>
-            <p className="text-sm text-slate-500">
-              Preview or paste it in a note. The candidate sees only the final outcome.
-            </p>
-          </section>
-        </main>
-        
-        {/* Actions */}
-        <div className="flex flex-col gap-3 focus-priority">
-          <button
-            onClick={() => window.open(offerLink, '_blank', 'noopener')}
-            className="w-full rounded-full bg-slate-900 text-white py-3 text-sm font-semibold hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 transition-all active:scale-[0.98]"
-          >
-            Open link
-          </button>
-
-          <button
-            onClick={() => {
-              setOfferLink(null);
-              setTotalMax(120000);
-              setTotalInput('120,000');
-            }}
-            className="w-full text-sm font-semibold text-slate-700 hover:underline py-2"
-          >
-            New offer
-          </button>
+          <div className="flex items-center justify-center gap-2 text-[12px] text-slate-500">
+            <span>🔐</span>
+            <span>{companyLinkCopy}</span>
+          </div>
         </div>
-        
-        {/* Privacy hint */}
-        <div className="flex items-center justify-center gap-2 text-[12px] text-slate-500">
-          <span>🔐</span>
-          <span>Your max is deleted after the run; only the outcome stays.</span>
-        </div>
-        
-      </div>
+      </PrimaryCard>
     );
   }
 
   return (
-    <div className="glass-panel card-flow animate-[cardIn_280ms_ease-out]" data-focus-mode={isFocusing}>
-      <section className="card-block instruction-block dim-when-unfocused">
-        <p className="instruction-primary">Set your ceiling.</p>
-        <p className="instruction-support" style={{ marginTop: '8px' }}>
-          One-time, 24h link. Only the final outcome is shown.
-        </p>
-        <div className="privacy-note" style={{ marginTop: '16px' }}>
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          <span>Your max is deleted after the run; only the outcome stays.</span>
-        </div>
-      </section>
-
-      <section className="card-block focus-priority input-section">
-        <label className="input-label">
-          Maximum total compensation
-        </label>
-        <div className="relative">
-          <div className="currency-prefix">$</div>
-          <input
-            className="hero-currency-input"
-            value={totalInput}
+    <div className="page-grid">
+      <PrimaryPanel
+        className="animate-[cardIn_280ms_ease-out]"
+        title="Set your ceiling. Share one private link."
+        subtitle={`One-time link. Expires in ${EXPIRY.offerHours} hours.`}
+        data-focus-mode={isFocusing}
+      >
+        <div className="card-flow">
+          <ValueInputSection
+            label="Maximum total compensation"
+            inputValue={totalInput}
             placeholder="120,000"
-            onFocus={() => setIsFocusing(true)}
-            onBlur={() => setIsFocusing(false)}
-            onChange={(e) => handleTotalInputChange(e.target.value)}
-            inputMode="numeric"
-            aria-label="Maximum total compensation"
+            onInputChange={handleTotalInputChange}
+            onFocus={() => {
+              setIsFocusing(true);
+              enableFocusMode();
+            }}
+            onBlur={() => {
+              setIsFocusing(false);
+              disableFocusMode();
+            }}
           />
-        </div>
 
-        <div className="slider-stack">
-          <div className="flex items-center justify-between">
-            <span className="instruction-support" style={{ textAlign: 'left' }}>Fine-tune with slider</span>
-            <span className="instruction-support" style={{ fontWeight: 500, color: 'var(--text-primary)' }}>{formatCurrency(totalMax)}</span>
-          </div>
-          <SignatureSlider
+          <PrimarySlider
+            label="Adjust maximum total compensation"
             value={totalMax}
             min={LIMITS.TOTAL_MIN}
             max={LIMITS.TOTAL_MAX}
@@ -195,28 +165,52 @@ export function CompanyView() {
               const next = Number(e.target.value);
               setTotalMax(next);
               setTotalInput(formatNumber(next));
+              setFormError('');
             }}
             variant="company"
-            label="Company maximum total compensation"
             enableSnapPoints={false}
             thumbEmoji={null}
-            onDragStart={() => setIsFocusing(true)}
-            onDragEnd={() => setIsFocusing(false)}
+            onDragStart={() => {
+              setIsFocusing(true);
+              enableFocusMode();
+            }}
+            onDragEnd={() => {
+              setIsFocusing(false);
+              disableFocusMode();
+            }}
           />
-        </div>
-      </section>
 
-      <section className="card-block card-block--cta cta-section">
-        <SlideToConfirm
-          text="Slide to Lock Offer"
-          onConfirm={handleSubmit}
-          loading={loading}
-          disabled={loading}
-        />
-        <p className="cta-hint dim-when-unfocused">
-          Works once and expires in 24 hours. We delete your max after the run.
-        </p>
-      </section>
+          <section className="card-block card-block--cta">
+            <div className="cta-stack">
+              <SlideToConfirm
+                text="Slide to Lock Offer"
+                onConfirm={handleSubmit}
+                loading={loading}
+                disabled={loading}
+              />
+              {formError ? (
+                <p className="cta-error" role="alert" aria-live="polite">
+                  <span aria-hidden="true">⚠️</span>
+                  <span>{formError}</span>
+                </p>
+              ) : (
+                <div className="privacy-note" aria-live="polite">
+                  <span>🔐</span>
+                  <span>{companyLinkCopy}</span>
+                </div>
+              )}
+            </div>
+          </section>
+        </div>
+      </PrimaryPanel>
+
+      <SecondaryPanel
+        title="For hiring teams"
+        items={[
+          'Set a ceiling without revealing it.',
+          'Share one link that auto-expires.',
+        ]}
+      />
     </div>
   );
 }

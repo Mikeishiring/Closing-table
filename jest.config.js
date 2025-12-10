@@ -1,6 +1,9 @@
 module.exports = {
   testEnvironment: 'node',
-  testMatch: ['**/*.test.js'],
+  testMatch: ['**/*.test.[jt]s'],
+  transform: {
+    '^.+\\.[tj]sx?$': 'babel-jest',
+  },
   collectCoverageFrom: [
     'server.js',
     '!**/node_modules/**',
@@ -14,6 +17,7 @@ module.exports = {
     }
   }
 };
+
 
 
 

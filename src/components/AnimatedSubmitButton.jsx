@@ -146,7 +146,7 @@ const SealedEnvelope = ({ show, reducedMotion, onComplete }) => {
  * @param {Function} props.onSuccess - Callback when success animation completes
  * @param {Function} props.onError - Callback for error handling
  */
-export function AnimatedSubmitButton({
+function AnimatedSubmitButtonComponent({
   onClick,
   disabled = false,
   buttonText = 'Lock it in & Get Link',
@@ -366,3 +366,5 @@ export function AnimatedSubmitButton({
     </div>
   );
 }
+
+export const AnimatedSubmitButton = React.memo(AnimatedSubmitButtonComponent);

@@ -5,6 +5,7 @@
 
 import React, { Suspense } from 'react';
 import { useHashRoute } from './hooks';
+import { LayoutShell } from './components';
 
 // Lazy load views for better performance
 const CompanyView = React.lazy(() => import('./views/CompanyView').then(m => ({ default: m.CompanyView })));
@@ -35,23 +36,17 @@ function App() {
   const route = useHashRoute();
 
   return (
-    <div className="aurora-shell flex items-center justify-center p-4">
-      <div className="relative max-w-4xl w-full z-10 flex flex-col items-center">
-        <h1 className="app-title dim-when-unfocused">
-          The Closing Table
-        </h1>
-
-        <Suspense fallback={<LoadingFallback />}>
-          {route.type === 'result' ? (
-            <ResultView resultId={route.id} />
-          ) : route.type === 'offer' ? (
-            <CandidateView offerId={route.id} />
-          ) : (
-            <CompanyView />
-          )}
-        </Suspense>
-      </div>
-    </div>
+    <LayoutShell>
+      <Suspense fallback={<LoadingFallback />}>
+        {route.type === 'result' ? (
+          <ResultView resultId={route.id} />
+        ) : route.type === 'offer' ? (
+          <CandidateView offerId={route.id} />
+        ) : (
+          <CompanyView />
+        )}
+      </Suspense>
+    </LayoutShell>
   );
 }
 

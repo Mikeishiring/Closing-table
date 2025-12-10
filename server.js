@@ -34,7 +34,9 @@ app.use(helmet({
         "https://grainy-gradients.vercel.app"
       ],
       connectSrc: [
-        "'self'"
+        "'self'",
+        "http://localhost:3000",
+        "https://closing-table-backend.onrender.com"
       ]
     }
   }

@@ -5,5 +5,6 @@
 
 export { SignatureSlider, SalarySliderThumb } from './SignatureSlider';
 export { AnimatedSubmitButton } from './AnimatedSubmitButton';
-export { SlideToConfirm } from './SlideToConfirm';
+export * from './composite';
 export { InitialsStamp } from './InitialsStamp';
+export * from './shared';

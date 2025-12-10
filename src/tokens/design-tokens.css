@@ -1,0 +1,55 @@
+:root {
+  /* Surfaces */
+  --bg-page: #050814;
+  --bg-card: rgba(255, 255, 255, 0.82);
+  --bg-card-strong: rgba(255, 255, 255, 0.9);
+  --bg-card-muted: rgba(255, 255, 255, 0.7);
+  --bg-info: rgba(255, 255, 255, 0.64);
+
+  /* Text */
+  --text-primary: #0b0b0f;
+  --text-secondary: #3c3c43;
+  --text-tertiary: #6b7280;
+
+  /* Accent + states */
+  --accent-primary: #4b7bf5;
+  --accent-primary-strong: #3764e5;
+  --accent-hover: #3f74f7;
+  --accent-candidate: #6c5ce7;
+  --accent-candidate-hover: #5b4ad6;
+  --success-color: #34c759;
+  --error-color: #ff3b30;
+
+  /* Borders & shadows */
+  --border-subtle: rgba(12, 18, 37, 0.08);
+  --border-strong: rgba(12, 18, 37, 0.12);
+  --shadow-card: 0 24px 60px -34px rgba(0, 0, 0, 0.55), 0 12px 30px -24px rgba(0, 0, 0, 0.32);
+  --shadow-soft: 0 12px 32px -20px rgba(7, 11, 24, 0.45), 0 6px 16px -12px rgba(7, 11, 24, 0.28);
+
+  /* Radii */
+  --radius-card: 22px;
+  --radius-chip: 14px;
+  --radius-pill: 999px;
+
+  /* Spacing scale */
+  --space-1: 6px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+
+  /* Slider */
+  --slider-track: #e4e6ef;
+  --slider-fill: linear-gradient(90deg, #4b7bf5 0%, #5ca0ff 100%);
+  --slider-thumb: #ffffff;
+
+  /* Aurora accents (existing) */
+  --aurora-1: #8b5cf6;
+  --aurora-2: #22d3ee;
+  --aurora-3: #7c3aed;
+  --aurora-4: #111827;
+}
+

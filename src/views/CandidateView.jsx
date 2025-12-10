@@ -3,12 +3,13 @@
  * Where candidates respond to offers
  */
 
-import React, { useState, useEffect } from 'react';
-import { SignatureSlider } from '../components/SignatureSlider';
-import { SlideToConfirm } from '../components/SlideToConfirm';
-import { getOffer, submitResponse } from '../lib/api';
-import { formatCurrency, LIMITS } from '../lib/deal-math';
-import { ResultCard } from '../components/ResultCard';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { PrimaryCard, PrimaryPanel, PrimarySlider, SlideToConfirm, ValueInputSection, ResultCard } from '../components';
+import { getOffer, submitResponse } from '../api';
+import { formatCurrency, LIMITS, parseMoneyInput, formatNumber } from '../lib/deal';
+import { useFocusMode } from '../hooks';
+import { goHome } from '../routing';
+import { PRIVACY_COPY, EXPIRY } from '../tokens';
 
 export function CandidateView({ offerId }) {
   const [loading, setLoading] = useState(true);
@@ -18,12 +19,25 @@ export function CandidateView({ offerId }) {
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState(null);
   const [isFocusing, setIsFocusing] = useState(false);
+  const [formError, setFormError] = useState('');
+  const offerAbortRef = useRef(null);
+  const { enable: enableFocusMode, disable: disableFocusMode } = useFocusMode();
+  const candidateLinkCopy = useMemo(
+    () => PRIVACY_COPY.candidateLink.replace('24 hours', `${EXPIRY.offerHours} hours`),
+    []
+  );
 
   useEffect(() => {
     async function fetchOffer() {
       try {
         setLoading(true);
-        const data = await getOffer(offerId);
+        // Abort any in-flight request when offerId changes
+        if (offerAbortRef.current) {
+          offerAbortRef.current.abort();
+        }
+        const controller = new AbortController();
+        offerAbortRef.current = controller;
+        const data = await getOffer(offerId, { signal: controller.signal });
         
         if (!data) {
           setError('Offer not found');
@@ -40,6 +54,7 @@ export function CandidateView({ offerId }) {
           return;
         }
       } catch (err) {
+        if (err?.name === 'AbortError') return;
         setError(err.message || 'Failed to load offer');
       } finally {
         setLoading(false);
@@ -47,70 +62,60 @@ export function CandidateView({ offerId }) {
     }
     
     fetchOffer();
+    return () => {
+      if (offerAbortRef.current) {
+        offerAbortRef.current.abort();
+      }
+    };
   }, [offerId]);
 
-  useEffect(() => {
-    if (isFocusing) {
-      document.body.classList.add('focus-mode');
-    } else {
-      document.body.classList.remove('focus-mode');
-    }
-    return () => document.body.classList.remove('focus-mode');
-  }, [isFocusing]);
+  const handleTotalInputChange = useCallback((val) => {
+    const { value, display } = parseMoneyInput(val, LIMITS);
+    setTotalInput(display);
+    setTotalComp(value);
+    setFormError('');
+  }, []);
 
-  const formatNumber = (value) => {
-    if (!Number.isFinite(value)) return '';
-    return value.toLocaleString('en-US');
-  };
-
-  const parseCurrencyInput = (raw) => {
-    if (!raw) return 0;
-    const str = raw.toString().trim().toLowerCase().replace(/[$,\s]/g, '');
-    const multiplier = str.includes('m') ? 1_000_000 : str.includes('k') ? 1_000 : 1;
-    const numeric = parseFloat(str.replace(/[km]/g, ''));
-    if (Number.isNaN(numeric)) return 0;
-    return Math.round(numeric * multiplier);
-  };
-
-  const handleTotalInputChange = (val) => {
-    setTotalInput(val);
-    const parsed = parseCurrencyInput(val);
-    const clamped = Math.min(Math.max(parsed, LIMITS.TOTAL_MIN), LIMITS.TOTAL_MAX);
-    setTotalComp(clamped);
-  };
-
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
+    if (submitting) return;
     try {
       setSubmitting(true);
+      setFormError('');
       
       const clampedTotal = Math.min(Math.max(totalComp, LIMITS.TOTAL_MIN), LIMITS.TOTAL_MAX);
 
       // Client-side validation for sanity
       if (clampedTotal < LIMITS.TOTAL_MIN || clampedTotal > LIMITS.TOTAL_MAX) {
-        throw new Error(
-          `Please keep your minimum between ${formatCurrency(LIMITS.TOTAL_MIN)} and ${formatCurrency(LIMITS.TOTAL_MAX)}.`
-        );
+        setFormError(`Please keep your minimum between ${formatCurrency(LIMITS.TOTAL_MIN)} and ${formatCurrency(LIMITS.TOTAL_MAX)}.`);
+        return;
       }
       
       const data = await submitResponse(offerId, {
         min: clampedTotal,
       });
-      
+
+      if (data?.resultId) {
+        // Persist result in route so it can be reopened/shareable
+        window.location.hash = `#result=${data.resultId}`;
+        return;
+      }
+
       setResult({
         status: data.status,
         finalOffer: data.final,
         suggested: data.suggested,
       });
     } catch (err) {
-      alert('Error submitting response: ' + err.message);
+      if (err?.name === 'AbortError') return;
+      setFormError(err.message || 'We could not submit your response. Please retry.');
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [offerId, submitting, totalComp]);
 
   if (loading) {
     return (
-      <div className="glass-panel space-y-6 animate-[cardIn_280ms_ease-out]">
+      <PrimaryCard className="space-y-6 animate-[cardIn_280ms_ease-out]">
         <div className="animate-pulse space-y-6">
           <div className="space-y-2 text-center">
             <div className="h-8 bg-slate-200 rounded w-1/3 mx-auto" />
@@ -123,19 +128,19 @@ export function CandidateView({ offerId }) {
           </div>
           <div className="h-12 bg-slate-200 rounded-full w-full" />
         </div>
-      </div>
+      </PrimaryCard>
     );
   }
 
   if (error) {
     return (
-      <div className="glass-panel space-y-6 animate-[cardIn_280ms_ease-out]">
+      <PrimaryCard className="space-y-6 animate-[cardIn_280ms_ease-out]">
         <header className="flex flex-col items-center text-center space-y-3">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 ring-4 ring-rose-100 text-4xl text-rose-600 animate-[emojiPop_260ms_ease-out]">
             <span>⚠️</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-semibold text-slate-900">
-            Oops
+            We couldn’t load your offer.
           </h1>
           <p className="text-sm md:text-base text-slate-600">
             {error}
@@ -144,13 +149,13 @@ export function CandidateView({ offerId }) {
         
         <div className="flex flex-col gap-3">
           <button
-            onClick={() => window.location.hash = ''}
+            onClick={goHome}
             className="w-full rounded-full bg-slate-900 text-white py-3 text-sm font-medium hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 transition-all active:scale-[0.98]"
           >
-            Ask for a new link
+            Request a new link
           </button>
         </div>
-      </div>
+      </PrimaryCard>
     );
   }
 
@@ -164,70 +169,30 @@ export function CandidateView({ offerId }) {
     );
   }
 
-  const currentStep = 1;
-  const steps = ['Set Number', 'See Result'];
-
   return (
-    <div className="panel-with-side">
-      <div className="glass-panel card-flow animate-[cardIn_280ms_ease-out] panel-main" data-focus-mode={isFocusing}>
-        {/* Stepper */}
-        <section className="card-block">
-          <div className="flex items-center gap-2">
-            {steps.map((label, idx) => {
-              const stepIndex = idx + 1;
-              const active = stepIndex <= currentStep;
-              const isCurrent = stepIndex === currentStep;
+    <div className="page-grid">
+      <PrimaryPanel
+        className="animate-[cardIn_280ms_ease-out]"
+        title="Total compensation"
+        data-focus-mode={isFocusing}
+      >
+        <div className="card-flow">
+          <ValueInputSection
+            label="Minimum total compensation you’d sign for"
+            inputValue={totalInput}
+            onInputChange={handleTotalInputChange}
+            onFocus={() => {
+              setIsFocusing(true);
+              enableFocusMode();
+            }}
+            onBlur={() => {
+              setIsFocusing(false);
+              disableFocusMode();
+            }}
+          />
 
-              return (
-                <div key={label} className="flex-1">
-                  <div
-                    className={`h-2 rounded-full transition-all ${
-                      active
-                        ? 'bg-gradient-to-r from-emerald-400 via-cyan-400 to-sky-500 shadow-[0_6px_16px_-6px_rgba(14,165,233,0.6)]'
-                        : 'bg-slate-200'
-                    }`}
-                  />
-                  {isCurrent && (
-                    <p className="mt-1 text-[11px] font-semibold text-slate-900 tracking-tight">
-                      {label}
-                    </p>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* Hero number */}
-        <section className="card-block text-center focus-priority">
-          <p className="eyebrow">Total Compensation</p>
-          <p className="text-5xl md:text-6xl font-semibold text-slate-900 tracking-tight">
-            {formatCurrency(totalComp)}
-          </p>
-          <p className="microcopy quiet-text">
-            One all-in number. Adjust and lock it in.
-          </p>
-        </section>
-
-        {/* Inputs */}
-        <section className="card-block focus-priority">
-          <div className="flex items-center justify-between text-sm">
-            <span className="input-label">Minimum total compensation</span>
-            <span className="value-chip">{formatCurrency(totalComp)}</span>
-          </div>
-          <div className="relative">
-            <div className="currency-prefix">$</div>
-            <input
-              className="currency-input"
-              value={totalInput}
-              onFocus={() => setIsFocusing(true)}
-              onBlur={() => setIsFocusing(false)}
-              onChange={(e) => handleTotalInputChange(e.target.value)}
-              inputMode="numeric"
-              aria-label="Total compensation"
-            />
-          </div>
-          <SignatureSlider
+          <PrimarySlider
+            label="Adjust minimum total compensation"
             value={totalComp}
             min={LIMITS.TOTAL_MIN}
             max={LIMITS.TOTAL_MAX}
@@ -236,40 +201,51 @@ export function CandidateView({ offerId }) {
               const next = Number(e.target.value);
               setTotalComp(next);
               setTotalInput(formatNumber(next));
+              setFormError('');
             }}
             variant="candidate"
-            label="Candidate minimum total compensation"
             thumbEmoji="🪙"
-            onDragStart={() => setIsFocusing(true)}
-            onDragEnd={() => setIsFocusing(false)}
+            onDragStart={() => {
+              setIsFocusing(true);
+              enableFocusMode();
+            }}
+            onDragEnd={() => {
+              setIsFocusing(false);
+              disableFocusMode();
+            }}
           />
-        </section>
 
-        {/* Privacy note */}
-        <section className="card-block dim-when-unfocused">
-          <div className="privacy-note">
-            <span>🔐</span>
-            <span>Single-use link; expires in 24 hours. We delete your inputs after the run.</span>
-          </div>
-        </section>
+          <section className="card-block">
+            <div className="privacy-note">
+              <span>🔐</span>
+              <span>
+                {candidateLinkCopy}
+              </span>
+            </div>
+          </section>
 
-        <section className="card-block card-block--cta">
-          <SlideToConfirm
-            text="Slide to Lock Offer"
-            onConfirm={handleSubmit}
-            loading={submitting}
-            disabled={submitting}
-          />
-          <p className="microcopy quiet-text cta-hint dim-when-unfocused">
-            You can adjust before locking; this will notify the company once submitted.
-          </p>
-        </section>
-      </div>
-
-      <aside className="mini-widget mini-widget--side dim-when-unfocused">
-        <p className="mini-widget__title">Your single number</p>
-        <p className="mini-widget__body">Set the all-in comp you need; we reveal only the final match.</p>
-      </aside>
+          <section className="card-block card-block--cta">
+            <div className="cta-stack">
+              <SlideToConfirm
+                text="Slide to Lock Offer"
+                onConfirm={handleSubmit}
+                loading={submitting}
+                disabled={submitting}
+              />
+              {formError ? (
+                <p className="cta-error" role="alert" aria-live="polite">
+                  <span aria-hidden="true">⚠️</span>
+                  <span>{formError}</span>
+                </p>
+              ) : (
+                <p className="microcopy quiet-text cta-hint">
+                  Adjust until it feels right. When you lock it, the company is notified.
+                </p>
+              )}
+            </div>
+          </section>
+        </div>
+      </PrimaryPanel>
     </div>
   );
 }

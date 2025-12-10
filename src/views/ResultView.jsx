@@ -4,8 +4,10 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { getResult } from '../lib/api';
-import { ResultCard } from '../components/ResultCard';
+import { getResult } from '../api';
+import { ResultCard } from '../components';
+import { goHome } from '../routing';
+import { PrimaryPanel } from '../components';
 
 export function ResultView({ resultId }) {
   const [result, setResult] = useState(null);
@@ -19,23 +21,23 @@ export function ResultView({ resultId }) {
         const data = await getResult(resultId);
         
         if (!data) {
-          setError('Result not found');
+          setError('We couldn’t find this result.');
           return;
         }
         
         if (data.status === 'invalid') {
-          setError('Invalid result link');
+          setError('This link doesn’t look right.');
           return;
         }
         
         if (data.status === 'expired') {
-          setError('Result has expired');
+          setError('This result has expired.');
           return;
         }
         
         setResult(data);
       } catch (err) {
-        setError(err.message || 'Failed to load result');
+        setError(err.message || 'We couldn’t load this result.');
       } finally {
         setLoading(false);
       }
@@ -46,7 +48,7 @@ export function ResultView({ resultId }) {
   
   if (loading) {
     return (
-      <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl space-y-6 animate-[cardIn_280ms_ease-out]">
+      <PrimaryPanel className="space-y-6 animate-[cardIn_280ms_ease-out]">
         <div className="animate-pulse space-y-6">
           <div className="space-y-2 text-center">
             <div className="h-8 bg-slate-200 rounded w-1/3 mx-auto" />
@@ -59,29 +61,31 @@ export function ResultView({ resultId }) {
           </div>
           <div className="h-12 bg-slate-200 rounded-full w-full" />
         </div>
-      </div>
+      </PrimaryPanel>
     );
   }
   
   if (error) {
     return (
-      <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl space-y-6 text-center animate-[cardIn_280ms_ease-out]">
+      <PrimaryPanel className="space-y-6 text-center animate-[cardIn_280ms_ease-out]">
         <div className="flex flex-col items-center space-y-3">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 ring-4 ring-rose-100 text-4xl text-rose-600 animate-[emojiPop_260ms_ease-out]">
             <span>⚠️</span>
           </div>
-          <h2 className="text-2xl md:text-3xl font-semibold text-slate-900">Oops</h2>
+          <h2 className="text-2xl md:text-3xl font-semibold text-slate-900">
+            We couldn’t show this result.
+          </h2>
           <p className="text-slate-600">{error}</p>
         </div>
         <div className="flex flex-col gap-3">
           <button
-            onClick={() => window.location.hash = ''}
+            onClick={goHome}
             className="w-full rounded-full bg-slate-900 text-white py-3 text-sm font-medium hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 transition-all active:scale-[0.98]"
           >
             Go to home
           </button>
         </div>
-      </div>
+      </PrimaryPanel>
     );
   }
   

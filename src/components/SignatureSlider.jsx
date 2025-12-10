@@ -11,7 +11,7 @@ import {
   getSnapPointPercent, 
   getNearestSnapPoint,
   applySnapBehavior 
-} from '../lib/deal-math';
+} from '../lib/deal';
 import { createSnapSound } from '../lib/audio';
 import { useHaptics, useReducedMotion } from '../hooks';
 
@@ -166,7 +166,7 @@ const GhostSignaturePath = ({ show, sliderWidth, reducedMotion }) => {
 /**
  * Signature Slider with haptics and micro-animations
  */
-export function SignatureSlider({
+function SignatureSliderComponent({
   value,
   min,
   max,
@@ -401,7 +401,7 @@ export function SignatureSlider({
 
   // Theme-based outline color
   const getThumbOutlineColor = () => {
-    return '#007AFF';
+    return 'var(--accent-primary)';
   };
 
   // Calculate thumb animation state
@@ -442,7 +442,7 @@ export function SignatureSlider({
           display: 'flex',
           width: '100%',
           alignItems: 'center',
-          height: '48px',
+          height: '52px',
         }}
       >
         {/* Track container */}
@@ -450,9 +450,9 @@ export function SignatureSlider({
           style={{
             position: 'relative',
             flex: 1,
-            height: '4px',
+            height: '6px',
             borderRadius: '9999px',
-            background: '#D1D1D6',
+            background: 'var(--slider-track, #e4e6ef)',
             marginLeft: '1.3rem',
             marginRight: '1.3rem',
           }}
@@ -463,9 +463,9 @@ export function SignatureSlider({
               position: 'absolute',
               height: '100%',
               borderRadius: '9999px',
-              background: '#007AFF',
+              background: 'var(--slider-fill, #4b7bf5)',
               width: `${percent}%`,
-              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
+              boxShadow: '0 4px 12px -8px rgba(0, 0, 0, 0.28)',
             }}
           />
 
@@ -512,8 +512,8 @@ export function SignatureSlider({
               justifyContent: 'center',
               borderRadius: '9999px',
               border: thumbEmoji ? '0px solid transparent' : `1px solid ${getThumbOutlineColor()}`,
-              backgroundColor: thumbEmoji ? 'transparent' : 'white',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.15)',
+              backgroundColor: thumbEmoji ? 'transparent' : 'var(--bg-card-strong, #fff)',
+              boxShadow: '0 10px 24px -16px rgba(7,11,24,0.45), 0 2px 8px -6px rgba(7,11,24,0.32)',
               pointerEvents: 'none',
               zIndex: 5,
             }}
@@ -549,7 +549,7 @@ export function SignatureSlider({
                   height: '12px',
                   width: '12px',
                   borderRadius: '9999px',
-                  background: '#007AFF',
+                  background: 'var(--accent-primary)',
                   boxShadow: 'inset 0 0 0 2px #fff',
                 }}
               />
@@ -585,6 +585,10 @@ export function SignatureSlider({
             handleDragStart();
           }}
           aria-label={label || `Slider value: $${value.toLocaleString()}`}
+          aria-valuemin={min}
+          aria-valuemax={max}
+          aria-valuenow={value}
+          aria-valuetext={`$${value.toLocaleString()}`}
           style={{
             position: 'absolute',
             left: '1.3rem',
@@ -605,3 +609,5 @@ export function SignatureSlider({
     </div>
   );
 }
+
+export const SignatureSlider = React.memo(SignatureSliderComponent);
