@@ -36,7 +36,7 @@ function App() {
 
   return (
     <div className="aurora-shell flex items-center justify-center p-4">
-      <div className="relative max-w-4xl w-full z-10">
+      <div className="relative max-w-4xl w-full z-10 flex flex-col items-center">
         <h1 className="app-title dim-when-unfocused">
           The Closing Table
         </h1>

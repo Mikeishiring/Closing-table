@@ -148,47 +148,43 @@ export function CompanyView() {
   }
 
   return (
-    <div className="panel-with-side">
-      <div className="glass-panel card-flow animate-[cardIn_280ms_ease-out] panel-main" data-focus-mode={isFocusing}>
-        <section className="card-block dim-when-unfocused">
-          <p className="eyebrow">Offer setup</p>
-          <h2 className="section-title">Set your ceiling. Send one link.</h2>
-          <p className="section-lead quiet-text">
-            One-time, 24h link. Only the final outcome is shown.
-          </p>
-          <div className="privacy-note">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            <span>We delete your max after the run; only the result is shown.</span>
-          </div>
-        </section>
+    <div className="glass-panel card-flow animate-[cardIn_280ms_ease-out]" data-focus-mode={isFocusing}>
+      <section className="card-block instruction-block dim-when-unfocused">
+        <p className="instruction-primary">Set your ceiling.</p>
+        <p className="instruction-support" style={{ marginTop: '8px' }}>
+          One-time, 24h link. Only the final outcome is shown.
+        </p>
+        <div className="privacy-note" style={{ marginTop: '16px' }}>
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <span>Your max is deleted after the run; only the outcome stays.</span>
+        </div>
+      </section>
 
-        {/* Total Compensation */}
-        <section className="card-block focus-priority">
-          <label className="input-label">
-            Maximum total compensation
-          </label>
-          <div className="relative">
-            <div className="currency-prefix">$</div>
-            <input
-              className="hero-currency-input"
-              value={totalInput}
-              onFocus={() => setIsFocusing(true)}
-              onBlur={() => setIsFocusing(false)}
-              onChange={(e) => handleTotalInputChange(e.target.value)}
-              inputMode="numeric"
-              aria-label="Maximum total compensation"
-            />
-          </div>
-        </section>
+      <section className="card-block focus-priority input-section">
+        <label className="input-label">
+          Maximum total compensation
+        </label>
+        <div className="relative">
+          <div className="currency-prefix">$</div>
+          <input
+            className="hero-currency-input"
+            value={totalInput}
+            placeholder="120,000"
+            onFocus={() => setIsFocusing(true)}
+            onBlur={() => setIsFocusing(false)}
+            onChange={(e) => handleTotalInputChange(e.target.value)}
+            inputMode="numeric"
+            aria-label="Maximum total compensation"
+          />
+        </div>
 
-        {/* Slider */}
-        <section className="card-block focus-priority">
+        <div className="slider-stack">
           <div className="flex items-center justify-between">
-            <span className="quiet-text text-sm font-semibold">Fine-tune with slider</span>
-            <span className="value-chip">{formatCurrency(totalMax)}</span>
+            <span className="instruction-support" style={{ textAlign: 'left' }}>Fine-tune with slider</span>
+            <span className="instruction-support" style={{ fontWeight: 500, color: 'var(--text-primary)' }}>{formatCurrency(totalMax)}</span>
           </div>
           <SignatureSlider
             value={totalMax}
@@ -202,29 +198,25 @@ export function CompanyView() {
             }}
             variant="company"
             label="Company maximum total compensation"
-            thumbEmoji="🪙"
+            enableSnapPoints={false}
+            thumbEmoji={null}
             onDragStart={() => setIsFocusing(true)}
             onDragEnd={() => setIsFocusing(false)}
           />
-        </section>
+        </div>
+      </section>
 
-        <section className="card-block card-block--cta">
-          <SlideToConfirm
-            text="Slide to Lock Offer"
-            onConfirm={handleSubmit}
-            loading={loading}
-            disabled={loading}
-          />
-          <p className="microcopy quiet-text cta-hint dim-when-unfocused">
-            Works once and expires in 24 hours. We delete your max after the run.
-          </p>
-        </section>
-      </div>
-
-      <aside className="mini-widget mini-widget--side dim-when-unfocused">
-        <p className="mini-widget__title">Private, single-use link</p>
-        <p className="mini-widget__body">Share your ceiling once—only the final outcome is visible.</p>
-      </aside>
+      <section className="card-block card-block--cta cta-section">
+        <SlideToConfirm
+          text="Slide to Lock Offer"
+          onConfirm={handleSubmit}
+          loading={loading}
+          disabled={loading}
+        />
+        <p className="cta-hint dim-when-unfocused">
+          Works once and expires in 24 hours. We delete your max after the run.
+        </p>
+      </section>
     </div>
   );
 }

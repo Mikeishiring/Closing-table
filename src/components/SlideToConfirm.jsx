@@ -15,7 +15,7 @@ export function SlideToConfirm({
   const [dragging, setDragging] = useState(false);
   const [locked, setLocked] = useState(false);
   const controls = useAnimation();
-  const HANDLE_SIZE = 48; // px
+  const HANDLE_SIZE = 44; // px
   const [dragBounds, setDragBounds] = useState({ left: 0, right: 0 });
 
   // Measure track width to set drag bounds
@@ -91,18 +91,22 @@ export function SlideToConfirm({
     return true;
   };
 
-  const fillStyle = locked || loading
-    ? 'linear-gradient(90deg, #10b981, #22d3ee)'
-    : 'linear-gradient(90deg, rgba(148, 163, 184, 0.55), rgba(148, 163, 184, 0.75))';
+  const fillStyle = '#007AFF';
 
   return (
     <div className="slide-cta focus-priority">
       <div
         ref={trackRef}
-        className={`slide-track relative w-full h-14 rounded-full bg-slate-100 border border-slate-200 overflow-hidden select-none ${
+        className={`slide-track relative w-full overflow-hidden select-none ${
           disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
         }`}
-        style={{ touchAction: 'none' }}
+        style={{
+          touchAction: 'none',
+          height: '64px',
+          borderRadius: '16px',
+          border: '1px solid #E5E5EA',
+          background: '#F2F2F7',
+        }}
       >
         <div
           className="absolute inset-y-0 left-0"
@@ -110,13 +114,13 @@ export function SlideToConfirm({
             width: `${progress}%`,
             background: fillStyle,
             transition: dragging ? 'none' : 'width 180ms ease',
-            opacity: locked || loading ? 1 : 0.9,
+            opacity: locked || loading ? 0.25 : 0.18,
           }}
         />
 
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <span
-            className="cta-label text-sm font-semibold text-slate-500 transition-opacity"
+            className="cta-label transition-opacity"
             style={{ opacity: 1 - Math.min(progress / 100, 1) }}
           >
             {text}
@@ -124,7 +128,7 @@ export function SlideToConfirm({
         </div>
 
         <motion.div
-          className="absolute top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white shadow-lg border border-slate-200 flex items-center justify-center"
+          className="absolute top-1/2 -translate-y-1/2 flex items-center justify-center"
           drag="x"
           dragConstraints={{ left: dragBounds.left, right: dragBounds.right }}
           dragElastic={0}
@@ -134,7 +138,15 @@ export function SlideToConfirm({
           onDragEnd={handleDragEnd}
           animate={controls}
           initial={{ x: 0 }}
-          style={{ touchAction: 'none' }}
+          style={{
+            touchAction: 'none',
+            height: '44px',
+            width: '44px',
+            borderRadius: '50%',
+            backgroundColor: '#fff',
+            border: '1px solid #E5E5EA',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+          }}
           whileTap={{ scale: 1.02 }}
           whileHover={!disabled && !loading ? { scale: 1.01 } : undefined}
         >

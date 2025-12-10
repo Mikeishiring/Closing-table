@@ -401,13 +401,7 @@ export function SignatureSlider({
 
   // Theme-based outline color
   const getThumbOutlineColor = () => {
-    if (activeSnapPoint !== null) {
-      return '#00E5ED'; // Brighter when near snap point
-    }
-    if (variant === 'candidate') {
-      return '#7C3AED'; // Purple tint for candidate
-    }
-    return '#00C7CF'; // Teal for company (default)
+    return '#007AFF';
   };
 
   // Calculate thumb animation state
@@ -448,7 +442,7 @@ export function SignatureSlider({
           display: 'flex',
           width: '100%',
           alignItems: 'center',
-          height: '64px',
+          height: '48px',
         }}
       >
         {/* Track container */}
@@ -456,9 +450,9 @@ export function SignatureSlider({
           style={{
             position: 'relative',
             flex: 1,
-            height: '8px',
+            height: '4px',
             borderRadius: '9999px',
-            background: 'linear-gradient(90deg, rgba(226, 232, 240, 0.8), rgba(226, 232, 240, 0.7))',
+            background: '#D1D1D6',
             marginLeft: '1.3rem',
             marginRight: '1.3rem',
           }}
@@ -469,9 +463,9 @@ export function SignatureSlider({
               position: 'absolute',
               height: '100%',
               borderRadius: '9999px',
-              background: 'linear-gradient(90deg, #22d3ee 0%, #6366f1 100%)',
+              background: '#007AFF',
               width: `${percent}%`,
-              boxShadow: '0 8px 20px -10px rgba(79, 70, 229, 0.4)',
+              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.08)',
             }}
           />
 
@@ -512,18 +506,14 @@ export function SignatureSlider({
               top: '50%',
               left: `${percent}%`,
               display: 'flex',
-              height: thumbEmoji ? '2.1rem' : '2.4rem',
-              width: thumbEmoji ? '2.1rem' : '2.4rem',
+              height: thumbEmoji ? '24px' : '24px',
+              width: thumbEmoji ? '24px' : '24px',
               alignItems: 'center',
               justifyContent: 'center',
               borderRadius: '9999px',
-              border: thumbEmoji ? '0px solid transparent' : `2px solid ${getThumbOutlineColor()}`,
+              border: thumbEmoji ? '0px solid transparent' : `1px solid ${getThumbOutlineColor()}`,
               backgroundColor: thumbEmoji ? 'transparent' : 'white',
-              boxShadow: activeSnapPoint !== null
-                ? `0 14px 22px -8px rgba(37, 99, 235, 0.25), 0 0 ${snapPulse ? '14px' : '10px'} rgba(45, 212, 191, 0.5)`
-                : isDragging
-                  ? '0 13px 20px -8px rgba(17, 24, 39, 0.25)'
-                  : '0 8px 14px -8px rgba(17, 24, 39, 0.2)',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.15)',
               pointerEvents: 'none',
               zIndex: 5,
             }}
@@ -556,10 +546,10 @@ export function SignatureSlider({
             ) : (
               <div
                 style={{
-                  height: '14px',
-                  width: '14px',
+                  height: '12px',
+                  width: '12px',
                   borderRadius: '9999px',
-                  background: 'linear-gradient(135deg, #22d3ee 0%, #6366f1 100%)',
+                  background: '#007AFF',
                   boxShadow: 'inset 0 0 0 2px #fff',
                 }}
               />
@@ -599,7 +589,7 @@ export function SignatureSlider({
             position: 'absolute',
             left: '1.3rem',
             right: '1.3rem',
-            height: '57px',
+            height: '48px',
             opacity: 0,
             cursor: isDragging ? 'grabbing' : 'grab',
             zIndex: 10,
