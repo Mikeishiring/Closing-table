@@ -63,33 +63,26 @@ body {
 @keyframes auroraDrift {
   0% {
     background-position: 0% 50%;
-    transform: rotate(0deg);
   }
   50% {
     background-position: 100% 48%;
-    transform: rotate(1deg);
   }
   100% {
     background-position: 0% 52%;
-    transform: rotate(-1deg);
   }
 }
 
 @keyframes auroraWander {
   0% {
-    transform: translate3d(-6%, -4%, 0) rotate(-2deg);
     opacity: 0.85;
   }
   33% {
-    transform: translate3d(4%, 3%, 0) rotate(1deg);
     opacity: 0.95;
   }
   66% {
-    transform: translate3d(2%, -6%, 0) rotate(-1deg);
     opacity: 0.9;
   }
   100% {
-    transform: translate3d(-4%, 5%, 0) rotate(2deg);
     opacity: 0.92;
   }
 }
@@ -97,15 +90,12 @@ body {
 @keyframes auroraShimmer {
   0% {
     opacity: 0.32;
-    transform: translate3d(0%, 0%, 0);
   }
   50% {
     opacity: 0.48;
-    transform: translate3d(2%, -3%, 0);
   }
   100% {
     opacity: 0.36;
-    transform: translate3d(-2%, 3%, 0);
   }
 }
 
