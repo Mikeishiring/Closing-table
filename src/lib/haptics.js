@@ -3,7 +3,17 @@
  * Provides tactile feedback on supported devices with reduced motion support
  */
 
-import { prefersReducedMotion } from './audio';
+/**
+ * Check if user prefers reduced motion
+ * Safe to call on server (returns false)
+ */
+function prefersReducedMotion() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+  const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  return mediaQuery.matches;
+}
 
 /**
  * Check if haptic feedback is supported
@@ -79,6 +89,7 @@ export function cancelHaptic() {
     }
   }
 }
+
 
 
 

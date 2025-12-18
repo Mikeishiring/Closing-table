@@ -12,7 +12,6 @@ import {
   getNearestSnapPoint,
   applySnapBehavior 
 } from '../lib/deal';
-import { createSnapSound } from '../lib/audio';
 import { useHaptics, useReducedMotion } from '../hooks';
 
 // Session storage key for intro animation
@@ -195,18 +194,10 @@ function SignatureSliderComponent({
   const lastMilestoneRef = useRef(null);
   const lastSnapPointRef = useRef(null);
   const sliderRef = useRef(null);
-  const snapSoundRef = useRef(null);
   const dragStartTriggeredRef = useRef(false);
 
   const haptics = useHaptics();
   const reducedMotion = useReducedMotion();
-
-  // Initialize snap sound lazily
-  useEffect(() => {
-    if (enableSnapPoints && !snapSoundRef.current) {
-      snapSoundRef.current = createSnapSound();
-    }
-  }, [enableSnapPoints]);
 
   // Check and run intro animation on mount
   useEffect(() => {
@@ -311,12 +302,9 @@ function SignatureSliderComponent({
     if (snapInfo) {
       setActiveSnapPoint(snapInfo.snapPoint);
       
-      // Trigger haptic and audio when ENTERING a new snap zone
+      // Trigger haptic when ENTERING a new snap zone
       if (lastSnapPointRef.current !== snapInfo.snapPoint) {
         haptics.pulse('milestone');
-        if (snapSoundRef.current) {
-          snapSoundRef.current();
-        }
         // Visual pulse feedback
         setSnapPulse(true);
         setTimeout(() => setSnapPulse(false), 150);

@@ -28,3 +28,4 @@ export function generateOfferLink(offerId) {
   return `${base}#offer=${offerId}`;
 }
 
+

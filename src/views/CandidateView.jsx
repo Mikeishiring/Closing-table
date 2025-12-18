@@ -94,17 +94,22 @@ export function CandidateView({ offerId }) {
         min: clampedTotal,
       });
 
-      if (data?.resultId) {
-        // Persist result in route so it can be reopened/shareable
-        window.location.hash = `#result=${data.resultId}`;
-        return;
-      }
-
-      setResult({
+      // Store result in local state first (as backup)
+      const resultData = {
         status: data.status,
         finalOffer: data.final,
         suggested: data.suggested,
-      });
+      };
+      setResult(resultData);
+
+      // If we have a resultId, navigate to the result view
+      if (data?.resultId) {
+        // Small delay to ensure state is set before navigation
+        setTimeout(() => {
+          window.location.hash = `#result=${data.resultId}`;
+        }, 100);
+        return;
+      }
     } catch (err) {
       if (err?.name === 'AbortError') return;
       setFormError(err.message || 'We could not submit your response. Please retry.');

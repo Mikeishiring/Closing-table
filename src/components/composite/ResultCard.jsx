@@ -286,3 +286,4 @@ if (typeof document !== 'undefined' && !document.getElementById('result-card-ani
   document.head.appendChild(styleEl);
 }
 
+

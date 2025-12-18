@@ -156,15 +156,6 @@ function calculateDeal(cMax, cMin) {
 // Note: Email functionality removed. No email addresses are collected or stored.
 // If email notifications are needed in the future, implement here with clear privacy documentation.
 
-// --- SERVE STATIC FILES ---
-// Serve built static files from the dist directory (faster than inline Babel)
-app.use(express.static(path.join(__dirname, 'dist')));
-
-// --- SERVE FRONTEND ---
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-});
-
 // --- HEALTHCHECK ---
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
@@ -340,6 +331,20 @@ app.get('/api/results/:resultId', (req, res) => {
     suggested: result.suggested || null,
     createdAt: result.createdAt,
   });
+});
+
+// --- SERVE STATIC FILES ---
+// Serve built static files from the dist directory
+const distPath = path.join(__dirname, 'dist');
+app.use(express.static(distPath, {
+  maxAge: '1d', // Cache static assets for 1 day
+  etag: true,
+}));
+
+// --- SPA FALLBACK ---
+// Serve index.html for all other routes (must be last)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(distPath, 'index.html'));
 });
 
 // Export for testing (before starting server)

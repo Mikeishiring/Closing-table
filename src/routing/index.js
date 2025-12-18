@@ -56,3 +56,4 @@ export function goToResult(id) {
   window.location.hash = `#result=${id}`;
 }
 
+
