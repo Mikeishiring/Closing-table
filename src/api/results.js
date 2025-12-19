@@ -5,10 +5,7 @@ export async function getResult(resultId, options = {}) {
 }
 
 export function generateResultLink(resultId) {
-  const base = FRONTEND_BASE || (typeof window !== 'undefined'
-    ? `${window.location.origin}${window.location.pathname}`
-    : '');
-  return `${base}#result=${resultId}`;
+  return `${FRONTEND_BASE}#result=${resultId}`;
 }
 
 

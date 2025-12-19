@@ -22,10 +22,7 @@ export async function submitResponse(offerId, responseData, options = {}) {
 }
 
 export function generateOfferLink(offerId) {
-  const base = FRONTEND_BASE || (typeof window !== 'undefined'
-    ? `${window.location.origin}${window.location.pathname}`
-    : '');
-  return `${base}#offer=${offerId}`;
+  return `${FRONTEND_BASE}#offer=${offerId}`;
 }
 
 

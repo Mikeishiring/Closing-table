@@ -17,19 +17,22 @@ export function SlideToConfirm({
   const controls = useAnimation();
   const HANDLE_SIZE = 44; // px
   const [dragBounds, setDragBounds] = useState({ left: 0, right: 0 });
+  const [trackWidth, setTrackWidth] = useState(0);
 
   // Measure track width to set drag bounds
   useEffect(() => {
     const measure = () => {
       if (!trackRef.current) return;
-      const width = trackRef.current.getBoundingClientRect().width || 0;
+      const rect = trackRef.current.getBoundingClientRect();
+      const width = rect.width || 0;
+      setTrackWidth(width);
       const right = Math.max(0, width - HANDLE_SIZE);
       setDragBounds({ left: 0, right });
     };
     measure();
     window.addEventListener('resize', measure);
     return () => window.removeEventListener('resize', measure);
-  }, []);
+  }, [HANDLE_SIZE]);
 
   const reset = useCallback(() => {
     setProgress(0);
@@ -45,19 +48,16 @@ export function SlideToConfirm({
 
   const calcProgress = useCallback(
     (handleX) => {
-      if (!trackRef.current) return 0;
-      const width = trackRef.current.getBoundingClientRect().width;
-      if (!width) return 0;
-      const pct = ((handleX + HANDLE_SIZE / 2) / width) * 100;
+      if (!trackWidth) return 0;
+      const pct = (handleX / (trackWidth - HANDLE_SIZE)) * 100;
       return Math.min(100, Math.max(0, pct));
     },
-    []
+    [trackWidth, HANDLE_SIZE]
   );
 
   const handleDrag = (_, info) => {
-    if (!trackRef.current) return;
-    const width = trackRef.current.getBoundingClientRect().width;
-    const clampedX = Math.min(Math.max(info.offset.x, 0), Math.max(0, width - HANDLE_SIZE));
+    if (!trackWidth) return;
+    const clampedX = Math.min(Math.max(info.offset.x, 0), Math.max(0, trackWidth - HANDLE_SIZE));
     const pct = calcProgress(clampedX);
     setProgress(pct);
   };
@@ -66,35 +66,37 @@ export function SlideToConfirm({
     if (disabled || loading) return;
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      if (!trackRef.current) return;
-      const width = trackRef.current.getBoundingClientRect().width;
       setLocked(true);
       setProgress(100);
-      await controls.start({ x: Math.max(0, width - HANDLE_SIZE) });
+      await controls.start({ x: Math.max(0, trackWidth - HANDLE_SIZE) });
       onConfirm?.();
     }
   };
 
   const handleDragEnd = async (_, info) => {
-    if (!trackRef.current) return;
-    const width = trackRef.current.getBoundingClientRect().width;
     setDragging(false);
 
     const finalOffset = Math.min(
       Math.max(info?.offset?.x ?? 0, 0),
-      Math.max(0, width - HANDLE_SIZE)
+      Math.max(0, trackWidth - HANDLE_SIZE)
     );
     const pct = calcProgress(finalOffset);
     setProgress(pct);
 
-    if (pct >= 95 && !locked && !loading) {
+    if (pct >= 92 && !locked && !loading) {
       setLocked(true);
       setProgress(100);
-      await controls.start({ x: Math.max(0, width - HANDLE_SIZE) });
+      await controls.start({ 
+        x: Math.max(0, trackWidth - HANDLE_SIZE),
+        transition: { type: "spring", damping: 25, stiffness: 350 }
+      });
       onConfirm?.();
     } else {
       setProgress(0);
-      await controls.start({ x: 0 });
+      await controls.start({ 
+        x: 0,
+        transition: { type: "spring", damping: 28, stiffness: 400 }
+      });
     }
   };
 
@@ -135,8 +137,9 @@ export function SlideToConfirm({
           style={{
             width: `${progress}%`,
             background: fillStyle,
-            transition: dragging ? 'none' : 'width 180ms ease',
-            opacity: locked || loading ? 0.28 : 0.2,
+            transition: dragging ? 'none' : 'width 220ms cubic-bezier(0.4, 0, 0.2, 1)',
+            opacity: locked || loading ? 0.32 : 0.22,
+            borderRadius: '999px',
           }}
         />
 
@@ -151,11 +154,12 @@ export function SlideToConfirm({
         </div>
 
         <motion.div
-          className="absolute top-1/2 -translate-y-1/2 flex items-center justify-center"
+          className="absolute top-1/2 left-[6px] flex items-center justify-center"
           drag="x"
           dragConstraints={{ left: dragBounds.left, right: dragBounds.right }}
-          dragElastic={0}
+          dragElastic={0.05}
           dragMomentum={false}
+          dragTransition={{ power: 0.15, timeConstant: 150 }}
           onDragStart={handleDragStart}
           onDrag={handleDrag}
           onDragEnd={handleDragEnd}
@@ -165,13 +169,16 @@ export function SlideToConfirm({
             touchAction: 'none',
             height: '44px',
             width: '44px',
+            marginTop: '-22px',
             borderRadius: '50%',
             backgroundColor: 'var(--bg-card-strong, #fff)',
             border: '1px solid var(--border-subtle)',
-            boxShadow: '0 12px 30px -20px rgba(7,11,24,0.48), 0 2px 10px -8px rgba(7,11,24,0.32)',
+            boxShadow: '0 12px 30px -20px rgba(7,11,24,0.48), 0 2px 10px -8px rgba(7,11,24,0.32), 0 1px 0 rgba(255,255,255,0.8)',
+            cursor: dragging ? 'grabbing' : 'grab',
           }}
-          whileTap={{ scale: 1.02 }}
-          whileHover={!disabled && !loading ? { scale: 1.01 } : undefined}
+          whileTap={{ scale: 0.96 }}
+          whileHover={!disabled && !loading ? { scale: 1.04 } : undefined}
+          transition={{ type: "spring", damping: 30, stiffness: 400 }}
         >
           <AnimatePresence mode="wait">
             {loading ? (
@@ -182,10 +189,19 @@ export function SlideToConfirm({
             ) : (
               <motion.div
                 key="arrow"
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                className="text-slate-600 text-lg"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="flex items-center justify-center text-slate-700 font-semibold"
+                style={{ 
+                  fontSize: '20px',
+                  lineHeight: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '100%',
+                  height: '100%'
+                }}
               >
                 {locked ? '🔒' : '→'}
               </motion.div>

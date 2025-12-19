@@ -8,6 +8,7 @@ import { getResult } from '../api';
 import { ResultCard } from '../components';
 import { goHome } from '../routing';
 import { PrimaryPanel } from '../components';
+import { copy } from '../tokens';
 
 export function ResultView({ resultId }) {
   const [result, setResult] = useState(null);
@@ -21,23 +22,23 @@ export function ResultView({ resultId }) {
         const data = await getResult(resultId);
         
         if (!data) {
-          setError('We couldn’t find this result.');
+          setError(copy.error.resultNotFound);
           return;
         }
         
         if (data.status === 'invalid') {
-          setError('This link doesn’t look right.');
+          setError(copy.error.invalidResult);
           return;
         }
         
         if (data.status === 'expired') {
-          setError('This result has expired.');
+          setError(copy.error.expiredResult);
           return;
         }
         
         setResult(data);
       } catch (err) {
-        setError(err.message || 'We couldn’t load this result.');
+        setError(err.message || copy.error.resultNotFound);
       } finally {
         setLoading(false);
       }
@@ -73,7 +74,9 @@ export function ResultView({ resultId }) {
             <span>⚠️</span>
           </div>
           <h2 className="text-2xl md:text-3xl font-semibold text-slate-900">
-            We couldn’t show this result.
+            {error === copy.error.resultNotFound ? copy.error.resultNotFoundHeadline :
+             error === copy.error.expiredResult ? copy.error.resultExpiredHeadline :
+             'Oops'}
           </h2>
           <p className="text-slate-600">{error}</p>
         </div>
@@ -82,7 +85,7 @@ export function ResultView({ resultId }) {
             onClick={goHome}
             className="w-full rounded-full bg-slate-900 text-white py-3 text-sm font-medium hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 transition-all active:scale-[0.98]"
           >
-            Go to home
+            {copy.error.goHome}
           </button>
         </div>
       </PrimaryPanel>

@@ -25,7 +25,17 @@ const API_BASE = (() => {
 const FRONTEND_BASE =
   import.meta.env.VITE_APP_BASE_URL ||
   (typeof window !== 'undefined'
-    ? `${window.location.origin}${window.location.pathname.split('#')[0] || '/'}`
+    ? (() => {
+        // Get the full URL path without hash
+        const pathname = window.location.pathname;
+        // Remove index.html if present to get clean base path
+        const cleanPath = pathname.endsWith('index.html') 
+          ? pathname.slice(0, -'index.html'.length)
+          : pathname.endsWith('/')
+          ? pathname
+          : pathname + '/';
+        return `${window.location.origin}${cleanPath}`;
+      })()
     : '');
 
 // Add timeout support

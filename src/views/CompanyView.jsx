@@ -8,7 +8,7 @@ import { PrimaryCard, PrimaryPanel, PrimarySlider, SecondaryPanel, SlideToConfir
 import { createOffer, generateOfferLink, copyToClipboard } from '../api';
 import { LIMITS, parseMoneyInput, formatNumber } from '../lib/deal';
 import { useFocusMode } from '../hooks';
-import { PRIVACY_COPY, EXPIRY } from '../tokens';
+import { copy, EXPIRY } from '../tokens';
 
 export function CompanyView() {
   const [totalMax, setTotalMax] = useState(120000);
@@ -19,10 +19,6 @@ export function CompanyView() {
   const [isFocusing, setIsFocusing] = useState(false);
   const [formError, setFormError] = useState('');
   const { enable: enableFocusMode, disable: disableFocusMode } = useFocusMode();
-  const companyLinkCopy = useMemo(
-    () => PRIVACY_COPY.companyLink.replace('24 hours', `${EXPIRY.offerHours} hours`),
-    []
-  );
 
   const resetForm = useCallback(() => {
     setOfferLink(null);
@@ -77,18 +73,18 @@ export function CompanyView() {
             </div>
             
             <h1 className="text-3xl font-extrabold text-slate-900">
-              Link ready
+              {copy.company.linkReady.headline}
             </h1>
             
             <p className="text-base text-slate-600 max-w-sm">
-              {`${companyLinkCopy} This is the handshake—keep it handy.`}
+              {copy.company.linkReady.subtitle}
             </p>
           </header>
           
           <main className="space-y-4">
             <section className="space-y-3">
               <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
-                Shareable link
+                {copy.company.linkReady.linkLabel}
               </p>
               <div className="relative flex items-center rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3 text-xs md:text-sm text-slate-800 font-mono">
                 <span className="break-all pr-12">{offerLink}</span>
@@ -100,11 +96,11 @@ export function CompanyView() {
                     <rect x="9" y="9" width="13" height="13" rx="2" ry="2" strokeWidth="2" />
                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" strokeWidth="2" />
                   </svg>
-                  {copied ? 'Copied' : 'Copy link'}
+                  {copied ? copy.company.linkReady.copied : copy.company.linkReady.copy}
                 </button>
               </div>
               <p className="text-sm text-slate-500">
-                Preview it or drop it in a note. The candidate only sees the final outcome.
+                {copy.company.linkReady.explanation}
               </p>
             </section>
           </main>
@@ -114,17 +110,16 @@ export function CompanyView() {
               onClick={() => window.open(offerLink, '_blank', 'noopener')}
               className="w-full rounded-full bg-slate-900 text-white py-3 text-sm font-semibold hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 transition-all active:scale-[0.98]"
             >
-              Open link
+              {copy.company.linkReady.open}
             </button>
 
             <button onClick={resetForm} className="w-full text-sm font-semibold text-slate-700 hover:underline py-2">
-              New offer
+              {copy.company.linkReady.createNew}
             </button>
           </div>
           
           <div className="flex items-center justify-center gap-2 text-[12px] text-slate-500">
-            <span>🔐</span>
-            <span>{companyLinkCopy}</span>
+            <span>{copy.company.linkReady.expiryNote}</span>
           </div>
         </div>
       </PrimaryCard>
@@ -135,13 +130,13 @@ export function CompanyView() {
     <div className="page-grid">
       <PrimaryPanel
         className="animate-[cardIn_280ms_ease-out]"
-        title="Set your ceiling. Share one private link."
-        subtitle={`One-time link. Expires in ${EXPIRY.offerHours} hours.`}
+        title={copy.company.title}
+        subtitle={copy.company.subtitle}
         data-focus-mode={isFocusing}
       >
         <div className="card-flow">
           <ValueInputSection
-            label="Maximum total compensation"
+            label={copy.company.form.label}
             inputValue={totalInput}
             placeholder="120,000"
             onInputChange={handleTotalInputChange}
@@ -156,7 +151,7 @@ export function CompanyView() {
           />
 
           <PrimarySlider
-            label="Adjust maximum total compensation"
+            label={copy.company.form.inputAria}
             value={totalMax}
             min={LIMITS.TOTAL_MIN}
             max={LIMITS.TOTAL_MAX}
@@ -183,7 +178,7 @@ export function CompanyView() {
           <section className="card-block card-block--cta">
             <div className="cta-stack">
               <SlideToConfirm
-                text="Slide to Lock Offer"
+                text={copy.company.form.cta}
                 onConfirm={handleSubmit}
                 loading={loading}
                 disabled={loading}
@@ -195,8 +190,7 @@ export function CompanyView() {
                 </p>
               ) : (
                 <div className="privacy-note" aria-live="polite">
-                  <span>🔐</span>
-                  <span>{companyLinkCopy}</span>
+                  <span>{copy.company.privacyNote}</span>
                 </div>
               )}
             </div>
@@ -205,11 +199,8 @@ export function CompanyView() {
       </PrimaryPanel>
 
       <SecondaryPanel
-        title="For hiring teams"
-        items={[
-          'Set a ceiling without revealing it.',
-          'Share one link that auto-expires.',
-        ]}
+        title={copy.company.howItWorks.title}
+        items={copy.company.howItWorks.steps}
       />
     </div>
   );

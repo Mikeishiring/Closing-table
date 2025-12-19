@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { RESULT_CONFIG, PRIVACY_COPY, EXPIRY } from '../../tokens';
+import { copy, RESULT_CONFIG } from '../../tokens';
 import { goHome } from '../../routing';
 import { useReducedMotion } from '../../hooks';
 
@@ -155,7 +155,7 @@ function ResultCardInner({ status, finalOffer, suggested }) {
             <h1 className={`text-2xl md:text-3xl font-semibold text-slate-900 transition-all duration-300 ${
               stage !== 'computing' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
             }`}>
-              {stage === 'computing' ? 'Computing…' : cfg.title}
+              {stage === 'computing' ? copy.result.computing : cfg.title}
             </h1>
             
             <p className={`mt-2 text-sm md:text-base text-slate-600 max-w-sm transition-all duration-300 delay-75 ${
@@ -169,7 +169,7 @@ function ResultCardInner({ status, finalOffer, suggested }) {
           <main className="mt-6 space-y-4 transition-all duration-300 delay-150">
             {stage === 'computing' && (
               <section className="text-center space-y-3">
-                <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Computing…</p>
+                <p className="text-xs uppercase tracking-[0.18em] text-slate-500">{copy.result.computing}</p>
                 <p className="text-4xl md:text-5xl font-semibold text-slate-900">
                   {slotValue ? formatCurrency(slotValue) : '—'}
                 </p>
@@ -181,7 +181,7 @@ function ResultCardInner({ status, finalOffer, suggested }) {
                 {status === 'success' && (
                   <section className="text-center">
                     <p className="text-xs uppercase tracking-[0.18em] text-emerald-500">
-                      Final Offer
+                      {copy.result.statuses.success.label}
                     </p>
                     <p className={`mt-1 text-4xl md:text-5xl font-semibold text-emerald-600 ${
                       breathe ? 'animate-[numberBreathe_400ms_ease-in-out]' : ''
@@ -189,7 +189,7 @@ function ResultCardInner({ status, finalOffer, suggested }) {
                       {formatCurrency(displayFinal)}
                     </p>
                     <p className="mt-2 text-xs text-slate-500">
-                      Exactly between your ranges; inputs were deleted after the run.
+                      {copy.result.statuses.success.line}
                     </p>
                   </section>
                 )}
@@ -198,30 +198,22 @@ function ResultCardInner({ status, finalOffer, suggested }) {
                   <section className="text-center space-y-3">
                     <div>
                       <p className="text-xs uppercase tracking-[0.18em] text-amber-500">
-                        Bridge Window
+                        {copy.result.statuses.close.label}
                       </p>
                       <p className="mt-1 text-base md:text-lg font-semibold text-amber-600">
                         {suggested ? formatCurrency(displayFinal || suggested) : 'Within 10% of max'}
                       </p>
                     </div>
                     <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                      The mechanism pauses here so you can decide together whether to stretch.
+                      {copy.result.statuses.close.line}
                     </p>
-                    {suggested && (
-                      <div className="rounded-2xl bg-amber-50 px-4 py-3 text-xs text-amber-700">
-                        Start at the midpoint: <span className="font-semibold">{formatCurrency(suggested)}</span>
-                      </div>
-                    )}
                   </section>
                 )}
 
                 {status === 'fail' && (
                   <section className="text-center space-y-3">
-                    <p className="text-sm md:text-base text-slate-700 font-medium">
-                      The gap is larger than <span className="text-slate-500">10%</span> of the company's maximum.
-                    </p>
-                    <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                      The mechanism won't suggest a middle that crosses either side's stated limit.
+                    <p className="text-sm md:text-base text-slate-700">
+                      {copy.result.statuses.fail.line}
                     </p>
                   </section>
                 )}
@@ -237,9 +229,9 @@ function ResultCardInner({ status, finalOffer, suggested }) {
               onClick={handleNewOffer}
               className="w-full rounded-full border border-slate-200 py-3 text-sm text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 transition-all active:scale-[0.98]"
             >
-              {status === 'success' ? `Start new offer ${cfg.actionIcon}` : 
-               status === 'close' ? `Talk it through ${cfg.actionIcon}` : 
-               `Try again ${cfg.actionIcon}`}
+              {status === 'success' ? `${copy.result.startNew} 🔄` : 
+               status === 'close' ? `Talk It Through 💬` : 
+               `Try Again 🔍`}
             </button>
           </div>
         </div>
@@ -285,5 +277,6 @@ if (typeof document !== 'undefined' && !document.getElementById('result-card-ani
   styleEl.innerHTML = styles;
   document.head.appendChild(styleEl);
 }
+
 
 

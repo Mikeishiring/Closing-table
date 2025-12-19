@@ -9,7 +9,7 @@ import { getOffer, submitResponse } from '../api';
 import { formatCurrency, LIMITS, parseMoneyInput, formatNumber } from '../lib/deal';
 import { useFocusMode } from '../hooks';
 import { goHome } from '../routing';
-import { PRIVACY_COPY, EXPIRY } from '../tokens';
+import { copy, EXPIRY } from '../tokens';
 
 export function CandidateView({ offerId }) {
   const [loading, setLoading] = useState(true);
@@ -22,10 +22,6 @@ export function CandidateView({ offerId }) {
   const [formError, setFormError] = useState('');
   const offerAbortRef = useRef(null);
   const { enable: enableFocusMode, disable: disableFocusMode } = useFocusMode();
-  const candidateLinkCopy = useMemo(
-    () => PRIVACY_COPY.candidateLink.replace('24 hours', `${EXPIRY.offerHours} hours`),
-    []
-  );
 
   useEffect(() => {
     async function fetchOffer() {
@@ -145,7 +141,10 @@ export function CandidateView({ offerId }) {
             <span>⚠️</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-semibold text-slate-900">
-            We couldn’t load your offer.
+            {error === 'Offer not found' ? copy.error.notFoundHeadline : 
+             error === 'Offer has expired' ? copy.error.expiredHeadline : 
+             error === 'Invalid offer link' ? copy.error.invalidHeadline : 
+             'Oops'}
           </h1>
           <p className="text-sm md:text-base text-slate-600">
             {error}
@@ -157,7 +156,7 @@ export function CandidateView({ offerId }) {
             onClick={goHome}
             className="w-full rounded-full bg-slate-900 text-white py-3 text-sm font-medium hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 transition-all active:scale-[0.98]"
           >
-            Request a new link
+            {copy.error.retry}
           </button>
         </div>
       </PrimaryCard>
@@ -178,12 +177,12 @@ export function CandidateView({ offerId }) {
     <div className="page-grid">
       <PrimaryPanel
         className="animate-[cardIn_280ms_ease-out]"
-        title="Total compensation"
+        title={copy.candidate.headline}
         data-focus-mode={isFocusing}
       >
         <div className="card-flow">
           <ValueInputSection
-            label="Minimum total compensation you’d sign for"
+            label={copy.candidate.valueLabel}
             inputValue={totalInput}
             onInputChange={handleTotalInputChange}
             onFocus={() => {
@@ -197,7 +196,7 @@ export function CandidateView({ offerId }) {
           />
 
           <PrimarySlider
-            label="Adjust minimum total compensation"
+            label={copy.candidate.sliderLabel}
             value={totalComp}
             min={LIMITS.TOTAL_MIN}
             max={LIMITS.TOTAL_MAX}
@@ -222,29 +221,22 @@ export function CandidateView({ offerId }) {
 
           <section className="card-block">
             <div className="privacy-note">
-              <span>🔐</span>
-              <span>
-                {candidateLinkCopy}
-              </span>
+              <span>{copy.candidate.privacy}</span>
             </div>
           </section>
 
           <section className="card-block card-block--cta">
             <div className="cta-stack">
               <SlideToConfirm
-                text="Slide to Lock Offer"
+                text={copy.candidate.cta}
                 onConfirm={handleSubmit}
                 loading={submitting}
                 disabled={submitting}
               />
-              {formError ? (
+              {formError && (
                 <p className="cta-error" role="alert" aria-live="polite">
                   <span aria-hidden="true">⚠️</span>
                   <span>{formError}</span>
-                </p>
-              ) : (
-                <p className="microcopy quiet-text cta-hint">
-                  Adjust until it feels right. When you lock it, the company is notified.
                 </p>
               )}
             </div>

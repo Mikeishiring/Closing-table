@@ -7,7 +7,8 @@ Shared UX language and design primitives:
 
 Import from the barrel where possible:
 ```js
-import { copy, PRIVACY_COPY, RESULT_CONFIG, EXPIRY, DEAL_LIMITS } from '../tokens';
+import { copy, RESULT_CONFIG, EXPIRY, DEAL_LIMITS } from '../tokens';
 ```
+
 
 
