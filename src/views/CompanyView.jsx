@@ -14,14 +14,17 @@ export function CompanyView() {
   const [totalMax, setTotalMax] = useState(120000);
   const [totalInput, setTotalInput] = useState('120,000');
   const [offerLink, setOfferLink] = useState(null);
+  const [resultLink, setResultLink] = useState(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [copiedResult, setCopiedResult] = useState(false);
   const [isFocusing, setIsFocusing] = useState(false);
   const [formError, setFormError] = useState('');
   const { enable: enableFocusMode, disable: disableFocusMode } = useFocusMode();
 
   const resetForm = useCallback(() => {
     setOfferLink(null);
+    setResultLink(null);
     setTotalMax(120000);
     setTotalInput('120,000');
     setFormError('');
@@ -36,8 +39,11 @@ export function CompanyView() {
         max: totalMax,
       });
       
-      const link = generateOfferLink(response.offerId);
-      setOfferLink(link);
+      const candidateLink = generateOfferLink(response.offerId);
+      const companyResultLink = `${window.location.origin}${window.location.pathname}#result=${response.resultId}`;
+      
+      setOfferLink(candidateLink);
+      setResultLink(companyResultLink);
     } catch (error) {
       setFormError(error.message || 'We could not create this offer. Please retry.');
     } finally {
@@ -53,6 +59,15 @@ export function CompanyView() {
       setTimeout(() => setCopied(false), 2000);
     }
   }, [offerLink]);
+
+  const handleCopyResultLink = useCallback(async () => {
+    if (!resultLink) return;
+    const result = await copyToClipboard(resultLink);
+    if (result.success) {
+      setCopiedResult(true);
+      setTimeout(() => setCopiedResult(false), 2000);
+    }
+  }, [resultLink]);
 
   const handleTotalInputChange = useCallback((val) => {
     const { value, display } = parseMoneyInput(val, LIMITS);
@@ -77,14 +92,15 @@ export function CompanyView() {
             </h1>
             
             <p className="text-base text-slate-600 max-w-sm">
-              {copy.company.linkReady.subtitle}
+              Send the candidate link below. Bookmark your result link to watch for updates.
             </p>
           </header>
           
-          <main className="space-y-4">
+          <main className="space-y-6">
+            {/* Candidate Link */}
             <section className="space-y-3">
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
-                {copy.company.linkReady.linkLabel}
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 font-semibold">
+                Candidate Link (Send this)
               </p>
               <div className="relative flex items-center rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3 text-xs md:text-sm text-slate-800 font-mono">
                 <span className="break-all pr-12">{offerLink}</span>
@@ -96,21 +112,44 @@ export function CompanyView() {
                     <rect x="9" y="9" width="13" height="13" rx="2" ry="2" strokeWidth="2" />
                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" strokeWidth="2" />
                   </svg>
-                  {copied ? copy.company.linkReady.copied : copy.company.linkReady.copy}
+                  {copied ? 'Copied!' : 'Copy'}
                 </button>
               </div>
               <p className="text-sm text-slate-500">
                 {copy.company.linkReady.explanation}
               </p>
             </section>
+
+            {/* Result Link */}
+            <section className="space-y-3">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 font-semibold">
+                Your Result Link (Bookmark this)
+              </p>
+              <div className="relative flex items-center rounded-2xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-xs md:text-sm text-slate-800 font-mono">
+                <span className="break-all pr-12">{resultLink}</span>
+                <button
+                  onClick={handleCopyResultLink}
+                  className="absolute right-2 inline-flex items-center gap-1 rounded-xl px-3 py-2 text-xs font-semibold text-emerald-700 bg-white border border-emerald-200 shadow-sm hover:bg-emerald-50 transition"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" strokeWidth="2" />
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" strokeWidth="2" />
+                  </svg>
+                  {copiedResult ? 'Copied!' : 'Copy'}
+                </button>
+              </div>
+              <p className="text-sm text-slate-500">
+                Visit this link anytime to see if the candidate has responded. It starts as "pending" and updates when they submit.
+              </p>
+            </section>
           </main>
           
           <div className="flex flex-col gap-3 focus-priority">
             <button
-              onClick={() => window.open(offerLink, '_blank', 'noopener')}
+              onClick={() => window.open(resultLink, '_blank', 'noopener')}
               className="w-full rounded-full bg-slate-900 text-white py-3 text-sm font-semibold hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2 transition-all active:scale-[0.98]"
             >
-              {copy.company.linkReady.open}
+              Open Result Link
             </button>
 
             <button onClick={resetForm} className="w-full text-sm font-semibold text-slate-700 hover:underline py-2">

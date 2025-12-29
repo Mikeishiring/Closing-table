@@ -78,7 +78,13 @@ function ResultCardInner({ status, finalOffer, suggested }) {
     reducedMotion
   );
 
+  // Handle pending status - no animations, just show the message
   useEffect(() => {
+    if (status === 'pending') {
+      setStage('details');
+      return;
+    }
+
     if (reducedMotion) {
       setSlotValue(revealTarget);
       setStage('details');
@@ -126,7 +132,11 @@ function ResultCardInner({ status, finalOffer, suggested }) {
   }, [stage, status, reducedMotion]);
   
   const handleNewOffer = () => {
-    goHome();
+    if (status === 'pending') {
+      window.location.reload();
+    } else {
+      goHome();
+    }
   };
   
   return (
@@ -178,6 +188,19 @@ function ResultCardInner({ status, finalOffer, suggested }) {
 
             {stage === 'details' && (
               <>
+                {status === 'pending' && (
+                  <section className="text-center space-y-3">
+                    <p className="text-sm md:text-base text-slate-700">
+                      {copy.result.statuses.pending?.line || cfg.line}
+                    </p>
+                    <div className="mt-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                      <p className="text-xs text-slate-500">
+                        💡 <strong>Tip:</strong> Bookmark this page or refresh anytime to see if the candidate has responded.
+                      </p>
+                    </div>
+                  </section>
+                )}
+
                 {status === 'success' && (
                   <section className="text-center">
                     <p className="text-xs uppercase tracking-[0.18em] text-emerald-500">
@@ -229,7 +252,8 @@ function ResultCardInner({ status, finalOffer, suggested }) {
               onClick={handleNewOffer}
               className="w-full rounded-full border border-slate-200 py-3 text-sm text-slate-700 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2 transition-all active:scale-[0.98]"
             >
-              {status === 'success' ? `${copy.result.startNew} 🔄` : 
+              {status === 'pending' ? `Refresh Page 🔄` :
+               status === 'success' ? `${copy.result.startNew} 🔄` : 
                status === 'close' ? `Talk It Through 💬` : 
                `Try Again 🔍`}
             </button>

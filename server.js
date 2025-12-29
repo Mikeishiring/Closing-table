@@ -169,8 +169,10 @@ app.get('/health', (req, res) => {
  * The offer stores only the minimum data needed to run the mechanism once:
  * - max: total compensation
  * - createdAt/expiresAt: for TTL enforcement
+ * - resultId: pre-generated result that will be populated when candidate submits
  * 
  * The offer is DELETED immediately after the mechanism runs.
+ * The result starts as "pending" and gets updated when the candidate responds.
  */
 app.post('/api/offers', (req, res) => {
   const { max } = req.body || {};
@@ -187,21 +189,32 @@ app.post('/api/offers', (req, res) => {
   const createdAt = Date.now();
   const expiresAt = createdAt + OFFER_TTL_MS;
   const offerId = generateId('o');
+  const resultId = generateId('r');
 
   // Store only the minimum data needed for single-use mechanism
   // Note: No email or compensation breakdown stored (only total max)
   offers.set(offerId, {
     max: totalMax, // Total compensation for mechanism
+    resultId, // Link to the result that will be populated on submit
     createdAt,
     expiresAt,
   });
 
+  // Create a pending result that the company can watch
+  results.set(resultId, {
+    status: 'pending',
+    final: null,
+    suggested: null,
+    createdAt,
+  });
+
   console.log('[offer_created]', { 
     offerId,
+    resultId,
     createdAt 
   });
 
-  return res.json({ offerId });
+  return res.json({ offerId, resultId });
 });
 
 // --- CHECK OFFER STATUS ---
@@ -230,7 +243,7 @@ app.get('/api/offers/:offerId', (req, res) => {
  * Submits the candidate's minimum total compensation and runs the mechanism.
  * 
  * Privacy note: We do NOT collect or store email addresses.
- * The mechanism runs once, stores only the outcome, then IMMEDIATELY DELETES
+ * The mechanism runs once, updates the pre-existing result, then IMMEDIATELY DELETES
  * the offer (including company max).
  * 
  * Result storage: Only status, final number, suggested (for close), and timestamp.
@@ -262,21 +275,22 @@ app.post('/api/offers/:offerId/submit', async (req, res) => {
 
   const cMax = offer.max;
   const cMin = min;
+  const resultId = offer.resultId;
 
   // Run the mechanism (pure function)
   const dealResult = calculateDeal(cMax, cMin);
   const { status, final, suggested } = dealResult;
 
-  // Store result snapshot for ALL outcomes (success, close, fail)
+  // Get the existing result to preserve its createdAt timestamp
+  const existingResult = results.get(resultId);
+  
+  // Update the existing result with the outcome
   // Note: We store ONLY outcome data, never original inputs
-  const createdAt = Date.now();
-  const resultId = generateId('r');
-
   results.set(resultId, {
     status,
     final: status === 'success' ? final : null,
     suggested: status === 'close' ? suggested : null, // Starting point for close state
-    createdAt,
+    createdAt: existingResult ? existingResult.createdAt : Date.now(),
   });
 
   // IMMEDIATELY DELETE the offer after mechanism runs
@@ -295,7 +309,7 @@ app.post('/api/offers/:offerId/submit', async (req, res) => {
     final: status === 'success' ? final : null,
     suggested: status === 'close' ? suggested : null,
     resultId,
-    createdAt,
+    createdAt: existingResult ? existingResult.createdAt : Date.now(),
   });
 });
 

@@ -1,15 +1,15 @@
 :root {
   /* Surfaces */
   --bg-page: #050814;
-  --bg-card: rgba(255, 255, 255, 0.82);
-  --bg-card-strong: rgba(255, 255, 255, 0.9);
-  --bg-card-muted: rgba(255, 255, 255, 0.7);
-  --bg-info: rgba(255, 255, 255, 0.64);
+  --bg-card: rgba(255, 255, 255, 0.92);
+  --bg-card-strong: rgba(255, 255, 255, 0.96);
+  --bg-card-muted: rgba(255, 255, 255, 0.85);
+  --bg-info: rgba(255, 255, 255, 0.88);
 
   /* Text */
-  --text-primary: #0b0b0f;
-  --text-secondary: #3c3c43;
-  --text-tertiary: #6b7280;
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --text-tertiary: #64748b;
 
   /* Accent + states */
   --accent-primary: #4b7bf5;
@@ -43,7 +43,7 @@
 
   /* Slider */
   --slider-track: #e4e6ef;
-  --slider-fill: linear-gradient(90deg, #4b7bf5 0%, #5ca0ff 100%);
+  --slider-fill: linear-gradient(90deg, #8b5cf6 0%, #6366f1 50%, #3b82f6 100%);
   --slider-thumb: #ffffff;
 
   /* Aurora accents (existing) */

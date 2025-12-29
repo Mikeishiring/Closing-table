@@ -15,6 +15,14 @@ export const EXPIRY = {
 
 
 export const RESULT_CONFIG = {
+  pending: {
+    emoji: '⏳',
+    color: 'text-slate-600',
+    bgRing: 'ring-slate-100',
+    title: 'Waiting for response',
+    line: 'The candidate has not yet submitted their minimum. Refresh this page to check for updates.',
+    actionIcon: '🔄',
+  },
   success: {
     emoji: '✅',
     color: 'text-emerald-600',

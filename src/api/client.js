@@ -5,7 +5,10 @@
 
 const API_BASE = (() => {
   // Highest priority: explicitly configured API base
-  if (import.meta.env.VITE_API_BASE) return import.meta.env.VITE_API_BASE;
+  if (import.meta.env.VITE_API_BASE) {
+    console.log('[API Client] Using VITE_API_BASE:', import.meta.env.VITE_API_BASE);
+    return import.meta.env.VITE_API_BASE;
+  }
 
   // If running locally (page served from localhost), talk to local backend
   if (typeof window !== 'undefined') {
@@ -14,10 +17,14 @@ const API_BASE = (() => {
       host === 'localhost' ||
       host === '127.0.0.1' ||
       host === '0.0.0.0';
-    if (isLocalHost) return 'http://localhost:3000';
+    if (isLocalHost) {
+      console.log('[API Client] Localhost detected, using http://localhost:3001');
+      return 'http://localhost:3001';
+    }
   }
 
   // Default for hosted builds: use the hosted API
+  console.log('[API Client] Using production API');
   return 'https://closing-table-backend.onrender.com';
 })();
 
@@ -38,14 +45,15 @@ const FRONTEND_BASE =
       })()
     : '');
 
-// Add timeout support
-const DEFAULT_TIMEOUT = 10000; // 10 seconds
+// Add timeout support - increased for cold starts on hosted services
+const DEFAULT_TIMEOUT = 30000; // 30 seconds
 
 /**
  * Generic API call wrapper with error handling and timeout
  */
 export async function api(path, options = {}) {
   const url = `${API_BASE}${path}`;
+  console.log('[API Client] Making request to:', url);
   
   const controller = options.signal ? null : new AbortController();
   const config = {
@@ -57,21 +65,24 @@ export async function api(path, options = {}) {
     ...options,
   };
 
-  // Create timeout promise
+  // Create timeout promise with proper abort reason
+  let timeoutId;
   const timeoutPromise = new Promise((_, reject) => {
-    const timer = setTimeout(() => {
-      if (controller) controller.abort();
-      reject(new Error('Request timeout'));
+    timeoutId = setTimeout(() => {
+      if (controller) {
+        controller.abort('Request timeout - the server took too long to respond');
+      }
+      reject(new Error('Request timeout - the server took too long to respond. The backend may be starting up.'));
     }, DEFAULT_TIMEOUT);
-    // Clear timer when request completes/aborts
-    if (config.signal) {
-      config.signal.addEventListener('abort', () => clearTimeout(timer), { once: true });
-    }
   });
 
   try {
     const fetchPromise = fetch(url, config);
     const res = await Promise.race([fetchPromise, timeoutPromise]);
+    
+    // Clear timeout if request completed successfully
+    if (timeoutId) clearTimeout(timeoutId);
+    
     let data;
 
     // Try to parse JSON response
@@ -92,6 +103,13 @@ export async function api(path, options = {}) {
 
     return data;
   } catch (error) {
+    // Clear timeout on error
+    if (timeoutId) clearTimeout(timeoutId);
+    
+    // Handle abort errors with better messaging
+    if (error.name === 'AbortError') {
+      throw new Error('Request was cancelled. The server may be starting up - please try again.');
+    }
     // Network errors or fetch failures
     if (error instanceof TypeError) {
       throw new Error('Network error. Please check your connection.');
