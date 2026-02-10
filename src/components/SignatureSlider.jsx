@@ -53,7 +53,7 @@ const InkDroplet = ({ show, reducedMotion }) => {
           width: '6px',
           height: '6px',
           borderRadius: '50%',
-          backgroundColor: 'rgba(0, 196, 204, 0.6)',
+          backgroundColor: 'rgba(59, 130, 246, 0.4)',
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
@@ -73,7 +73,7 @@ const InkDroplet = ({ show, reducedMotion }) => {
         width: '12px',
         height: '12px',
         borderRadius: '50%',
-        backgroundColor: 'rgba(0, 196, 204, 0.5)',
+        backgroundColor: 'rgba(59, 130, 246, 0.3)',
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)',
@@ -108,7 +108,7 @@ const GhostSignaturePath = ({ show, sliderWidth, reducedMotion }) => {
             right: '10%',
             bottom: '-4px',
             height: '2px',
-            backgroundColor: 'rgba(0, 196, 204, 0.4)',
+            backgroundColor: 'rgba(59, 130, 246, 0.3)',
             borderRadius: '1px',
           }}
         />
@@ -138,7 +138,7 @@ const GhostSignaturePath = ({ show, sliderWidth, reducedMotion }) => {
         ref={pathRef}
         d="M0,10 Q20,5 40,10 T80,8 Q100,6 120,10 T160,8"
         fill="none"
-        stroke="#00C4CC"
+        stroke="#3b82f6"
         strokeWidth="1.5"
         strokeLinecap="round"
         style={{
@@ -474,11 +474,11 @@ function SignatureSliderComponent({
                   width: '2px',
                   height: isActive ? '6px' : '4px',
                   marginTop: '4px',
-                  backgroundColor: isActive 
-                    ? '#00C7CF' 
-                    : isPassed 
-                      ? 'rgba(0, 199, 207, 0.5)' 
-                      : 'rgba(180, 180, 180, 0.6)',
+                  backgroundColor: isActive
+                    ? '#3b82f6'
+                    : isPassed
+                      ? 'rgba(59, 130, 246, 0.4)'
+                      : 'rgba(148, 163, 184, 0.4)',
                   borderRadius: '1px',
                   transition: 'all 0.15s ease',
                   opacity: isActive && snapPulse ? 1 : 0.8,

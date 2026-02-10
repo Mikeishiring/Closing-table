@@ -7,8 +7,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        'accent': '#00C4CC',
-        'accent-hover': '#00B0B8',
+        'accent': '#3b82f6',
+        'accent-hover': '#2563eb',
       },
       keyframes: {
         fadeIn: {
@@ -16,12 +16,12 @@ export default {
           '100%': { opacity: '1' },
         },
         cardIn: {
-          '0%': { 
-            transform: 'scale(0.96)',
+          '0%': {
+            transform: 'translateY(8px)',
             opacity: '0',
           },
-          '100%': { 
-            transform: 'scale(1)',
+          '100%': {
+            transform: 'translateY(0)',
             opacity: '1',
           },
         },
@@ -37,7 +37,7 @@ export default {
         },
         numberBreathe: {
           '0%, 100%': { transform: 'scale(1)' },
-          '50%': { transform: 'scale(1.03)' },
+          '50%': { transform: 'scale(1.02)' },
         },
         slideDown: {
           '0%': {
@@ -51,14 +51,13 @@ export default {
         },
       },
       animation: {
-        fadeIn: 'fadeIn 280ms ease-out',
-        cardIn: 'cardIn 280ms ease-out',
-        emojiPop: 'emojiPop 260ms ease-out',
-        numberBreathe: 'numberBreathe 400ms ease-in-out',
-        slideDown: 'slideDown 200ms ease-out',
+        fadeIn: 'fadeIn 400ms ease',
+        cardIn: 'cardIn 400ms ease',
+        emojiPop: 'emojiPop 300ms ease',
+        numberBreathe: 'numberBreathe 500ms ease-in-out',
+        slideDown: 'slideDown 300ms ease',
       },
     },
   },
   plugins: [],
 }
-

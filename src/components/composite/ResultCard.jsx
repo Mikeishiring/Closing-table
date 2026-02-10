@@ -140,7 +140,7 @@ function ResultCardInner({ status, finalOffer, suggested }) {
   };
   
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-slate-900/70 p-4 animate-[fadeIn_280ms_ease-out]">
+    <div className="fixed inset-0 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 animate-[fadeIn_400ms_ease]">
       {/* Subtle background shimmer for success only */}
       {status === 'success' && (
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-transparent animate-pulse" />

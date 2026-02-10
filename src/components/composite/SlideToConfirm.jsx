@@ -119,9 +119,9 @@ export function SlideToConfirm({
           touchAction: 'none',
           height: '56px',
           borderRadius: '999px',
-          border: '1px solid rgba(139, 92, 246, 0.2)',
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(249, 250, 251, 0.95) 100%)',
-          boxShadow: '0 18px 40px -28px rgba(139, 92, 246, 0.4), inset 0 1px 0 rgba(255,255,255,0.9)',
+          border: '1px solid rgba(0, 0, 0, 0.06)',
+          background: '#ffffff',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)',
         }}
         role="slider"
         tabIndex={disabled ? -1 : 0}
@@ -136,11 +136,10 @@ export function SlideToConfirm({
           className="absolute inset-y-0 left-0"
           style={{
             width: `${progress}%`,
-            background: 'linear-gradient(90deg, #8b5cf6 0%, #6366f1 50%, #3b82f6 100%)',
+            background: 'linear-gradient(90deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%)',
             transition: dragging ? 'none' : 'width 220ms cubic-bezier(0.4, 0, 0.2, 1)',
-            opacity: locked || loading ? 0.4 : 0.3,
+            opacity: locked || loading ? 0.3 : 0.2,
             borderRadius: '999px',
-            boxShadow: '0 0 20px -8px rgba(139, 92, 246, 0.6)',
           }}
         />
 
@@ -173,8 +172,8 @@ export function SlideToConfirm({
             marginTop: '-22px',
             borderRadius: '50%',
             backgroundColor: '#ffffff',
-            border: '1px solid rgba(139, 92, 246, 0.3)',
-            boxShadow: '0 12px 30px -20px rgba(139, 92, 246, 0.6), 0 2px 10px -8px rgba(139, 92, 246, 0.4), 0 1px 0 rgba(255,255,255,0.9)',
+            border: '1px solid rgba(0, 0, 0, 0.08)',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)',
             cursor: dragging ? 'grabbing' : 'grab',
           }}
           whileTap={{ scale: 0.96 }}

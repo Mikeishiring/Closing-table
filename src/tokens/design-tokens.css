@@ -1,34 +1,35 @@
 :root {
-  /* Surfaces */
-  --bg-page: #050814;
+  /* Surfaces — light, clean (Social Graph language) */
+  --bg-page: #f8fafc;
+  --bg-secondary: #f1f5f9;
   --bg-card: rgba(255, 255, 255, 0.92);
   --bg-card-strong: rgba(255, 255, 255, 0.96);
-  --bg-card-muted: rgba(255, 255, 255, 0.85);
-  --bg-info: rgba(255, 255, 255, 0.88);
+  --bg-card-muted: rgba(255, 255, 255, 0.88);
+  --bg-info: rgba(255, 255, 255, 0.92);
 
-  /* Text */
+  /* Text — slate scale */
   --text-primary: #1e293b;
-  --text-secondary: #475569;
-  --text-tertiary: #64748b;
+  --text-secondary: #64748b;
+  --text-tertiary: #94a3b8;
 
   /* Accent + states */
-  --accent-primary: #4b7bf5;
-  --accent-primary-strong: #3764e5;
-  --accent-hover: #3f74f7;
+  --accent-primary: #3b82f6;
+  --accent-primary-strong: #2563eb;
+  --accent-hover: #2563eb;
   --accent-candidate: #6c5ce7;
   --accent-candidate-hover: #5b4ad6;
-  --success-color: #34c759;
-  --error-color: #ff3b30;
+  --success-color: #10b981;
+  --error-color: #ef4444;
 
-  /* Borders & shadows */
-  --border-subtle: rgba(12, 18, 37, 0.08);
-  --border-strong: rgba(12, 18, 37, 0.12);
-  --shadow-card: 0 24px 60px -34px rgba(0, 0, 0, 0.55), 0 12px 30px -24px rgba(0, 0, 0, 0.32);
-  --shadow-soft: 0 12px 32px -20px rgba(7, 11, 24, 0.45), 0 6px 16px -12px rgba(7, 11, 24, 0.28);
+  /* Borders & shadows — subtle, Social Graph style */
+  --border-subtle: rgba(0, 0, 0, 0.06);
+  --border-strong: rgba(0, 0, 0, 0.1);
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.06);
+  --shadow-soft: 0 2px 12px rgba(0, 0, 0, 0.04);
 
-  /* Radii */
-  --radius-card: 22px;
-  --radius-chip: 14px;
+  /* Radii — 12px standard */
+  --radius-card: 12px;
+  --radius-chip: 8px;
   --radius-pill: 999px;
 
   /* Spacing scale */
@@ -42,16 +43,7 @@
   --space-8: 32px;
 
   /* Slider */
-  --slider-track: #e4e6ef;
-  --slider-fill: linear-gradient(90deg, #8b5cf6 0%, #6366f1 50%, #3b82f6 100%);
+  --slider-track: #e2e8f0;
+  --slider-fill: linear-gradient(90deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
   --slider-thumb: #ffffff;
-
-  /* Aurora accents (existing) */
-  --aurora-1: #8b5cf6;
-  --aurora-2: #22d3ee;
-  --aurora-3: #7c3aed;
-  --aurora-4: #111827;
 }
-
-
-
