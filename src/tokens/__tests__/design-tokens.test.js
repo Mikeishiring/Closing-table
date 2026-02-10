@@ -35,10 +35,10 @@ describe('design tokens', () => {
   });
 
   it('keeps surface and text palette stable', () => {
-    expect(tokens['--bg-page']).toBe('#050814');
-    expect(tokens['--bg-card']).toBe('rgba(255, 255, 255, 0.82)');
-    expect(tokens['--text-primary']).toBe('#0b0b0f');
-    expect(tokens['--text-secondary']).toBe('#3c3c43');
+    expect(tokens['--bg-page']).toBe('#f8fafc');
+    expect(tokens['--bg-card']).toBe('rgba(255, 255, 255, 0.92)');
+    expect(tokens['--text-primary']).toBe('#1e293b');
+    expect(tokens['--text-secondary']).toBe('#64748b');
   });
 
   it('defines consistent accent and state colors', () => {
@@ -57,19 +57,14 @@ describe('design tokens', () => {
   });
 
   it('keeps slider affordances defined', () => {
-    expect(tokens['--slider-track']).toBe('#e4e6ef');
+    expect(tokens['--slider-track']).toBe('#e2e8f0');
     expect(tokens['--slider-fill']).toMatch(/linear-gradient/i);
     expect(tokens['--slider-thumb']).toBe('#ffffff');
   });
 
-  it('includes aurora accent set for visual flares', () => {
-    const auroraKeys = ['--aurora-1', '--aurora-2', '--aurora-3', '--aurora-4'];
-    auroraKeys.forEach((key) => {
-      expect(tokens[key]).toMatch(/^#|^rgb/i);
-    });
+  it('uses subtle shadows matching Social Graph design', () => {
+    expect(tokens['--shadow-card']).toContain('rgba(0, 0, 0');
+    expect(tokens['--shadow-soft']).toContain('rgba(0, 0, 0');
+    expect(tokens['--border-subtle']).toBe('rgba(0, 0, 0, 0.06)');
   });
 });
-
-
-
-
